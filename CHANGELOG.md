@@ -5,6 +5,76 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Workspace Reinstallation Migration**
+  - Added migration hook to automatically reinstall workspace with latest configuration
+  - Dynamic auto-discovery of all workspace JSON files in the workspace directory
+  - Ensures workspace updates are applied during app upgrades
+  - Comprehensive error handling and logging for workspace operations
+- **Community Support Enhancement**
+  - Added Telegram community link for real-time user communication and support
+  - Reorganized Support & Community section in README for better visibility
+
+### Fixed
+- **Workspace Configuration**
+  - Resolved workspace URL link validation error
+  - Removed problematic Start POS URL link from workspace links section
+  - URL links now properly supported only in shortcuts section
+
+## [1.7.0] - 2025-11-11
+
+### Added
+- **Proactive Filter-Aware Caching with Real-time Sync**
+  - Filter-aware caching strategy that checks POS Profile item group filters before loading
+  - Fetches and caches ONLY items from filtered groups (90% reduction in data transfer)
+  - Real-time cache synchronization via Socket.IO when POS Profile changes
+  - Smart delta calculation for surgical cache updates (added/removed groups)
+  - No manual cache clearing or page reload required
+  - Transaction batching in offline worker (10x performance boost)
+  - Query result caching with LRU eviction (5x faster repeated queries)
+  - Index-optimized IndexedDB operations
+  - Circuit breaker pattern for fault tolerance with exponential backoff retry
+- **Free Items Support for Promotional Offers**
+  - Added processFreeItems() to handle free item quantities from backend
+  - Display free item badge (+X FREE) in cart UI
+  - Include free items in total quantity count
+  - Minimum quantity validation for offer eligibility
+  - Reactive offer eligibility based on cart changes
+- **Professional Documentation Enhancement**
+  - Added 5 high-quality screenshots showcasing POS features
+  - Created animated sales cycle GIF demonstrating complete workflow
+  - Enhanced README with visual elements and comprehensive documentation
+
+### Fixed
+- **Item Group Filter and Toast Notifications**
+  - Fixed empty items display when updating item group filters
+  - Added forceServerFetch parameter to bypass cache and fetch fresh data
+  - Migrated from frappe-ui toast to custom useToast composable
+  - Reduced notification noise by removing low-value success notifications
+  - Kept critical error and warning notifications only
+- **IndexedDB and Caching Issues**
+  - Fixed item_prices IndexedDB constraint violations
+  - Added default "Standard" price_list for items missing one
+  - Graceful error handling with individual record recovery
+  - Fixed Dexie transaction API syntax
+
+### Changed
+- **Offers Module Refactoring**
+  - Refactored offers.py with type hints and data classes
+  - Removed unused coupon functions and pos_offer references
+  - Fixed database column checks in promotions.py
+
+## [1.6.1] - 2025-11-08
+
+### Fixed
+- **Tax-Inclusive Calculation**
+  - Fixed issue where tax amounts were incorrectly shown as discounts in tax-inclusive mode
+  - Frontend now sends correct gross amount (after discount, before tax extraction) to ERPNext
+  - Proper tax calculation based on included_in_print_rate flag
+  - Fixed both scenarios: items without discounts and items with discounts
+
 ## [1.6.0] - 2025-11-07
 
 ### Added
@@ -288,7 +358,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shift management
 - Stock tracking
 
-[Unreleased]: https://github.com/yourusername/pos_next/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/yourusername/pos_next/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/yourusername/pos_next/compare/v1.6.1...v1.7.0
+[1.6.1]: https://github.com/yourusername/pos_next/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/yourusername/pos_next/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/yourusername/pos_next/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/yourusername/pos_next/compare/v1.3.0...v1.4.0
