@@ -1321,12 +1321,14 @@ function handleItemSelected(item, autoAdd = false) {
 	}
 
 	// Check stock availability first (before any dialogs)
-	// Only enforce if negative stock is not allowed
-	if (settingsStore.shouldEnforceStockValidation()) {
+	// Skip validation for batch/serial items - they have their own validation in the dialog
+	// Product Bundles have calculated stock based on component availability
+	if (settingsStore.shouldEnforceStockValidation() && (item.is_stock_item || item.is_bundle) && !item.has_serial_no && !item.has_batch_no) {
 		const actualQty = Math.floor(item.actual_qty ?? item.stock_qty ?? 0)
 
 		if (actualQty <= 0) {
-			showError(`"${item.item_name}" cannot be added to cart. Allow Negative Stock is disabled.`)
+			const itemType = item.is_bundle ? "Bundle" : "Item"
+			showError(`"${item.item_name}" cannot be added to cart. ${itemType} is out of stock. Allow Negative Stock is disabled.`)
 			return
 		}
 	}

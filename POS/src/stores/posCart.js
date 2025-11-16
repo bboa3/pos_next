@@ -62,8 +62,9 @@ export const usePOSCartStore = defineStore("posCart", () => {
 	// Actions
 	function addItem(item, qty = 1, autoAdd = false, currentProfile = null) {
 		// Check stock availability before adding to cart
-		// Only enforce stock validation if negative stock is not allowed
-		if (currentProfile && !autoAdd && settingsStore.shouldEnforceStockValidation()) {
+		// Skip validation for batch/serial items - they have their own validation in the dialog
+		// Check for stock items AND Product Bundles (bundles now have calculated stock)
+		if (currentProfile && !autoAdd && settingsStore.shouldEnforceStockValidation() && (item.is_stock_item || item.is_bundle) && !item.has_serial_no && !item.has_batch_no) {
 			const warehouse = item.warehouse || currentProfile.warehouse
 			const actualQty =
 				item.actual_qty !== undefined ? item.actual_qty : item.stock_qty || 0
@@ -77,6 +78,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 				})
 
 				if (!stockCheck.available) {
+					const itemType = item.is_bundle ? "Bundle" : "Item"
 					const errorMsg = formatStockError(
 						item.item_name,
 						qty,
@@ -84,7 +86,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 						warehouse,
 					)
 
-					throw new Error(errorMsg)
+					throw new Error(errorMsg.replace("Item", itemType))
 				}
 			}
 		}

@@ -201,7 +201,9 @@
 						]"
 					>
 						<!-- Stock Badge - Positioned at top right of card -->
+						<!-- Show for stock items and bundles (bundles now have calculated actual_qty) -->
 						<div
+							v-if="item.is_stock_item || item.is_bundle"
 							:class="[
 								'absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 rounded-md shadow-lg z-10',
 								'px-2 sm:px-2.5 py-1 sm:py-1',
@@ -210,7 +212,7 @@
 								getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).color,
 								getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).textColor
 							]"
-							:title="`${getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).label}: ${Math.floor(item.actual_qty ?? item.stock_qty ?? 0)} ${item.uom || item.stock_uom || 'Nos'}`"
+							:title="`${getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).label}: ${Math.floor(item.actual_qty ?? item.stock_qty ?? 0)} ${item.is_bundle ? 'Bundles' : (item.uom || item.stock_uom || 'Nos')}`"
 						>
 							{{ Math.floor(item.actual_qty ?? item.stock_qty ?? 0) }}
 						</div>
@@ -277,8 +279,8 @@
 					<p class="ml-2 text-xs text-gray-500">Loading more items...</p>
 				</div>
 
-				<!-- End of Results Indicator - Only show when browsing (not searching) -->
-				<div v-else-if="!hasMore && filteredItems.length > 0 && !searchTerm" class="flex justify-center items-center py-3">
+				<!-- End of Results Indicator - Only show on last page or when all items fit in one page -->
+				<div v-else-if="!hasMore && filteredItems.length > 0 && !searchTerm && (currentPage === totalPages || totalPages === 1)" class="flex justify-center items-center py-3">
 					<p class="text-xs text-gray-400">All items loaded</p>
 				</div>
 
@@ -295,6 +297,20 @@
 						{{ ((currentPage - 1) * itemsPerPage) + 1 }}-{{ Math.min(currentPage * itemsPerPage, filteredItems.length) }} of {{ filteredItems.length }}
 					</div>
 					<div class="flex items-center space-x-1 order-1 sm:order-2">
+						<button
+							@click="goToPage(1)"
+							:disabled="currentPage === 1"
+							:class="[
+								'px-2 sm:px-3 py-1.5 text-[10px] sm:text-xs font-medium rounded-lg border transition-[background-color] duration-75 touch-manipulation',
+								currentPage === 1
+									? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+									: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
+							]"
+							:aria-label="'Go to first page'"
+						>
+							<span class="hidden xs:inline">First</span>
+							<span class="xs:hidden">«</span>
+						</button>
 						<button
 							@click="previousPage"
 							:disabled="currentPage === 1"
@@ -338,6 +354,20 @@
 						>
 							<span class="hidden xs:inline">Next</span>
 							<span class="xs:hidden">›</span>
+						</button>
+						<button
+							@click="goToPage(totalPages)"
+							:disabled="currentPage === totalPages"
+							:class="[
+								'px-2 sm:px-3 py-1.5 text-[10px] sm:text-xs font-medium rounded-lg border transition-[background-color] duration-75 touch-manipulation',
+								currentPage === totalPages
+									? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+									: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
+							]"
+							:aria-label="'Go to last page'"
+						>
+							<span class="hidden xs:inline">Last</span>
+							<span class="xs:hidden">»</span>
 						</button>
 					</div>
 				</div>
@@ -406,15 +436,22 @@
 							</td>
 							<td class="px-2 sm:px-3 py-2 whitespace-nowrap w-[70px] sm:w-[100px]">
 								<span
+									v-if="item.is_stock_item || item.is_bundle"
 									:class="[
 										'inline-block px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-md shadow-sm',
 										'text-[10px] sm:text-sm font-bold',
 										getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).color,
 										getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).textColor
 									]"
-									:title="`${getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).label}: ${Math.floor(item.actual_qty ?? item.stock_qty ?? 0)} ${item.uom || item.stock_uom || 'Nos'}`"
+									:title="`${getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).label}: ${Math.floor(item.actual_qty ?? item.stock_qty ?? 0)} ${item.is_bundle ? 'Bundles' : (item.uom || item.stock_uom || 'Nos')}`"
 								>
 									{{ Math.floor(item.actual_qty ?? item.stock_qty ?? 0) }}
+								</span>
+								<span
+									v-else
+									class="text-xs sm:text-sm text-gray-400 italic"
+								>
+									N/A
 								</span>
 							</td>
 							<td class="hidden md:table-cell px-2 sm:px-3 py-2 whitespace-nowrap md:w-[80px]">
@@ -431,8 +468,8 @@
 							</td>
 						</tr>
 
-						<!-- End of Results Indicator Row - Only show when browsing (not searching) -->
-						<tr v-else-if="!hasMore && filteredItems.length > 0 && !searchTerm">
+						<!-- End of Results Indicator Row - Only show on last page or when all items fit in one page -->
+						<tr v-else-if="!hasMore && filteredItems.length > 0 && !searchTerm && (currentPage === totalPages || totalPages === 1)">
 							<td colspan="6" class="px-2 sm:px-3 py-3 text-center bg-white">
 								<p class="text-xs text-gray-400">All items loaded</p>
 							</td>
@@ -455,6 +492,20 @@
 						{{ ((currentPage - 1) * itemsPerPage) + 1 }}-{{ Math.min(currentPage * itemsPerPage, filteredItems.length) }} of {{ filteredItems.length }}
 					</div>
 					<div class="flex items-center space-x-1 order-1 sm:order-2">
+						<button
+							@click="goToPage(1)"
+							:disabled="currentPage === 1"
+							:class="[
+								'px-2 sm:px-3 py-1.5 text-[10px] sm:text-xs font-medium rounded-lg border transition-[background-color] duration-75 touch-manipulation',
+								currentPage === 1
+									? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+									: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
+							]"
+							:aria-label="'Go to first page'"
+						>
+							<span class="hidden xs:inline">First</span>
+							<span class="xs:hidden">«</span>
+						</button>
 						<button
 							@click="previousPage"
 							:disabled="currentPage === 1"
@@ -498,6 +549,20 @@
 						>
 							<span class="hidden xs:inline">Next</span>
 							<span class="xs:hidden">›</span>
+						</button>
+						<button
+							@click="goToPage(totalPages)"
+							:disabled="currentPage === totalPages"
+							:class="[
+								'px-2 sm:px-3 py-1.5 text-[10px] sm:text-xs font-medium rounded-lg border transition-[background-color] duration-75 touch-manipulation',
+								currentPage === totalPages
+									? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+									: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
+							]"
+							:aria-label="'Go to last page'"
+						>
+							<span class="hidden xs:inline">Last</span>
+							<span class="xs:hidden">»</span>
 						</button>
 					</div>
 				</div>
@@ -839,10 +904,12 @@ function handleItemClick(itemCode) {
 	if (!item) return
 
 	// Check stock availability and show error if needed, but still emit the event
-	// The parent component (POSSale.vue) will handle the actual validation
+	// Skip validation for batch/serial items - they have their own validation in the dialog
+	// Check stock for stock items AND Product Bundles (bundles now have calculated stock)
 	const qty = Math.floor(item.actual_qty ?? item.stock_qty ?? 0)
-	if (qty <= 0 && settingsStore.shouldEnforceStockValidation()) {
-		showError(`"${item.item_name}" cannot be added to cart. Allow Negative Stock is disabled.`)
+	if ((item.is_stock_item || item.is_bundle) && !item.has_serial_no && !item.has_batch_no && qty <= 0 && settingsStore.shouldEnforceStockValidation()) {
+		const itemType = item.is_bundle ? "Bundle" : "Item"
+		showError(`"${item.item_name}" cannot be added to cart. ${itemType} is out of stock. Allow Negative Stock is disabled.`)
 		return
 	}
 

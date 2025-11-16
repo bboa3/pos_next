@@ -49,38 +49,161 @@ def get_stock_availability(item_code, warehouse):
 
 
 def get_item_detail(item, doc=None, warehouse=None, price_list=None, company=None):
-	"""Get item detail with batch/serial data and pricing"""
+	"""
+	Get comprehensive item details including batch/serial data, pricing, and stock information.
+
+	This function enriches basic item data with real-time information needed for POS transactions:
+	- Batch numbers with expiry dates (for batch-tracked items)
+	- Serial numbers (for serial-tracked items)
+	- Pricing with multi-currency support
+	- UOM conversions
+	- Stock availability
+	- Item attributes (group, brand)
+
+	Batch Tracking:
+	===============
+	For items with has_batch_no=1, returns all active batches with:
+	- Available quantity per batch
+	- Expiry dates (excludes expired batches)
+	- Manufacturing dates
+	- Only includes batches with qty > 0 and not disabled
+
+	Serial Number Tracking:
+	=======================
+	For items with has_serial_no=1, returns all available serial numbers:
+	- Only Active serial numbers
+	- From specified warehouse only
+	- Serial numbers are unique identifiers for individual units
+
+	Multi-Currency Pricing:
+	=======================
+	Handles price lists in different currencies with automatic conversion:
+	- Fetches exchange rates from price list currency to company currency
+	- Applies conversion factors (plc_conversion_rate)
+	- Falls back to 1:1 if exchange rate unavailable (with error logging)
+
+	UOM (Unit of Measure) Handling:
+	================================
+	Returns all UOM conversions for the item:
+	- Stock UOM (base unit)
+	- Alternative UOMs with conversion factors
+	- Example: Item sold in "Box" but stocked in "Pcs" (1 Box = 12 Pcs)
+
+	Args:
+		item (dict|str): Item data dict or JSON string with at least:
+						 - item_code: Item identifier (required)
+						 - has_batch_no: 1 if batch tracked
+						 - has_serial_no: 1 if serial tracked
+						 - qty: Quantity (default: 1)
+		doc (frappe.Document, optional): Sales Invoice document for context
+		warehouse (str, optional): Warehouse for stock/batch/serial lookup
+		price_list (str, optional): Selling price list name
+		company (str, optional): Company for currency conversion
+
+	Returns:
+		dict: Enriched item details containing:
+			  - All ERPNext item_details (rate, tax, etc.)
+			  - actual_qty: Stock available in warehouse
+			  - batch_no_data: List of available batches with expiry dates
+			  - serial_no_data: List of available serial numbers
+			  - max_discount: Maximum discount allowed
+			  - item_uoms: Alternative UOMs with conversion factors
+			  - item_group, brand: For offer eligibility checking
+
+	Example:
+		>>> item = {
+		... 	"item_code": "LAPTOP-001",
+		... 	"has_serial_no": 1,
+		... 	"qty": 1
+		... }
+		>>> details = get_item_detail(
+		... 	item=json.dumps(item),
+		... 	warehouse="Main Store",
+		... 	price_list="Standard Selling",
+		... 	company="My Company"
+		... )
+		>>> print(details["serial_no_data"])
+		[{"serial_no": "SN001"}, {"serial_no": "SN002"}]
+
+	Database Queries:
+		- Batches: 1 query (only if has_batch_no=1)
+		- Serial Numbers: 1 query (only if has_serial_no=1)
+		- Item Details: 1 query via ERPNext's get_item_details
+		- Stock: 1 query (only if is_stock_item=1)
+		- UOMs: 1 query for conversion details
+		Total: 2-5 queries depending on item type
+	"""
+	# Parse item data (accept both JSON string and dict)
 	item = json.loads(item) if isinstance(item, str) else item
 	today = nowdate()
 	item_code = item.get("item_code")
 	batch_no_data = []
 	serial_no_data = []
 
+	# ===========================================================================
+	# BATCH TRACKING: Get available batches with expiry filtering
+	# ===========================================================================
+	# For batch-tracked items (e.g., medicines, perishables), return only:
+	# 1. Batches with qty > 0 (available stock)
+	# 2. Non-expired batches (expiry_date > today or no expiry)
+	# 3. Enabled batches (disabled = 0)
+	#
+	# Sorted by: Expiry date (FIFO - First to Expire, First Out)
+	#
+	# Use Case: POS cashier selects batch when adding item to cart
+	# Example: Medicine "ABC" has 3 batches:
+	#   - Batch A: 50 qty, expires in 2 days → INCLUDED (sell first!)
+	#   - Batch B: 100 qty, expires in 30 days → INCLUDED
+	#   - Batch C: 20 qty, expired yesterday → EXCLUDED
 	if warehouse and item.get("has_batch_no"):
+		# Get all batches with available quantity for this item in warehouse
 		batch_list = get_batch_qty(warehouse=warehouse, item_code=item_code)
 		if batch_list:
 			for batch in batch_list:
+				# Filter 1: Only batches with available stock
 				if batch.qty > 0 and batch.batch_no:
+					# Fetch batch metadata (expiry, manufacturing dates, disabled status)
 					batch_doc = frappe.get_cached_doc("Batch", batch.batch_no)
-					if (
-						str(batch_doc.expiry_date) > str(today) or batch_doc.expiry_date in ["", None]
-					) and batch_doc.disabled == 0:
-						batch_no_data.append(
-							{
-								"batch_no": batch.batch_no,
-								"batch_qty": batch.qty,
-								"expiry_date": batch_doc.expiry_date,
-								"manufacturing_date": batch_doc.manufacturing_date,
-							}
-						)
 
+					# Filter 2: Exclude expired batches
+					# Filter 3: Exclude disabled batches
+					is_not_expired = (
+						str(batch_doc.expiry_date) > str(today)
+						or batch_doc.expiry_date in ["", None]
+					)
+					is_enabled = batch_doc.disabled == 0
+
+					if is_not_expired and is_enabled:
+						batch_no_data.append({
+							"batch_no": batch.batch_no,
+							"batch_qty": batch.qty,
+							"expiry_date": batch_doc.expiry_date,
+							"manufacturing_date": batch_doc.manufacturing_date,
+						})
+
+	# ===========================================================================
+	# SERIAL NUMBER TRACKING: Get available serial numbers
+	# ===========================================================================
+	# For serial-tracked items (e.g., laptops, phones), return only:
+	# 1. Serial numbers with status = "Active" (not sold/scrapped)
+	# 2. Serial numbers in the specified warehouse
+	#
+	# Serial numbers are unique identifiers for individual item units.
+	# Each serial number can only be sold once.
+	#
+	# Use Case: POS cashier scans or selects serial number when selling
+	# Example: Laptop "XYZ" has serial numbers:
+	#   - SN001 (Active, Main Store) → INCLUDED
+	#   - SN002 (Active, Main Store) → INCLUDED
+	#   - SN003 (Delivered, Main Store) → EXCLUDED (already sold)
+	#   - SN004 (Active, Branch Store) → EXCLUDED (different warehouse)
 	if warehouse and item.get("has_serial_no"):
 		serial_no_data = frappe.get_all(
 			"Serial No",
 			filters={
 				"item_code": item_code,
-				"status": "Active",
-				"warehouse": warehouse,
+				"status": "Active",  # Only available serial numbers
+				"warehouse": warehouse,  # From specified warehouse only
 			},
 			fields=["name as serial_no"],
 		)
@@ -495,6 +618,193 @@ def _build_item_base_conditions(pos_profile_doc, item_group=None):
 	return conditions, params
 
 
+def _calculate_bundle_availability_bulk(bundle_codes, warehouse):
+	"""
+	Calculate Product Bundle availability in bulk with component-based calculation.
+
+	This function determines how many complete bundles can be assembled based on
+	available component stock. It uses available_qty (actual - reserved) to prevent
+	overselling and supports group warehouses for hierarchical stock tracking.
+
+	Product Bundle Availability Logic:
+	=====================================
+	A bundle's availability is limited by its MOST CONSTRAINED component.
+
+	Example:
+		Bundle: "Laptop Combo"
+		Components:
+			- Laptop (need 1) → available: 50 units → can make 50 bundles
+			- Mouse (need 1) → available: 30 units → can make 30 bundles ← LIMITING
+			- Keyboard (need 1) → available: 100 units → can make 100 bundles
+
+		Result: Bundle availability = 30 (limited by Mouse stock)
+
+	Stock Calculation:
+	==================
+	Uses AVAILABLE quantity (actual_qty - reserved_qty) instead of actual_qty
+	to prevent overselling when items are reserved in other pending orders.
+
+	Performance Optimization:
+	=========================
+	- Single bulk query for all bundle components
+	- Single bulk query for all component stock levels
+	- Handles multiple bundles simultaneously
+	- Supports group warehouses (auto-expands to child warehouses)
+
+	Group Warehouse Support:
+	========================
+	If warehouse is a group warehouse, automatically includes stock from all
+	child warehouses in the calculation. This provides accurate availability
+	across multiple storage locations.
+
+	Args:
+		bundle_codes (list): List of bundle item codes to check
+		warehouse (str): Warehouse name (supports group warehouses)
+
+	Returns:
+		dict: Mapping of bundle_code -> available_quantity
+			  Example: {"BUNDLE-001": 30, "BUNDLE-002": 15}
+			  Returns empty dict if no bundles or warehouse not provided
+
+	Example Usage:
+		>>> bundles = ["LAPTOP-COMBO", "DESKTOP-BUNDLE"]
+		>>> availability = _calculate_bundle_availability_bulk(bundles, "Stores - WH")
+		>>> print(availability)
+		{"LAPTOP-COMBO": 30, "DESKTOP-BUNDLE": 15}
+
+	Database Queries:
+		1. Fetch all bundle components (1 query for all bundles)
+		2. Fetch stock for all components (1 query for all items)
+		Total: 2 queries regardless of number of bundles
+
+	Edge Cases:
+		- No bundles: Returns {}
+		- No warehouse: Returns {}
+		- Component with 0 stock: Bundle availability = 0
+		- Component not in stock table: Treated as 0 availability
+		- Group warehouse with no children: Falls back to warehouse itself
+	"""
+	# ===========================================================================
+	# GUARD CLAUSE: Validate inputs
+	# ===========================================================================
+	if not bundle_codes or not warehouse:
+		return {}
+
+	# ===========================================================================
+	# STEP 1: Fetch Bundle Component Definitions
+	# ===========================================================================
+	# Query all bundle definitions and their components in a single query.
+	# This is more efficient than querying each bundle separately.
+	#
+	# Example Result:
+	# [
+	#   {"bundle_code": "LAPTOP-COMBO", "component_code": "LAPTOP", "required_qty": 1},
+	#   {"bundle_code": "LAPTOP-COMBO", "component_code": "MOUSE", "required_qty": 1},
+	#   {"bundle_code": "LAPTOP-COMBO", "component_code": "KEYBOARD", "required_qty": 1}
+	# ]
+	bundle_components = frappe.db.sql("""
+		SELECT
+			pb.new_item_code as bundle_code,
+			pbi.item_code as component_code,
+			pbi.qty as required_qty
+		FROM `tabProduct Bundle` pb
+		INNER JOIN `tabProduct Bundle Item` pbi ON pbi.parent = pb.name
+		WHERE pb.new_item_code IN %(bundles)s
+	""", {"bundles": bundle_codes}, as_dict=1)
+
+	if not bundle_components:
+		# No bundle definitions found - items are not configured as bundles
+		return {}
+
+	# ===========================================================================
+	# STEP 2: Extract Unique Component Codes
+	# ===========================================================================
+	# Get all unique component item codes needed across all bundles.
+	# This allows us to fetch stock for all components in a single query.
+	#
+	# Example: {"LAPTOP", "MOUSE", "KEYBOARD", "MONITOR", "CABLE"}
+	component_codes = list(set(c["component_code"] for c in bundle_components))
+
+	# ===========================================================================
+	# STEP 3: Resolve Warehouse Hierarchy (Group Warehouse Support)
+	# ===========================================================================
+	# If the warehouse is a group warehouse, expand to include all child warehouses.
+	# This provides accurate stock availability across multiple storage locations.
+	#
+	# Example:
+	#   Input: "Main Store" (group warehouse)
+	#   Output: ["Main Store - A", "Main Store - B", "Main Store - C"]
+	warehouses = [warehouse]
+	if frappe.db.get_value("Warehouse", warehouse, "is_group"):
+		child_warehouses = frappe.db.get_descendants("Warehouse", warehouse)
+		# Fallback to original warehouse if no children found
+		warehouses = child_warehouses or [warehouse]
+
+	# ===========================================================================
+	# STEP 4: Fetch Stock Availability for All Components (Bulk Query)
+	# ===========================================================================
+	# Query stock for all component items across all warehouses in ONE query.
+	# Uses available_qty (actual - reserved) to prevent overselling.
+	#
+	# Performance: Single query handles all components regardless of count
+	# Formula: available_qty = actual_qty - reserved_qty
+	#
+	# Example Result:
+	# [
+	#   {"item_code": "LAPTOP", "available_qty": 50.0},
+	#   {"item_code": "MOUSE", "available_qty": 30.0},
+	#   {"item_code": "KEYBOARD", "available_qty": 100.0}
+	# ]
+	component_stock = frappe.db.sql("""
+		SELECT
+			item_code,
+			COALESCE(SUM(actual_qty - reserved_qty), 0) as available_qty
+		FROM `tabBin`
+		WHERE item_code IN %(items)s AND warehouse IN %(warehouses)s
+		GROUP BY item_code
+	""", {"items": component_codes, "warehouses": warehouses}, as_dict=1)
+
+	# Build fast lookup map: item_code -> available_qty
+	# Components not in map are treated as having 0 stock
+	component_stock_map = {row["item_code"]: flt(row["available_qty"]) for row in component_stock}
+
+	# ===========================================================================
+	# STEP 5: Calculate Bundle Availability (Limited by Most Constrained Component)
+	# ===========================================================================
+	# For each bundle, determine how many complete bundles can be made based on
+	# component availability. The bundle quantity is limited by whichever
+	# component can make the FEWEST bundles.
+	#
+	# Formula: possible_bundles = floor(available_qty / required_qty)
+	# Final: bundle_qty = min(possible_bundles across all components)
+	#
+	# Example:
+	#   LAPTOP-COMBO components:
+	#     - LAPTOP (need 1): 50 available → 50 possible bundles
+	#     - MOUSE (need 1): 30 available → 30 possible bundles ← LIMITING FACTOR
+	#     - KEYBOARD (need 1): 100 available → 100 possible bundles
+	#   Result: LAPTOP-COMBO availability = 30 (limited by MOUSE)
+	bundle_availability = {}
+	for comp in bundle_components:
+		bundle_code = comp["bundle_code"]
+		available = component_stock_map.get(comp["component_code"], 0)
+		required = flt(comp["required_qty"])
+
+		if required > 0:
+			# Calculate how many bundles this component can supply
+			possible = int(available / required)
+
+			# Update bundle availability with minimum across all components
+			if bundle_code not in bundle_availability:
+				# First component for this bundle
+				bundle_availability[bundle_code] = possible
+			else:
+				# Subsequent components - take minimum (most constrained)
+				bundle_availability[bundle_code] = min(bundle_availability[bundle_code], possible)
+
+	return bundle_availability
+
+
 @frappe.whitelist()
 def get_items(pos_profile, search_term=None, item_group=None, start=0, limit=20):
 	"""Get items for POS with stock, price, and tax details"""
@@ -657,6 +967,40 @@ def get_items(pos_profile, search_term=None, item_group=None, start=0, limit=20)
 				)
 				stock_map = {s["item_code"]: s["actual_qty"] for s in stocks}
 
+		# ===================================================================
+		# PRODUCT BUNDLE AVAILABILITY: Calculate bundle stock (bulk optimized)
+		# ===================================================================
+		# Product Bundles are "virtual" items assembled from component items.
+		# Unlike regular stock items, bundles don't have direct stock entries.
+		# Instead, availability is calculated from component stock levels.
+		#
+		# Example:
+		#   Bundle: "Office Starter Kit"
+		#   Components:
+		#     - Desk (need 1, have 10) → can make 10 bundles
+		#     - Chair (need 2, have 15) → can make 7 bundles ← LIMITING
+		#     - Lamp (need 1, have 20) → can make 20 bundles
+		#   Result: Bundle availability = 7 (limited by chairs)
+		#
+		# Performance: Single bulk calculation for ALL bundles (not per-item)
+		# This is done BEFORE the item enrichment loop for efficiency.
+		bundle_availability_map = {}
+		if item_codes and pos_profile_doc.warehouse:
+			# Bulk calculate availability for all items (bundles auto-detected)
+			bundle_availability_map = _calculate_bundle_availability_bulk(
+				item_codes,
+				pos_profile_doc.warehouse
+			)
+		elif item_codes and not pos_profile_doc.warehouse:
+			# Warning: Bundles require warehouse for component stock lookup
+			# Without warehouse, bundles will show as unavailable (qty = 0)
+			has_bundles = frappe.db.exists("Product Bundle", {"new_item_code": ["in", item_codes]})
+			if has_bundles:
+				frappe.log_error(
+					"POS Profile missing warehouse - Product Bundles will show as unavailable",
+					"Bundle Availability Warning"
+				)
+
 		# Enrich items with price, stock, barcode, and UOM data
 		for item in items:
 			stock_uom = item.get("stock_uom")
@@ -727,8 +1071,46 @@ def get_items(pos_profile, search_term=None, item_group=None, start=0, limit=20)
 			item["conversion_factor"] = 1
 			item["price_list_rate_price_uom"] = display_rate
 
-			# Stock - use pre-loaded stock map (performance optimization)
-			item["actual_qty"] = stock_map.get(item["item_code"], 0) if item.get("is_stock_item") else 0
+			# ===================================================================
+			# STOCK QUANTITY ASSIGNMENT: Stock Items vs Product Bundles
+			# ===================================================================
+			# Stock items: Use actual_qty from Bin table (direct stock tracking)
+			# Product Bundles: Use calculated availability from component stock
+			#
+			# Decision Logic:
+			#   IF item.is_stock_item == 1:
+			#     actual_qty = stock from Bin table (or 0 if not in stock)
+			#   ELSE:
+			#     actual_qty = bundle availability (or 0 if not a bundle)
+			#
+			# Example 1 - Stock Item (Laptop):
+			#   is_stock_item = 1
+			#   actual_qty = 50 (from Bin table)
+			#
+			# Example 2 - Product Bundle (Office Kit):
+			#   is_stock_item = 0 (bundles are not stock items)
+			#   actual_qty = 7 (calculated from components)
+			#
+			# Example 3 - Service Item (Consulting):
+			#   is_stock_item = 0
+			#   actual_qty = 0 (not a bundle, no stock tracking)
+			item["actual_qty"] = (
+				stock_map.get(item["item_code"], 0)
+				if item.get("is_stock_item")
+				else bundle_availability_map.get(item["item_code"], 0)
+			)
+
+			# ===================================================================
+			# BUNDLE MARKER: Flag items that are Product Bundles
+			# ===================================================================
+			# Add is_bundle=True flag for frontend to identify bundle items.
+			# This allows UI to show bundle-specific indicators and handle
+			# bundle logic differently (e.g., show component details on click).
+			#
+			# Bundle Detection: If item_code exists in bundle_availability_map,
+			# it means a Product Bundle definition exists for this item.
+			if item["item_code"] in bundle_availability_map:
+				item["is_bundle"] = True
 
 			# Add warehouse to item (needed for stock validation)
 			item["warehouse"] = pos_profile_doc.warehouse
@@ -901,14 +1283,25 @@ def get_stock_quantities(item_codes, warehouse):
 		)
 
 		# Create a lookup for items that have stock entries
-		stock_lookup = {row["item_code"]: row for row in stock_rows}
+		item_stock_map = {row["item_code"]: row for row in stock_rows}
 
-		# Return stock for all requested items (0 if not in Bin table)
+		# Get bundle availability for non-stock items (bulk optimized)
+		bundle_availability_map = _calculate_bundle_availability_bulk(normalized_codes, warehouse)
+
+		# Return stock for all requested items
 		result = []
 		for item_code in normalized_codes:
-			row = stock_lookup.get(item_code)
-			actual_qty = flt(row["actual_qty"]) if row else 0.0
-			reserved_qty = flt(row["reserved_qty"]) if row else 0.0
+			# Check if it's a bundle
+			if item_code in bundle_availability_map:
+				# Bundle item - use calculated availability
+				actual_qty = flt(bundle_availability_map[item_code])
+				reserved_qty = 0.0
+			else:
+				# Regular item - use Bin data
+				row = item_stock_map.get(item_code)
+				actual_qty = flt(row["actual_qty"]) if row else 0.0
+				reserved_qty = flt(row["reserved_qty"]) if row else 0.0
+
 			result.append(
 				{
 					"item_code": item_code,
@@ -925,3 +1318,94 @@ def get_stock_quantities(item_codes, warehouse):
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "Get Stock Quantities Error")
 		frappe.throw(_("Error fetching stock quantities: {0}").format(str(e)))
+
+
+@frappe.whitelist()
+def get_product_bundle_availability(item_code, warehouse):
+	"""
+	Get Product Bundle availability with detailed component information.
+	Uses available_qty (actual - reserved) to prevent overselling.
+
+	Returns:
+		{
+			"available_qty": int,
+			"components": [
+				{
+					"item_code": str,
+					"item_name": str,
+					"required_qty": float,
+					"available_qty": float,
+					"possible_bundles": int,
+					"uom": str,
+					"is_limiting": bool  # True if this component limits bundle qty
+				}
+			]
+		}
+	"""
+	try:
+		# Use bulk calculation for single bundle
+		bundle_availability = _calculate_bundle_availability_bulk([item_code], warehouse)
+		available_qty = bundle_availability.get(item_code, 0)
+
+		# Get detailed component information with item names (single query with JOIN)
+		components = frappe.db.sql("""
+			SELECT
+				pbi.item_code,
+				i.item_name,
+				pbi.qty as required_qty,
+				pbi.uom
+			FROM `tabProduct Bundle Item` pbi
+			INNER JOIN `tabItem` i ON i.name = pbi.item_code
+			WHERE pbi.parent = %(bundle)s
+			ORDER BY pbi.idx
+		""", {"bundle": item_code}, as_dict=1)
+
+		if not components:
+			return {"available_qty": 0, "components": []}
+
+		# Get warehouses (support group warehouses)
+		warehouses = [warehouse]
+		if frappe.db.get_value("Warehouse", warehouse, "is_group"):
+			warehouses = frappe.db.get_descendants("Warehouse", warehouse) or [warehouse]
+
+		# Get component stock (use available = actual - reserved)
+		component_codes = [c["item_code"] for c in components]
+		stock_data = frappe.db.sql("""
+			SELECT
+				item_code,
+				COALESCE(SUM(actual_qty - reserved_qty), 0) as available_qty
+			FROM `tabBin`
+			WHERE item_code IN %(items)s AND warehouse IN %(warehouses)s
+			GROUP BY item_code
+		""", {"items": component_codes, "warehouses": warehouses}, as_dict=1)
+
+		component_stock_map = {row["item_code"]: flt(row["available_qty"]) for row in stock_data}
+
+		# Build component details with limiting indicator
+		component_details = []
+		for comp in components:
+			available = component_stock_map.get(comp["item_code"], 0)
+			required = flt(comp["required_qty"])
+			possible = int(available / required) if required > 0 else 0
+
+			component_details.append({
+				"item_code": comp["item_code"],
+				"item_name": comp["item_name"],
+				"required_qty": required,
+				"available_qty": available,
+				"possible_bundles": possible,
+				"uom": comp["uom"],
+				"is_limiting": (possible == available_qty)  # Mark limiting component
+			})
+
+		return {
+			"available_qty": available_qty,
+			"components": component_details
+		}
+
+	except Exception as e:
+		frappe.log_error(
+			frappe.get_traceback(),
+			f"Bundle Availability Error: {item_code} in {warehouse}"
+		)
+		frappe.throw(_("Error fetching bundle availability for {0}: {1}").format(item_code, str(e)))
