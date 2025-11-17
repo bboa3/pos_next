@@ -87,7 +87,7 @@ function printInvoiceCustom(invoiceData) {
 		<html>
 		<head>
 			<meta charset="UTF-8">
-			<title>Invoice - ${invoiceData.name}</title>
+			<title>${__('Invoice - {0}', [invoiceData.name])}</title>
 			<style>
 				* {
 					margin: 0;
@@ -254,24 +254,24 @@ function printInvoiceCustom(invoiceData) {
 				<!-- Header -->
 				<div class="header">
 					<div class="company-name">${invoiceData.company || "POS Next"}</div>
-					<div style="font-size: 12px;">TAX INVOICE</div>
+					<div style="font-size: 12px;">${__('TAX INVOICE')}</div>
 				</div>
 
 				<!-- Invoice Info -->
 				<div class="invoice-info">
 					<div>
-						<span>Invoice #:</span>
+						<span>${__('Invoice #:')}</span>
 						<span><strong>${invoiceData.name}</strong></span>
 					</div>
 					<div>
-						<span>Date:</span>
+						<span>${__('Date:')}</span>
 						<span>${new Date(invoiceData.posting_date || Date.now()).toLocaleString()}</span>
 					</div>
 					${
 						invoiceData.customer_name
 							? `
 					<div>
-						<span>Customer:</span>
+						<span>${__('Customer:')}</span>
 						<span>${invoiceData.customer_name}</span>
 					</div>
 					`
@@ -281,8 +281,8 @@ function printInvoiceCustom(invoiceData) {
 						(invoiceData.status === "Partly Paid" || (invoiceData.outstanding_amount && invoiceData.outstanding_amount > 0 && invoiceData.outstanding_amount < invoiceData.grand_total))
 							? `
 					<div class="partial-status">
-						<span>Status:</span>
-						<span>PARTIAL PAYMENT</span>
+						<span>${__('Status:')}</span>
+						<span>${__('PARTIAL PAYMENT')}</span>
 					</div>
 					`
 							: ""
@@ -310,7 +310,7 @@ function printInvoiceCustom(invoiceData) {
 							return `
 						<div class="item-row">
 							<div class="item-name">
-								${item.item_name || item.item_code}${isFree ? " (FREE)" : ""}
+								${item.item_name || item.item_code} ${isFree ? __('(FREE)') : ""}
 							</div>
 							<div class="item-details">
 								<span>${qty} × ${formatCurrency(displayRate)}</span>
@@ -339,11 +339,11 @@ function printInvoiceCustom(invoiceData) {
 						invoiceData.total_taxes_and_charges > 0
 							? `
 					<div class="total-row">
-						<span>Subtotal:</span>
+						<span>${__('Subtotal:')}</span>
 						<span>${formatCurrency((invoiceData.grand_total || 0) - (invoiceData.total_taxes_and_charges || 0))}</span>
 					</div>
 					<div class="total-row">
-						<span>Tax:</span>
+						<span>${__('Tax:')}</span>
 						<span>${formatCurrency(invoiceData.total_taxes_and_charges)}</span>
 					</div>
 					`
@@ -360,7 +360,7 @@ function printInvoiceCustom(invoiceData) {
 							: ""
 					}
 					<div class="total-row grand-total">
-						<span>TOTAL:</span>
+						<span>${__('TOTAL:')}</span>
 						<span>${formatCurrency(invoiceData.grand_total)}</span>
 					</div>
 				</div>
@@ -382,14 +382,14 @@ function printInvoiceCustom(invoiceData) {
 						)
 						.join("")}
 					<div class="payment-row total-paid">
-						<span>Total Paid:</span>
+						<span>${__('Total Paid:')}</span>
 						<span>${formatCurrency(invoiceData.paid_amount || 0)}</span>
 					</div>
 					${
 						invoiceData.change_amount && invoiceData.change_amount > 0
 							? `
 					<div class="payment-row" style="font-weight: bold; margin-top: 5px;">
-						<span>Change:</span>
+						<span>${__('Change:')}</span>
 						<span>${formatCurrency(invoiceData.change_amount)}</span>
 					</div>
 					`
@@ -399,7 +399,7 @@ function printInvoiceCustom(invoiceData) {
 						invoiceData.outstanding_amount && invoiceData.outstanding_amount > 0
 							? `
 					<div class="outstanding-row">
-						<span>BALANCE DUE:</span>
+						<span>${__('BALANCE DUE:')}</span>
 						<span>${formatCurrency(invoiceData.outstanding_amount)}</span>
 					</div>
 					`
@@ -412,17 +412,17 @@ function printInvoiceCustom(invoiceData) {
 
 				<!-- Footer -->
 				<div class="footer">
-					<div style="margin-bottom: 5px;">Thank you for your business!</div>
+					<div style="margin-bottom: 5px;">${__('Thank you for your business!')}</div>
 					<div style="font-size: 10px;">Powered by <a href="https://nexus.brainwise.me" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: 600;">BrainWise</a></div>
 				</div>
 			</div>
 
 			<div class="no-print" style="text-align: center; margin-top: 20px;">
 				<button onclick="window.print()" style="padding: 10px 20px; font-size: 14px; cursor: pointer;">
-					Print Receipt
+					${__('Print Receipt')}
 				</button>
 				<button onclick="window.close()" style="padding: 10px 20px; font-size: 14px; cursor: pointer; margin-left: 10px;">
-					Close
+					${__('Close')}
 				</button>
 			</div>
 		</body>

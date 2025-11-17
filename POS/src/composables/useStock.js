@@ -26,7 +26,7 @@ export function useStock() {
 				level: "negative",
 				color: "bg-red-500",
 				textColor: "text-white",
-				label: "Negative Stock",
+				label: __("Negative Stock"),
 			}
 		}
 
@@ -35,7 +35,7 @@ export function useStock() {
 				level: "out",
 				color: "bg-red-500",
 				textColor: "text-white",
-				label: "Out of Stock",
+				label: __("Out of Stock"),
 			}
 		}
 
@@ -44,7 +44,7 @@ export function useStock() {
 				level: "low",
 				color: "bg-amber-500",
 				textColor: "text-white",
-				label: "Low Stock",
+				label: __("Low Stock"),
 			}
 		}
 
@@ -52,7 +52,7 @@ export function useStock() {
 			level: "safe",
 			color: "bg-green-500",
 			textColor: "text-white",
-			label: "In Stock",
+			label: __("In Stock"),
 		}
 	}
 

@@ -26,7 +26,7 @@ export const usePOSDraftsStore = defineStore("posDrafts", () => {
 		appliedOffers = [],
 	) {
 		if (invoiceItems.length === 0) {
-			showWarning("Cannot save an empty cart as draft")
+			showWarning(__("Cannot save an empty cart as draft"))
 			return false
 		}
 
@@ -41,12 +41,12 @@ export const usePOSDraftsStore = defineStore("posDrafts", () => {
 			await saveDraft(draftData)
 			await updateDraftsCount()
 
-			showSuccess("Invoice saved as draft successfully")
+			showSuccess(__("Invoice saved as draft successfully"))
 
 			return true
 		} catch (error) {
 			console.error("Error saving draft:", error)
-			showError("Failed to save draft")
+			showError(__("Failed to save draft"))
 			return false
 		}
 	}
@@ -57,7 +57,7 @@ export const usePOSDraftsStore = defineStore("posDrafts", () => {
 			await deleteDraft(draft.draft_id)
 			await updateDraftsCount()
 
-			showSuccess("Draft invoice loaded successfully")
+			showSuccess(__("Draft invoice loaded successfully"))
 
 			return {
 				items: draft.items || [],
@@ -66,7 +66,7 @@ export const usePOSDraftsStore = defineStore("posDrafts", () => {
 			}
 		} catch (error) {
 			console.error("Error loading draft:", error)
-			showError("Failed to load draft")
+			showError(__("Failed to load draft"))
 			throw error
 		}
 	}

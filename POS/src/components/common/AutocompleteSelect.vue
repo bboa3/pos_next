@@ -44,7 +44,7 @@
 				<!-- Loading State -->
 				<div v-if="loading" class="dropdown-loading">
 					<div class="loading-spinner"></div>
-					<span>Searching...</span>
+					<span>{{ __('Searching...') }}</span>
 				</div>
 
 				<!-- No Results -->
@@ -52,7 +52,7 @@
 					<svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
 					</svg>
-					<span>{{ searchQuery ? 'No results found' : 'No options available' }}</span>
+					<span>{{ searchQuery ? __('No results found') : __('No options available') }}</span>
 				</div>
 
 				<!-- Options List -->
@@ -67,7 +67,7 @@
 						<svg class="item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
 						</svg>
-						<span>Clear selection</span>
+						<span>{{ __('Clear selection') }}</span>
 					</button>
 
 					<!-- Options -->
@@ -100,7 +100,7 @@
 						<svg class="item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
 						</svg>
-						<span>Load more ({{ filteredOptions.length - displayLimit }} remaining)</span>
+						<span>{{ __('Load more ({0} remaining)', [(filteredOptions.length - displayLimit)]) }}</span>
 					</button>
 				</div>
 			</div>
@@ -122,7 +122,7 @@ const props = defineProps({
 	},
 	placeholder: {
 		type: String,
-		default: "Search...",
+		default: __("Search..."),
 	},
 	icon: {
 		type: String,

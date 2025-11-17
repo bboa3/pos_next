@@ -18,9 +18,9 @@
 								</svg>
 							</div>
 							<div>
-								<h2 class="text-xl font-bold text-gray-900">Partial Payments</h2>
+								<h2 class="text-xl font-bold text-gray-900">{{ __('Partial Payments') }}</h2>
 								<p class="text-sm text-gray-600 flex items-center mt-0.5">
-									Manage invoices with pending payments
+									{{ __('Manage invoices with pending payments') }}
 								</p>
 							</div>
 						</div>
@@ -28,7 +28,9 @@
 							<!-- Summary Badge -->
 							<div v-if="summary.count > 0" class="px-4 py-2 bg-orange-100 rounded-lg border border-orange-200">
 								<div class="text-xs text-orange-600 font-medium">
-									{{ summary.count }} invoice{{ summary.count !== 1 ? 's' : '' }} - {{ formatCurrency(summary.total_outstanding) }} outstanding
+									{{ summary.count === 1 
+									? __('{0} invoice - {1} outstanding', [summary.count, formatCurrency(summary.total_outstanding)])
+									: __('{0} invoices - {1} outstanding', [summary.count, formatCurrency(summary.total_outstanding)]) }}
 								</div>
 							</div>
 							<Button
@@ -42,7 +44,7 @@
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
 									</svg>
 								</template>
-								Refresh
+								{{ __('Refresh') }}
 							</Button>
 							<button
 								@click="handleClose"
@@ -60,7 +62,7 @@
 						<!-- Loading State -->
 						<div v-if="loading" class="flex flex-col items-center justify-center py-16">
 							<div class="animate-spin rounded-full h-12 w-12 border-b-3 border-orange-500 mb-4"></div>
-							<p class="text-sm font-medium text-gray-600">Loading invoices...</p>
+							<p class="text-sm font-medium text-gray-600">{{ __('Loading invoices...') }}</p>
 						</div>
 
 						<!-- Empty State -->
@@ -68,8 +70,8 @@
 							<svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
 							</svg>
-							<p class="text-gray-600 font-medium">No Partial Payments</p>
-							<p class="text-gray-500 text-sm mt-1">All invoices are either fully paid or unpaid</p>
+							<p class="text-gray-600 font-medium">{{ __('No Partial Payments') }}</p>
+							<p class="text-gray-500 text-sm mt-1">{{ __('All invoices are either fully paid or unpaid') }}</p>
 						</div>
 
 						<!-- Invoices List -->
@@ -113,7 +115,7 @@
 											@click="selectInvoice(invoice)"
 											class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-semibold"
 										>
-											Add Payment
+											{{ __('Add Payment') }}
 										</button>
 									</div>
 								</div>
@@ -122,15 +124,15 @@
 								<div class="p-4">
 									<div class="grid grid-cols-3 gap-4 mb-4">
 										<div class="text-center p-3 bg-blue-50 rounded-lg border border-blue-100">
-											<div class="text-xs text-gray-600 mb-1">Total Amount</div>
+											<div class="text-xs text-gray-600 mb-1">{{ __('Total Amount') }}</div>
 											<div class="text-lg font-bold text-gray-900">{{ formatCurrency(invoice.grand_total) }}</div>
 										</div>
 										<div class="text-center p-3 bg-green-50 rounded-lg border border-green-100">
-											<div class="text-xs text-gray-600 mb-1">Paid</div>
+											<div class="text-xs text-gray-600 mb-1">{{ __('Paid') }}</div>
 											<div class="text-lg font-bold text-green-600">{{ formatCurrency(invoice.paid_amount) }}</div>
 										</div>
 										<div class="text-center p-3 bg-orange-50 rounded-lg border border-orange-100">
-											<div class="text-xs text-gray-600 mb-1">Outstanding</div>
+											<div class="text-xs text-gray-600 mb-1">{{ __('Outstanding') }}</div>
 											<div class="text-lg font-bold text-orange-600">{{ formatCurrency(invoice.outstanding_amount) }}</div>
 										</div>
 									</div>
@@ -145,7 +147,7 @@
 
 									<!-- Payment Methods -->
 									<div v-if="invoice.payments && invoice.payments.length > 0" class="mt-3">
-										<div class="text-xs font-medium text-gray-600 mb-2">Payment History</div>
+										<div class="text-xs font-medium text-gray-600 mb-2">{{ __('Payment History') }}</div>
 										<div class="grid grid-cols-2 md:grid-cols-3 gap-2">
 											<div
 												v-for="(payment, idx) in invoice.payments"
@@ -274,7 +276,7 @@ async function loadInvoices() {
 		invoices.value = result || []
 	} catch (error) {
 		console.error("Error loading partial payments:", error)
-		showError(error.message || "Failed to load partial payments")
+		showError(error.message || __("Failed to load partial payments"))
 	} finally {
 		loading.value = false
 	}
@@ -324,7 +326,7 @@ async function handlePaymentCompleted(paymentData) {
 
 		console.log('[PartialPayments] API response:', result)
 
-		showSuccess("Payment added successfully")
+		showSuccess(__("Payment added successfully"))
 
 		// Reload invoices and summary
 		console.log('[PartialPayments] Reloading invoices and summary...')
@@ -334,7 +336,7 @@ async function handlePaymentCompleted(paymentData) {
 		selectedInvoice.value = null
 	} catch (error) {
 		console.error("[PartialPayments] Error adding payment:", error)
-		showError(error.message || "Failed to add payment")
+		showError(error.message || __("Failed to add payment"))
 	}
 }
 
@@ -360,19 +362,19 @@ function getStatusLabel(status) {
 	// Convert ERPNext status to user-friendly labels
 	switch (status) {
 		case 'Partly Paid':
-			return 'Partially Paid'
+			return __('Partially Paid')
 		case 'Overdue':
-			return 'Overdue'
+			return __('Overdue')
 		case 'Unpaid':
-			return 'Unpaid'
+			return __('Unpaid')
 		case 'Paid':
-			return 'Paid'
+			return __('Paid')
 		case 'Draft':
-			return 'Draft'
+			return __('Draft')
 		case 'Cancelled':
-			return 'Cancelled'
+			return __('Cancelled')
 		case 'Return':
-			return 'Return'
+			return __('Return')
 		default:
 			return status
 	}

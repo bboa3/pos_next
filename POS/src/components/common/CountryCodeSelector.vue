@@ -67,7 +67,7 @@
 							ref="searchInputRef"
 							v-model="searchQuery"
 							type="text"
-							placeholder="Search countries..."
+							:placeholder="__('Search countries...')"
 							class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 							@keydown.escape="closeDropdown"
 							@keydown.enter.prevent="selectFirstFiltered"
@@ -95,7 +95,7 @@
 					</div>
 
 					<div v-else-if="filteredCountries.length === 0" class="px-4 py-8 text-center text-sm text-gray-500">
-						No countries found
+						{{ __('No countries found') }}
 					</div>
 
 					<button

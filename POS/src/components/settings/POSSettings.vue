@@ -19,7 +19,7 @@
 								</svg>
 							</div>
 							<div>
-								<h2 class="text-xl font-bold text-gray-900">POS Settings</h2>
+								<h2 class="text-xl font-bold text-gray-900">{{ __('POS Settings') }}</h2>
 								<p class="text-sm text-gray-600 flex items-center mt-0.5">
 									<svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -40,7 +40,7 @@
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
 									</svg>
 								</template>
-								Refresh
+								{{ __('Refresh') }}
 							</Button>
 							<Button
 								@click="saveSettings"
@@ -53,7 +53,7 @@
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
 									</svg>
 								</template>
-								Save Changes
+								{{ __('Save Changes') }}
 							</Button>
 							<button
 								@click="handleClose"
@@ -71,7 +71,7 @@
 						<!-- Loading State -->
 						<div v-if="loading" class="flex flex-col items-center justify-center py-16">
 							<div class="animate-spin rounded-full h-12 w-12 border-b-3 border-blue-500 mb-4"></div>
-							<p class="text-sm font-medium text-gray-600">Loading settings...</p>
+							<p class="text-sm font-medium text-gray-600">{{ __('Loading settings...') }}</p>
 						</div>
 
 						<!-- Settings Form -->
@@ -87,15 +87,15 @@
 												</svg>
 											</div>
 											<div>
-												<h3 class="text-lg font-bold text-gray-900">Stock Management</h3>
-												<p class="text-xs text-gray-600 mt-0.5">Configure warehouse and inventory settings</p>
+												<h3 class="text-lg font-bold text-gray-900">{{ __('Stock Management') }}</h3>
+												<p class="text-xs text-gray-600 mt-0.5">{{ __('Configure warehouse and inventory settings') }}</p>
 											</div>
 										</div>
 										<div :class="stockSectionClasses.badge">
 											<svg :class="stockSectionClasses.badgeIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.checkCircle"/>
 											</svg>
-											<span :class="stockSectionClasses.badgeText">Stock Controls</span>
+											<span :class="stockSectionClasses.badgeText">{{ __('Stock Controls') }}</span>
 										</div>
 									</div>
 								</div>
@@ -106,20 +106,20 @@
 											<svg :class="warehouseSubsectionClasses.icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.location"/>
 											</svg>
-											<h4 class="text-sm font-semibold text-gray-900">Warehouse Selection</h4>
+											<h4 class="text-sm font-semibold text-gray-900">{{ __('Warehouse Selection') }}</h4>
 										</div>
 										<div v-if="warehouseOptions.length === 0" class="flex items-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
 											<svg class="w-5 h-5 text-yellow-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.warning"/>
 											</svg>
-											<p class="text-sm text-yellow-800 font-medium">Loading warehouses...</p>
+											<p class="text-sm text-yellow-800 font-medium">{{ __('Loading warehouses...') }}</p>
 										</div>
 										<SelectField
 											v-else
 											v-model="selectedWarehouse"
-											label="Active Warehouse"
+											:label="__('Active Warehouse')"
 											:options="warehouseOptions"
-											description="All stock operations will use this warehouse. Stock quantities will refresh after saving."
+											:description="__('All stock operations will use this warehouse. Stock quantities will refresh after saving.')"
 										/>
 									</div>
 
@@ -129,23 +129,24 @@
 											<svg :class="stockPolicySubsectionClasses.icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.clipboard"/>
 											</svg>
-											<h4 class="text-sm font-semibold text-gray-900">Stock Validation Policy</h4>
+											<h4 class="text-sm font-semibold text-gray-900">{{ __('Stock Validation Policy') }}</h4>
 										</div>
 										<div class="space-y-3">
 											<CheckboxField
 												v-model="settings.allow_negative_stock"
-												label="Allow Negative Stock"
-												description="Enable selling items even when stock reaches zero or below. Integrates with ERPNext stock settings."
+												:label="__('Allow Negative Stock')"
+												:description="__('Enable selling items even when stock reaches zero or below. Integrates with ERPNext stock settings.')"
 											/>
 											<div class="mt-3 p-3 bg-blue-100 rounded-md">
 												<div class="flex items-start space-x-2">
 													<svg class="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.info"/>
 													</svg>
-													<p class="text-xs text-blue-800 leading-relaxed">
-														<strong>Note:</strong> When enabled, the system will allow sales even when stock quantity is zero or negative.
-														This is useful for handling stock sync delays or backorders. All transactions are tracked in the stock ledger.
-													</p>
+													<TranslatedHTML 
+														:tag="'p'"
+														class="text-xs text-blue-800 leading-relaxed" 
+														:inner="__('&lt;strong&gt;Note:&lt;strong&gt; When enabled, the system will allow sales even when stock quantity is zero or negative. This is useful for handling stock sync delays or backorders. All transactions are tracked in the stock ledger.')"
+													/>
 												</div>
 											</div>
 										</div>
@@ -157,14 +158,14 @@
 											<svg :class="stockSyncSubsectionClasses.icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
 											</svg>
-											<h4 class="text-sm font-semibold text-gray-900">Background Stock Sync</h4>
+											<h4 class="text-sm font-semibold text-gray-900">{{ __('Background Stock Sync') }}</h4>
 											<div v-if="stockSyncStatus.enabled" class="ml-auto flex items-center px-2.5 py-1 bg-green-100 border border-green-300 rounded-full">
 												<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
-												<span class="text-xs font-medium text-green-800">Active</span>
+												<span class="text-xs font-medium text-green-800">{{ __('Active') }}</span>
 											</div>
 											<div v-else class="ml-auto flex items-center px-2.5 py-1 bg-gray-100 border border-gray-300 rounded-full">
 												<div class="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
-												<span class="text-xs font-medium text-gray-600">Inactive</span>
+												<span class="text-xs font-medium text-gray-600">{{ __('Inactive') }}</span>
 											</div>
 										</div>
 
@@ -172,16 +173,16 @@
 											<!-- Enable Sync Toggle -->
 											<CheckboxField
 												v-model="stockSyncEnabled"
-												label="Enable Automatic Stock Sync"
-												description="Periodically sync stock quantities from server in the background (runs in Web Worker)"
+												:label="__('Enable Automatic Stock Sync')"
+												:description="__('Periodically sync stock quantities from server in the background (runs in Web Worker)')"
 											/>
 
 											<!-- Sync Interval -->
 											<div v-if="stockSyncEnabled" class="pl-6 space-y-3 border-l-2 border-blue-200">
 												<NumberField
 													v-model="stockSyncIntervalSeconds"
-													label="Sync Interval (seconds)"
-													description="How often to check server for stock updates (minimum 10 seconds)"
+													:label="__('Sync Interval (seconds)')"
+													:description="__('How often to check server for stock updates (minimum 10 seconds)')"
 													:min="10"
 													:max="300"
 													:step="10"
@@ -194,13 +195,28 @@
 															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.info"/>
 														</svg>
 														<div class="text-xs text-blue-800 space-y-1">
-															<p><strong>Status:</strong> {{ stockSyncStatus.enabled ? 'Running' : 'Stopped' }}</p>
-															<p><strong>Items Tracked:</strong> {{ stockSyncStatus.itemCount || 0 }}</p>
-															<p><strong>Warehouse:</strong> {{ stockSyncStatus.warehouse || 'Not set' }}</p>
-															<p v-if="stockSyncStatus.lastSync">
-																<strong>Last Sync:</strong> {{ formatSyncTime(stockSyncStatus.lastSync) }}
-															</p>
-															<p v-else><strong>Last Sync:</strong> Never</p>
+															<TranslatedHTML 
+																:tag="'p'"
+																:inner="stockSyncStatus.enabled 
+																	? __('&lt;strong&gt;Status:&lt;strong&gt; Running')
+																	: __('&lt;strong&gt;Status:&lt;strong&gt; Stopped')"
+															/>
+															<TranslatedHTML
+																:tag="'p'"
+																:inner="__('&lt;strong&gt;Items Tracked:&lt;strong&gt; {0}', [stockSyncStatus.itemCount || 0])"
+															/>
+															<TranslatedHTML 
+																:tag="'p'"
+																:inner="stockSyncStatus.warehouse
+																	? __('&lt;strong&gt;Warehouse:&lt;strong&gt; {0}', [stockSyncStatus.warehouse])
+																	: __('Warehouse not set')"
+															/>
+															<TranslatedHTML 
+																:tag="'p'"
+																:inner="stockSyncStatus.lastSync
+																	? __('&lt;strong&gt;Last Sync:&lt;strong&gt; {0}', [formatSyncTime(stockSyncStatus.lastSync)]) 
+																	: __('&lt;strong&gt;Last Sync:&lt;strong&gt; Never')"
+															/>
 														</div>
 													</div>
 												</div>
@@ -212,9 +228,9 @@
 															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
 														</svg>
 														<div class="text-xs text-gray-700">
-															<p class="font-medium mb-1">Network Usage:</p>
-															<p>~15 KB per sync cycle</p>
-															<p>~{{ Math.round((3600 / stockSyncIntervalSeconds) * 15 / 1024) }} MB per hour</p>
+															<p class="font-medium mb-1">{{ __('Network Usage:') }}</p>
+															<p>{{ __('~15 KB per sync cycle') }}</p>
+															<p>{{ __('~{0} MB per hour', [Math.round((3600 / stockSyncIntervalSeconds) * 15 / 1024)]) }}</p>
 														</div>
 													</div>
 												</div>
@@ -235,15 +251,15 @@
 												</svg>
 											</div>
 											<div>
-												<h3 class="text-lg font-bold text-gray-900">Sales Management</h3>
-												<p class="text-xs text-gray-600 mt-0.5">Configure pricing, discounts, and sales operations</p>
+												<h3 class="text-lg font-bold text-gray-900">{{ __('Sales Management') }}</h3>
+												<p class="text-xs text-gray-600 mt-0.5">{{ __('Configure pricing, discounts, and sales operations') }}</p>
 											</div>
 										</div>
 										<div :class="salesSectionClasses.badge">
 											<svg :class="salesSectionClasses.badgeIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.currency"/>
 											</svg>
-											<span :class="salesSectionClasses.badgeText">Sales Controls</span>
+											<span :class="salesSectionClasses.badgeText">{{ __('Sales Controls') }}</span>
 										</div>
 									</div>
 								</div>
@@ -254,40 +270,40 @@
 											<svg :class="pricingSubsectionClasses.icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.tag"/>
 											</svg>
-											<h4 class="text-sm font-semibold text-gray-900">Pricing & Discounts</h4>
+											<h4 class="text-sm font-semibold text-gray-900">{{ __('Pricing & Discounts') }}</h4>
 										</div>
 										<div class="space-y-3">
 											<CheckboxField
 												v-model="settings.tax_inclusive"
-												label="Tax Inclusive"
-												description="When enabled, displayed prices include tax. When disabled, tax is calculated separately. Changes apply immediately to your cart when you save."
+												:label="__('Tax Inclusive')"
+												:description="__('When enabled, displayed prices include tax. When disabled, tax is calculated separately. Changes apply immediately to your cart when you save.')"
 											/>
 											<NumberField
 												v-model="settings.max_discount_allowed"
-												label="Max Discount (%)"
-												description="Maximum discount per item"
+												:label="__('Max Discount (%)')"
+												:description="__('Maximum discount per item')"
 												:min="0"
 												:max="100"
 											/>
 											<CheckboxField
 												v-model="settings.use_percentage_discount"
-												label="Use Percentage Discount"
-												description="Show discounts as percentages"
+												:label="__('Use Percentage Discount')"
+												:description="__('Show discounts as percentages')"
 											/>
 											<CheckboxField
 												v-model="settings.allow_user_to_edit_additional_discount"
-												label="Allow Additional Discount"
-												description="Enable invoice-level discount"
+												:label="__('Allow Additional Discount')"
+												:description="__('Enable invoice-level discount')"
 											/>
 											<CheckboxField
 												v-model="settings.allow_user_to_edit_item_discount"
-												label="Allow Item Discount"
-												description="Enable item-level discount in edit dialog"
+												:label="__('Allow Item Discount')"
+												:description="__('Enable item-level discount in edit dialog')"
 											/>
 											<CheckboxField
 												v-model="settings.disable_rounded_total"
-												label="Disable Rounded Total"
-												description="Show exact totals without rounding"
+												:label="__('Disable Rounded Total')"
+												:description="__('Show exact totals without rounding')"
 											/>
 										</div>
 									</div>
@@ -298,33 +314,33 @@
 											<svg :class="operationsSubsectionClasses.icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.checkCircle"/>
 											</svg>
-											<h4 class="text-sm font-semibold text-gray-900">Sales Operations</h4>
+											<h4 class="text-sm font-semibold text-gray-900">{{ __('Sales Operations') }}</h4>
 										</div>
 										<div class="space-y-3">
 											<CheckboxField
 												v-model="settings.allow_credit_sale"
-												label="Allow Credit Sale"
-												description="Enable sales on credit"
+												:label="__('Allow Credit Sale')"
+												:description="__('Enable sales on credit')"
 											/>
 											<CheckboxField
 												v-model="settings.allow_return"
-												label="Allow Return"
-												description="Enable product returns"
+												:label="__('Allow Return')"
+												:description="__('Enable product returns')"
 											/>
 											<CheckboxField
 												v-model="settings.allow_write_off_change"
-												label="Allow Write Off Change"
-												description="Write off small change amounts"
+												:label="__('Allow Write Off Change')"
+												:description="__('Write off small change amounts')"
 											/>
 											<CheckboxField
 												v-model="settings.allow_partial_payment"
-												label="Allow Partial Payment"
-												description="Enable partial payment for invoices"
+												:label="__('Allow Partial Payment')"
+												:description="__('Enable partial payment for invoices')"
 											/>
 											<CheckboxField
 												v-model="settings.silent_print"
-												label="Silent Print"
-												description="Print without confirmation"
+												:label="__('Silent Print')"
+												:description="__('Print without confirmation')"
 											/>
 										</div>
 									</div>
@@ -339,8 +355,8 @@
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
 							</svg>
-							<p class="text-gray-600 font-medium">No POS Profile Selected</p>
-							<p class="text-gray-500 text-sm mt-1">Please select a POS Profile to configure settings</p>
+							<p class="text-gray-600 font-medium">{{ __('No POS Profile Selected') }}</p>
+							<p class="text-gray-500 text-sm mt-1">{{ __('Please select a POS Profile to configure settings') }}</p>
 						</div>
 					</div>
 				</div>
@@ -364,6 +380,7 @@ import {
 import { offlineWorker } from "@/utils/offline/workerClient"
 import { logger } from "@/utils/logger"
 import { usePOSEvents } from "@/composables/usePOSEvents"
+import TranslatedHTML from "../common/TranslatedHTML.vue"
 
 const log = logger.create('POSSettings')
 const { detectSettingsChanges, updateSettingsSnapshot, emitStockSyncConfigured } = usePOSEvents()
@@ -475,7 +492,7 @@ const settingsResource = createResource({
 	},
 	onError(error) {
 		loading.value = false
-		showError("Failed to load settings")
+		showError(__("Failed to load settings"))
 	},
 })
 
@@ -560,7 +577,7 @@ async function loadSettings() {
 
 async function saveSettings() {
 	if (!props.posProfile) {
-		showError("POS Profile not found")
+		showError(__("POS Profile not found"))
 		return
 	}
 
@@ -633,20 +650,21 @@ async function saveSettings() {
 		}
 
 		// Show success toast for other changes
-		let successMessage = "Settings saved successfully"
+		let successMessage = __("Settings saved successfully")
 		if (warehouseChanged && taxInclusiveChanged) {
-			successMessage = "Settings saved, warehouse updated, and tax mode changed. Cart will be recalculated."
+			successMessage = __("Settings saved, warehouse updated, and tax mode changed. Cart will be recalculated.")
 		} else if (warehouseChanged) {
-			successMessage = "Settings saved and warehouse updated. Reloading stock..."
+			successMessage = __("Settings saved and warehouse updated. Reloading stock...")
 		} else if (taxInclusiveChanged) {
-			const mode = settings.value.tax_inclusive ? 'inclusive' : 'exclusive'
-			successMessage = `Settings saved. Tax mode is now ${mode}. Cart will be recalculated.`
+			successMessage = settings.value.tax_inclusive
+				? __('Settings saved. Tax mode is now "inclusive". Cart will be recalculated.')
+				: __('Settings saved. Tax mode is now "exclusive". Cart will be recalculated.')
 		}
 
 		showSuccess(successMessage)
 	} catch (error) {
 		log.error("Error saving settings:", error)
-		showError(error.message || "Failed to save settings")
+		showError(error.message || __("Failed to save settings"))
 	} finally {
 		saving.value = false
 	}
@@ -726,15 +744,15 @@ async function applyStockSyncConfig() {
 
 // Format sync time for display
 function formatSyncTime(timestamp) {
-	if (!timestamp) return 'Never'
+	if (!timestamp) return __('Never')
 
 	const now = Date.now()
 	const diff = now - timestamp
 
 	if (diff < 60000) {
-		return `${Math.floor(diff / 1000)}s ago`
+		return __('{0}s ago', [Math.floor(diff / 1000)])
 	} else if (diff < 3600000) {
-		return `${Math.floor(diff / 60000)}m ago`
+		return __('{0}m ago', [Math.floor(diff / 60000)])
 	} else {
 		const date = new Date(timestamp)
 		return date.toLocaleTimeString()

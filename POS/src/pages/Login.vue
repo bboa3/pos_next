@@ -3,10 +3,10 @@
     <div class="max-w-md w-full space-y-8">
       <div class="text-center">
         <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
-          Sign in to POS Next
+          {{ __('Sign in to POS Next') }}
         </h2>
         <p class="mt-2 text-sm text-gray-600">
-          Access your point of sale system
+          {{ __('Access your point of sale system') }}
         </p>
       </div>
 
@@ -21,7 +21,7 @@
               </div>
               <div class="ml-3">
                 <h3 class="text-sm font-medium text-red-800">
-                  Login Failed
+                  {{ __('Login Failed') }}
                 </h3>
                 <div class="mt-2 text-sm text-red-700">
                   <p>{{ session.login.error.messages.join('\n') }}</p>
@@ -36,22 +36,22 @@
               required
               name="email"
               type="text"
-              placeholder="Enter your username or email"
-              label="User ID / Email"
+              :placeholder="__('Enter your username or email')"
+              :label="__('User ID / Email')"
               :disabled="session.login.loading"
             />
           </div>
 
           <div>
             <label class="block">
-              <span class="mb-2 block text-sm leading-4 text-gray-700">Password</span>
+              <span class="mb-2 block text-sm leading-4 text-gray-700">{{ __('Password') }}</span>
               <div class="relative">
                 <input
                   v-model="loginForm.password"
                   required
                   name="password"
                   :type="showPassword ? 'text' : 'password'"
-                  placeholder="Enter your password"
+                  :placeholder="__('Enter your password')"
                   :disabled="session.login.loading"
                   class="form-input block w-full border-gray-400 placeholder-gray-500 pr-10"
                 />
@@ -61,7 +61,7 @@
                   class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-600 hover:text-gray-800 transition-colors focus:outline-none"
                   :disabled="session.login.loading"
                   tabindex="-1"
-                  :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                  :aria-label="showPassword ? __('Hide password') : __('Show password')"
                 >
                   <FeatherIcon
                     :name="showPassword ? 'eye-off' : 'eye'"
@@ -80,7 +80,7 @@
               class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
               type="submit"
             >
-              {{ session.login.loading ? 'Signing in...' : 'Sign in' }}
+              {{ session.login.loading ? __('Signing in...') : __('Sign in') }}
             </Button>
           </div>
         </form>

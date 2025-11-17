@@ -8,7 +8,7 @@
 				<FormControl
 					type="text"
 					v-model="searchQuery"
-					placeholder="Search coupons..."
+					:placeholder="__('Search coupons...')"
 				>
 					<template #prefix>
 						<FeatherIcon name="search" class="w-4 h-4 text-gray-500" />
@@ -20,21 +20,21 @@
 						type="select"
 						v-model="filterStatus"
 						:options="[
-							{ label: 'All Status', value: 'all' },
-							{ label: 'Active Only', value: 'active' },
-							{ label: 'Expired', value: 'expired' },
-							{ label: 'Not Started', value: 'not_started' },
-							{ label: 'Exhausted', value: 'exhausted' },
-							{ label: 'Disabled', value: 'disabled' }
+							{ label: __('All Status'), value: 'all' },
+							{ label: __('Active Only'), value: 'active' },
+							{ label: __('Expired'), value: 'expired' },
+							{ label: __('Not Started'), value: 'not_started' },
+							{ label: __('Exhausted'), value: 'exhausted' },
+							{ label: __('Disabled'), value: 'disabled' }
 						]"
 					/>
 					<FormControl
 						type="select"
 						v-model="filterType"
 						:options="[
-							{ label: 'All Types', value: 'all' },
-							{ label: 'Promotional', value: 'Promotional' },
-							{ label: 'Gift Card', value: 'Gift Card' }
+							{ label: __('All Types'), value: 'all' },
+							{ label: __('Promotional'), value: 'Promotional' },
+							{ label: __('Gift Card'), value: 'Gift Card' }
 						]"
 					/>
 				</div>
@@ -51,7 +51,7 @@
 					<template #prefix>
 						<FeatherIcon name="plus-circle" class="w-4 h-4" />
 					</template>
-					Create New Coupon
+					{{ __('Create New Coupon') }}
 				</Button>
 				<Button
 					@click="loadCoupons"
@@ -62,7 +62,7 @@
 					<template #prefix>
 						<FeatherIcon name="refresh-cw" class="w-4 h-4" />
 					</template>
-					Refresh
+					{{ __('Refresh') }}
 				</Button>
 			</div>
 
@@ -72,7 +72,7 @@
 				<div v-if="loading && coupons.length === 0" class="flex items-center justify-center py-12">
 					<div class="text-center">
 						<LoadingIndicator class="w-6 h-6 mx-auto mb-2" />
-						<p class="text-sm text-gray-600">Loading...</p>
+						<p class="text-sm text-gray-600">{{ __('Loading...') }}</p>
 					</div>
 				</div>
 
@@ -81,7 +81,7 @@
 					<div class="text-gray-400 mb-3">
 						<FeatherIcon name="gift" class="w-12 h-12 mx-auto" />
 					</div>
-					<p class="text-sm text-gray-600">No coupons found</p>
+					<p class="text-sm text-gray-600">{{ __('No coupons found') }}</p>
 				</div>
 
 				<!-- Coupon Items -->
@@ -112,7 +112,7 @@
 										theme="purple"
 										size="sm"
 									>
-										Gift
+										{{ __('Gift') }}
 									</Badge>
 								</div>
 								<p class="text-xs text-gray-500 mt-0.5 truncate">{{ coupon.coupon_name }}</p>
@@ -122,15 +122,17 @@
 								:theme="getStatusTheme(coupon.status)"
 								size="sm"
 							>
-								{{ coupon.status || 'Active' }}
+								{{ coupon.status || __('Active') }}
 							</Badge>
 						</div>
 						<div class="flex items-center justify-between text-xs">
 							<span class="text-gray-500">
-								Used: {{ coupon.used }}{{ coupon.maximum_use ? `/${coupon.maximum_use}` : '' }}
+								{{ coupon.maximum_use 
+									? __('Used: {0}/{1}', [coupon.used, coupon.maximum_use])
+									: __('Used: {0}', [coupon.used]) }}
 							</span>
 							<span class="text-gray-500">
-								{{ coupon.valid_upto ? formatDate(coupon.valid_upto) : 'No expiry' }}
+								{{ coupon.valid_upto ? formatDate(coupon.valid_upto) : __('No expiry') }}
 							</span>
 						</div>
 					</button>
@@ -146,8 +148,8 @@
 					<div class="text-gray-300 mb-4">
 						<FeatherIcon name="gift" class="w-16 h-16 mx-auto" />
 					</div>
-					<h3 class="text-xl font-semibold text-gray-900 mb-2">Select a Coupon</h3>
-					<p class="text-sm text-gray-600 mb-6">Choose a coupon from the list to view and edit, or create a new one to get started</p>
+					<h3 class="text-xl font-semibold text-gray-900 mb-2">{{ __('Select a Coupon') }}</h3>
+					<p class="text-sm text-gray-600 mb-6">{{ __('Choose a coupon from the list to view and edit, or create a new one to get started') }}</p>
 					<Button
 						v-if="permissions.create"
 						@click="handleCreateNew"
@@ -156,10 +158,10 @@
 						<template #prefix>
 							<FeatherIcon name="plus" class="w-4 h-4" />
 						</template>
-						Create New Coupon
+						{{ __('Create New Coupon') }}
 					</Button>
 					<p v-else class="text-sm text-amber-600">
-						You don't have permission to create coupons
+						{{ __("You don't have permission to create coupons") }}
 					</p>
 				</div>
 			</div>
@@ -172,7 +174,7 @@
 						<div>
 							<div class="flex items-center space-x-3">
 								<h3 class="text-xl font-semibold text-gray-900">
-									{{ isCreating ? 'Create New Coupon' : 'Coupon Details' }}
+									{{ isCreating ? __('Create New Coupon') : __('Coupon Details') }}
 								</h3>
 								<Badge
 									v-if="!isCreating && selectedCoupon?.coupon_type"
@@ -184,7 +186,7 @@
 								</Badge>
 							</div>
 							<p class="text-sm text-gray-600 mt-1">
-								{{ isCreating ? 'Fill in the details to create a new coupon' : 'View and update coupon information' }}
+								{{ isCreating ? __('Fill in the details to create a new coupon') : __('View and update coupon information') }}
 							</p>
 						</div>
 						<div class="flex items-center space-x-2">
@@ -197,7 +199,7 @@
 								<template #prefix>
 									<FeatherIcon :name="couponDetails.disabled ? 'check-circle' : 'x-circle'" class="w-4 h-4" />
 								</template>
-								{{ couponDetails.disabled ? 'Enable' : 'Disable' }}
+								{{ couponDetails.disabled ? __('Enable') : __('Disable') }}
 							</Button>
 							<Button
 								v-if="!isCreating && permissions.delete && selectedCoupon.used === 0"
@@ -208,14 +210,14 @@
 								<template #prefix>
 									<FeatherIcon name="trash-2" class="w-4 h-4" />
 								</template>
-								Delete
+								{{ __('Delete') }}
 							</Button>
 							<div v-if="!isCreating && (permissions.write || permissions.delete)" class="w-px h-6 bg-gray-200"></div>
 							<Button
 								@click="handleCancel"
 								variant="ghost"
 							>
-								Cancel
+								{{ __('Cancel') }}
 							</Button>
 							<Button
 								v-if="isCreating ? permissions.create : permissions.write"
@@ -226,7 +228,7 @@
 								<template #prefix>
 									<FeatherIcon :name="isCreating ? 'plus' : 'save'" class="w-4 h-4" />
 								</template>
-								{{ isCreating ? 'Create' : 'Update' }}
+								{{ isCreating ? __('Create') : __('Update') }}
 							</Button>
 						</div>
 					</div>
@@ -238,38 +240,38 @@
 							<div class="p-5">
 								<div class="flex items-center space-x-2 mb-4">
 									<FeatherIcon name="info" class="w-4 h-4 text-blue-600" />
-									<h4 class="text-sm font-semibold text-gray-900">Basic Information</h4>
+									<h4 class="text-sm font-semibold text-gray-900">{{ __('Basic Information') }}</h4>
 								</div>
 								<div class="grid grid-cols-2 gap-4">
 									<div class="col-span-2">
 										<FormControl
 											type="text"
-											label="Coupon Name"
+											:label="__('Coupon Name')"
 											v-model="form.coupon_name"
 											:disabled="!isCreating"
-											placeholder="e.g., Summer Sale Coupon 2025"
+											:placeholder="__('e.g., Summer Sale Coupon 2025')"
 											required
 										/>
 									</div>
 
 									<FormControl
 										type="select"
-										label="Coupon Type"
+										:label="__('Coupon Type')"
 										v-model="form.coupon_type"
 										:disabled="!isCreating"
 										:options="[
-											{ label: 'Promotional', value: 'Promotional' },
-											{ label: 'Gift Card', value: 'Gift Card' }
+											{ label: __('Promotional'), value: 'Promotional' },
+											{ label: __('Gift Card'), value: 'Gift Card' }
 										]"
 										required
 									/>
 
 									<FormControl
 										type="text"
-										label="Coupon Code"
+										:label="__('Coupon Code')"
 										v-model="form.coupon_code"
 										:disabled="!isCreating"
-										placeholder="Auto-generated if empty"
+										:placeholder="__('Auto-generated if empty')"
 									>
 										<template #suffix v-if="isCreating">
 											<Button
@@ -277,7 +279,7 @@
 												variant="ghost"
 												@click="generateCouponCode"
 											>
-												Generate
+												{{ __('Generate') }}
 											</Button>
 										</template>
 									</FormControl>
@@ -287,13 +289,13 @@
 										<FormControl
 											v-if="isCreating"
 											type="text"
-											label="Customer"
+											:label="__('Customer')"
 											v-model="form.customer"
-											placeholder="Customer ID or Name"
+											:placeholder="__('Customer ID or Name')"
 											required
 										/>
 										<div v-else>
-											<label class="block text-sm font-medium text-gray-700 mb-2">Customer</label>
+											<label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Customer') }}</label>
 											<div class="px-3 py-2 bg-gray-50 rounded-lg">
 												<p class="text-sm font-medium text-gray-900">{{ couponDetails.customer_name || couponDetails.customer }}</p>
 												<p class="text-xs text-gray-500">{{ couponDetails.customer }}</p>
@@ -304,7 +306,7 @@
 									<FormControl
 										v-if="campaigns.length > 0"
 										type="select"
-										label="Campaign"
+										:label="__('Campaign')"
 										v-model="form.campaign"
 										:disabled="!isCreating"
 										:options="campaignOptions"
@@ -312,7 +314,7 @@
 
 									<!-- Company field -->
 									<div>
-										<label class="block text-sm font-medium text-gray-700 mb-2">Company</label>
+										<label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Company') }}</label>
 										<div class="px-3 py-2 bg-gray-50 rounded-lg">
 											<p class="text-sm text-gray-900">{{ isCreating ? props.company : couponDetails.company }}</p>
 										</div>
@@ -320,7 +322,7 @@
 
 									<!-- Referral Code (view only when editing) -->
 									<div v-if="!isCreating && couponDetails.referral_code">
-										<label class="block text-sm font-medium text-gray-700 mb-2">Referral Code</label>
+										<label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Referral Code') }}</label>
 										<div class="px-3 py-2 bg-blue-50 rounded-lg border border-blue-200">
 											<p class="text-sm font-medium text-blue-900">{{ couponDetails.referral_code }}</p>
 										</div>
@@ -334,27 +336,27 @@
 							<div class="p-5">
 								<div class="flex items-center space-x-2 mb-4">
 									<FeatherIcon name="percent" class="w-4 h-4 text-purple-600" />
-									<h4 class="text-sm font-semibold text-gray-900">Discount Configuration</h4>
+									<h4 class="text-sm font-semibold text-gray-900">{{ __('Discount Configuration') }}</h4>
 								</div>
 								<div class="grid grid-cols-2 gap-4">
 									<FormControl
 										type="select"
-										label="Discount Type"
+										:label="__('Discount Type')"
 										v-model="form.discount_type"
 										:options="[
-											{ label: 'Percentage', value: 'Percentage' },
-											{ label: 'Amount', value: 'Amount' }
+											{ label: __('Percentage'), value: 'Percentage' },
+											{ label: __('Amount'), value: 'Amount' }
 										]"
 										required
 									/>
 
 									<FormControl
 										type="select"
-										label="Apply Discount On"
+										:label="__('Apply Discount On')"
 										v-model="form.apply_on"
 										:options="[
-											{ label: 'Grand Total', value: 'Grand Total' },
-											{ label: 'Net Total', value: 'Net Total' }
+											{ label: __('Grand Total'), value: 'Grand Total' },
+											{ label: __('Net Total'), value: 'Net Total' }
 										]"
 										required
 									/>
@@ -362,9 +364,9 @@
 									<FormControl
 										v-if="form.discount_type === 'Percentage'"
 										type="number"
-										label="Discount Percentage (%)"
+										:label="__('Discount Percentage (%)')"
 										v-model="form.discount_percentage"
-										placeholder="e.g., 20"
+										:placeholder="__('e.g., 20')"
 										:min="0"
 										:max="100"
 										required
@@ -373,43 +375,43 @@
 									<FormControl
 										v-if="form.discount_type === 'Amount'"
 										type="number"
-										label="Discount Amount"
+										:label="__('Discount Amount')"
 										v-model="form.discount_amount"
-										:placeholder="`Amount in ${currency}`"
+										:placeholder="__('Amount in {0}', [currency])"
 										:min="0"
 										required
 									/>
 
 									<FormControl
 										type="number"
-										label="Minimum Cart Amount"
+										:label="__('Minimum Cart Amount')"
 										v-model="form.min_amount"
-										:placeholder="`Optional minimum in ${currency}`"
+										:placeholder="__('Optional minimum in {0}', [currency])"
 										:min="0"
 									/>
 
 									<FormControl
 										type="number"
-										label="Maximum Discount Amount"
+										:label="__('Maximum Discount Amount')"
 										v-model="form.max_amount"
-										:placeholder="`Optional cap in ${currency}`"
+										:placeholder="__('Optional cap in {0}', [currency])"
 										:min="0"
 									/>
 								</div>
 								<div v-if="!isCreating && couponDetails.discount_type" class="mt-4 p-3 bg-purple-50 rounded-lg">
 									<p class="text-sm text-gray-700">
-										<strong>Current Discount:</strong>
+										<strong>{{ __('Current Discount:') }}</strong>
 										<span v-if="couponDetails.discount_type === 'Percentage'">
-											{{ Number(couponDetails.discount_percentage).toFixed(2) }}% off {{ couponDetails.apply_on }}
+											{{ __('{0}% off {1}', [Number(couponDetails.discount_percentage).toFixed(2), couponDetails.apply_on]) }}
 										</span>
 										<span v-else>
-											{{ formatCurrency(couponDetails.discount_amount) }} off {{ couponDetails.apply_on }}
+											{{ __('{0} off {1}', [formatCurrency(couponDetails.discount_amount), couponDetails.apply_on]) }}
 										</span>
 										<span v-if="couponDetails.min_amount" class="ml-2">
-											(Min: {{ formatCurrency(couponDetails.min_amount) }})
+											{{ __('(Min: {0})', [formatCurrency(couponDetails.min_amount)]) }}
 										</span>
 										<span v-if="couponDetails.max_amount" class="ml-2">
-											(Max Discount: {{ formatCurrency(couponDetails.max_amount) }})
+											{{ __('(Max Discount: {0})', [formatCurrency(couponDetails.max_amount)]) }}
 										</span>
 									</p>
 								</div>
@@ -421,28 +423,28 @@
 							<div class="p-5">
 								<div class="flex items-center space-x-2 mb-4">
 									<FeatherIcon name="calendar" class="w-4 h-4 text-green-600" />
-									<h4 class="text-sm font-semibold text-gray-900">Validity & Usage</h4>
+									<h4 class="text-sm font-semibold text-gray-900">{{ __('Validity & Usage') }}</h4>
 								</div>
 								<div class="grid grid-cols-3 gap-4">
 									<FormControl
 										type="date"
-										label="Valid From"
+										:label="__('Valid From')"
 										v-model="form.valid_from"
 									/>
 									<FormControl
 										type="date"
-										label="Valid Until"
+										:label="__('Valid Until')"
 										v-model="form.valid_upto"
 									/>
 									<FormControl
 										v-if="form.coupon_type === 'Promotional'"
 										type="number"
-										label="Maximum Use"
+										:label="__('Maximum Use')"
 										v-model="form.maximum_use"
-										placeholder="Unlimited"
+										:placeholder="__('Unlimited')"
 									/>
 									<div v-if="!isCreating">
-										<label class="block text-sm font-medium text-gray-700 mb-2">Times Used</label>
+										<label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Times Used') }}</label>
 										<div class="px-3 py-2 bg-gray-50 rounded-lg">
 											<p class="text-lg font-bold text-gray-900">{{ couponDetails.used || 0 }}</p>
 										</div>
@@ -455,7 +457,7 @@
 											v-model="form.one_use"
 											class="rounded border-gray-300"
 										/>
-										<span class="text-sm text-gray-700">Only One Use Per Customer</span>
+										<span class="text-sm text-gray-700">{{ __('Only One Use Per Customer') }}</span>
 									</label>
 								</div>
 							</div>
@@ -466,29 +468,29 @@
 							<div class="p-5">
 								<div class="flex items-center space-x-2 mb-4">
 									<FeatherIcon name="activity" class="w-4 h-4 text-orange-600" />
-									<h4 class="text-sm font-semibold text-gray-900">Coupon Status & Info</h4>
+									<h4 class="text-sm font-semibold text-gray-900">{{ __('Coupon Status & Info') }}</h4>
 								</div>
 								<div class="grid grid-cols-3 gap-4">
 									<div>
-										<label class="block text-xs font-medium text-gray-500 mb-1">Current Status</label>
+										<label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Current Status') }}</label>
 										<Badge :theme="getStatusTheme(selectedCoupon.status)" variant="subtle" size="md">
 											{{ selectedCoupon.status }}
 										</Badge>
 									</div>
 									<div>
-										<label class="block text-xs font-medium text-gray-500 mb-1">Created On</label>
+										<label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Created On') }}</label>
 										<p class="text-sm text-gray-900">{{ formatDate(couponDetails.creation) }}</p>
 									</div>
 									<div>
-										<label class="block text-xs font-medium text-gray-500 mb-1">Last Modified</label>
+										<label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Last Modified') }}</label>
 										<p class="text-sm text-gray-900">{{ formatDate(couponDetails.modified) }}</p>
 									</div>
 									<div v-if="couponDetails.email_id">
-										<label class="block text-xs font-medium text-gray-500 mb-1">Email</label>
+										<label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Email') }}</label>
 										<p class="text-sm text-gray-900">{{ couponDetails.email_id }}</p>
 									</div>
 									<div v-if="couponDetails.mobile_no">
-										<label class="block text-xs font-medium text-gray-500 mb-1">Mobile</label>
+										<label class="block text-xs font-medium text-gray-500 mb-1">{{ __('Mobile') }}</label>
 										<p class="text-sm text-gray-900">{{ couponDetails.mobile_no }}</p>
 									</div>
 								</div>
@@ -515,12 +517,14 @@
 						</div>
 					</div>
 					<div class="flex-1">
-						<h3 class="text-lg font-semibold text-gray-900 mb-2">Delete Coupon</h3>
-						<p class="text-sm text-gray-600 mb-1">
-							Are you sure you want to delete <strong>"{{ selectedCoupon?.coupon_code }}"</strong>?
-						</p>
+						<h3 class="text-lg font-semibold text-gray-900 mb-2">{{ __('Delete Coupon') }}</h3>
+							<TranslatedHTML 
+								:tag="'p'"
+								class="text-sm text-gray-600 mb-1"
+								:inner="__('Are you sure you want to delete &lt;strong&gt;&quot;{0}&quot;&lt;strong&gt;?', [selectedCoupon?.coupon_code])"
+							/>
 						<p class="text-sm text-gray-500">
-							This action cannot be undone.
+							{{ __('This action cannot be undone.') }}
 						</p>
 					</div>
 				</div>
@@ -529,7 +533,7 @@
 						@click="showDeleteConfirm = false"
 						variant="ghost"
 					>
-						Cancel
+						{{ __('Cancel') }}
 					</Button>
 					<Button
 						@click="confirmDelete"
@@ -540,7 +544,7 @@
 						<template #prefix>
 							<FeatherIcon name="trash-2" class="w-4 h-4" />
 						</template>
-						Delete Coupon
+						{{ __('Delete Coupon') }}
 					</Button>
 				</div>
 			</div>
@@ -553,6 +557,7 @@ import { useToast } from "@/composables/useToast"
 import { Badge, Button, Card, FormControl, LoadingIndicator, createResource } from "frappe-ui"
 import { FeatherIcon } from "frappe-ui"
 import { computed, onMounted, ref, watch } from "vue"
+import TranslatedHTML from "../common/TranslatedHTML.vue"
 
 const { showSuccess, showError, showWarning } = useToast()
 
@@ -641,7 +646,7 @@ const filteredCoupons = computed(() => {
 
 const campaignOptions = computed(() => {
 	return [
-		{ label: "-- No Campaign --", value: "" },
+		{ label: __("-- No Campaign --"), value: "" },
 		...campaigns.value.map(c => ({ label: c.name, value: c.name }))
 	]
 })
@@ -662,7 +667,7 @@ const couponsResource = createResource({
 	},
 	onError(error) {
 		loading.value = false
-		handleError(error, "Failed to load coupons")
+		handleError(error, __('Failed to load coupons'))
 	},
 })
 
@@ -679,7 +684,7 @@ const couponDetailsResource = createResource({
 	},
 	onError(error) {
 		loading.value = false
-		handleError(error, "Failed to load coupon details")
+		handleError(error, __('Failed to load coupon details'))
 	},
 })
 
@@ -708,14 +713,14 @@ const createCouponResource = createResource({
 	onSuccess(data) {
 		loading.value = false
 		const responseData = data?.message || data
-		showSuccess(responseData?.message || "Coupon created successfully")
+		showSuccess(responseData?.message || __("Coupon created successfully"))
 		loadCoupons()
 		handleCancel()
 		emit("coupon-saved", responseData)
 	},
 	onError(error) {
 		loading.value = false
-		handleError(error, "Failed to create coupon")
+		handleError(error, __("Failed to create coupon"))
 	},
 })
 
@@ -742,14 +747,14 @@ const updateCouponResource = createResource({
 	onSuccess(data) {
 		loading.value = false
 		const responseData = data?.message || data
-		showSuccess(responseData?.message || "Coupon updated successfully")
+		showSuccess(responseData?.message || __("Coupon updated successfully"))
 		loadCoupons()
 		// Reload details to show updated info
 		couponDetailsResource.reload()
 	},
 	onError(error) {
 		loading.value = false
-		handleError(error, "Failed to update coupon")
+		handleError(error, __("Failed to update coupon"))
 	},
 })
 
@@ -762,7 +767,7 @@ const toggleCouponResource = createResource({
 	onSuccess(data) {
 		loading.value = false
 		const responseData = data?.message || data
-		showSuccess(responseData?.message || "Coupon status updated successfully")
+		showSuccess(responseData?.message || __("Coupon status updated successfully"))
 		loadCoupons()
 		// Reload details to get updated disabled status
 		if (selectedCoupon.value) {
@@ -771,7 +776,7 @@ const toggleCouponResource = createResource({
 	},
 	onError(error) {
 		loading.value = false
-		handleError(error, "Failed to toggle coupon status")
+		handleError(error, __("Failed to toggle coupon status"))
 	},
 })
 
@@ -785,14 +790,14 @@ const deleteCouponResource = createResource({
 		loading.value = false
 		showDeleteConfirm.value = false
 		const responseData = data?.message || data
-		showSuccess(responseData?.message || "Coupon deleted successfully")
+		showSuccess(responseData?.message || __("Coupon deleted successfully"))
 		loadCoupons()
 		handleCancel()
 	},
 	onError(error) {
 		loading.value = false
 		showDeleteConfirm.value = false
-		handleError(error, "Failed to delete coupon")
+		handleError(error, __("Failed to delete coupon"))
 	},
 })
 
@@ -839,26 +844,26 @@ function handleCancel() {
 function handleSubmit() {
 	// Validate
 	if (!form.value.coupon_name) {
-		showWarning("Please enter a coupon name")
+		showWarning(__("Please enter a coupon name"))
 		return
 	}
 	if (!form.value.discount_type) {
-		showWarning("Please select a discount type")
+		showWarning(__("Please select a discount type"))
 		return
 	}
 	if (form.value.discount_type === "Percentage") {
 		if (!form.value.discount_percentage || form.value.discount_percentage <= 0 || form.value.discount_percentage > 100) {
-			showWarning("Please enter a valid discount percentage (1-100)")
+			showWarning(__("Please enter a valid discount percentage (1-100)"))
 			return
 		}
 	} else if (form.value.discount_type === "Amount") {
 		if (!form.value.discount_amount || form.value.discount_amount <= 0) {
-			showWarning("Please enter a valid discount amount")
+			showWarning(__("Please enter a valid discount amount"))
 			return
 		}
 	}
 	if (form.value.coupon_type === "Gift Card" && !form.value.customer) {
-		showWarning("Please select a customer for gift card")
+		showWarning(__("Please select a customer for gift card"))
 		return
 	}
 
@@ -878,7 +883,7 @@ function handleToggle() {
 
 function handleDelete() {
 	if (selectedCoupon.value.used > 0) {
-		showWarning(`Cannot delete coupon as it has been used ${selectedCoupon.value.used} times`)
+		showWarning(__('Cannot delete coupon as it has been used {0} times', [selectedCoupon.value.used]))
 		return
 	}
 	showDeleteConfirm.value = true
@@ -922,14 +927,14 @@ function resetForm() {
 function populateFormFromCoupon(coupon) {
 	form.value = {
 		coupon_name: coupon.coupon_name || "",
-		coupon_type: coupon.coupon_type || "Promotional",
+		coupon_type: coupon.coupon_type || __('Promotional'),
 		coupon_code: coupon.coupon_code || "",
-		discount_type: coupon.discount_type || "Percentage",
+		discount_type: coupon.discount_type || __('Percentage'),
 		discount_percentage: coupon.discount_percentage || null,
 		discount_amount: coupon.discount_amount || null,
 		min_amount: coupon.min_amount || null,
 		max_amount: coupon.max_amount || null,
-		apply_on: coupon.apply_on || "Grand Total",
+		apply_on: coupon.apply_on || __('Grand Total'),
 		customer: coupon.customer || "",
 		campaign: coupon.campaign || "",
 		valid_from: coupon.valid_from || "",
@@ -980,16 +985,16 @@ function parseErrorMessage(error) {
 			const messages = JSON.parse(error._server_messages)
 			if (Array.isArray(messages) && messages.length > 0) {
 				const firstMessage = typeof messages[0] === "string" ? JSON.parse(messages[0]) : messages[0]
-				return firstMessage.message || error.message || "An error occurred"
+				return firstMessage.message || error.message || __("An error occurred")
 			}
 		}
-		return error.message || "An error occurred"
+		return error.message || __("An error occurred")
 	} catch (e) {
-		return error.message || "An error occurred"
+		return error.message || __("An error occurred")
 	}
 }
 
-function handleError(error, defaultMessage = "An error occurred") {
+function handleError(error, defaultMessage = __("An error occurred")) {
 	const errorMessage = parseErrorMessage(error)
 	showError(errorMessage || defaultMessage)
 }
