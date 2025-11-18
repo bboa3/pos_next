@@ -1,4 +1,7 @@
 import { call } from "@/utils/apiWrapper"
+import { logger } from "@/utils/logger"
+
+const log = logger.create('PrintInvoice')
 
 /**
  * Print invoice using Frappe's print format system
@@ -47,7 +50,7 @@ export async function printInvoice(
 
 		return true
 	} catch (error) {
-		console.error("Error printing with Frappe print format:", error)
+		log.error("Error printing with Frappe print format:", error)
 		// Fallback to custom print format
 		return printInvoiceCustom(invoiceData)
 	}
@@ -453,10 +456,9 @@ export async function printInvoiceByName(
 	letterhead = null,
 ) {
 	try {
-		// Fetch the invoice document
-		const invoiceDoc = await call("frappe.client.get", {
-			doctype: "Sales Invoice",
-			name: invoiceName,
+		// Fetch the invoice document using proper POS API endpoint
+		const invoiceDoc = await call("pos_next.api.invoices.get_invoice", {
+			invoice_name: invoiceName,
 		})
 
 		if (!invoiceDoc) {
@@ -476,7 +478,7 @@ export async function printInvoiceByName(
 					letterhead = letterhead || posProfileDoc.letter_head
 				}
 			} catch (error) {
-				console.warn("Could not fetch POS Profile print settings:", error)
+				log.warn("Could not fetch POS Profile print settings:", error)
 				// Continue with default print format
 			}
 		}
@@ -484,7 +486,7 @@ export async function printInvoiceByName(
 		// Print the invoice
 		return await printInvoice(invoiceDoc, printFormat, letterhead)
 	} catch (error) {
-		console.error("Error fetching invoice for print:", error)
+		log.error("Error fetching invoice for print:", error)
 		throw error
 	}
 }
