@@ -11,7 +11,8 @@
 				:shift-duration="shiftStore.shiftDuration"
 				:has-open-shift="shiftStore.hasOpenShift"
 				:profile-name="shiftStore.profileName"
-				:user-name="getCurrentUser()"
+				:user-name="userName"
+				:user-image="userImage"
 				:is-offline="offlineStore.isOffline"
 				:is-syncing="offlineStore.isSyncing"
 				:pending-invoices-count="offlineStore.pendingInvoicesCount"
@@ -673,6 +674,7 @@ import InvoiceManagement from "@/components/invoices/InvoiceManagement.vue"
 import { useRealtimeStock } from "@/composables/useRealtimeStock"
 import { usePOSEvents } from "@/composables/usePOSEvents"
 import { session } from "@/data/session"
+import { useUserData } from "@/data/user"
 import { parseError } from "@/utils/errorHandler"
 import { offlineWorker } from "@/utils/offline/workerClient"
 import { printInvoiceByName } from "@/utils/printInvoice"
@@ -714,6 +716,9 @@ const { showSuccess, showError, showWarning } = useToast()
 
 // Initialize logger
 const log = logger.create('POSSale')
+
+// User data composable
+const { userName, userImage } = useUserData()
 
 // Component refs
 const itemsSelectorRef = ref(null)
@@ -1622,17 +1627,6 @@ async function handlePrintInvoice() {
 
 function formatCurrency(amount) {
 	return Number.parseFloat(amount || 0).toFixed(2)
-}
-
-function getCurrentUser() {
-	if (typeof window !== "undefined" && window.frappe?.session) {
-		return (
-			window.frappe.session.user_fullname ||
-			window.frappe.session.user ||
-			"User"
-		)
-	}
-	return "User"
 }
 
 function confirmLogout() {
