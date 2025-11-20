@@ -356,10 +356,15 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			updatedEntries.push({
 				name: offer.title || offer.name,
 				code: offerCode,
-				offer,
+				offer, // Store full offer object for validation
 				source: "manual",
 				applied: true,
 				rules: offerRuleCodes,
+				// Store constraints for quick validation
+				min_qty: offer.min_qty,
+				max_qty: offer.max_qty,
+				min_amt: offer.min_amt,
+				max_amt: offer.max_amt,
 			})
 			appliedOffers.value = updatedEntries
 
@@ -439,6 +444,10 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		}
 	}
 
+	/**
+	 * Validates applied offers and removes invalid ones when cart changes
+	 * This function is called automatically when items are added/removed or quantities change
+	 */
 	async function reapplyOffer(currentProfile) {
 		// Clear offers if cart is empty
 		if (invoiceItems.value.length === 0 && appliedOffers.value.length) {
@@ -447,33 +456,108 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			return
 		}
 
-		// Reapply or discover offers when cart has items
-		// - If appliedOffers.length > 0: re-validates existing offers
-		// - If appliedOffers.length === 0: discovers new eligible offers
-		if (invoiceItems.value.length > 0 && !suppressOfferReapply.value) {
-			try {
-				const invoiceData = buildInvoiceDataForOffers(currentProfile)
-				const offerNames = getAppliedOfferCodes()
-
-				const response = await applyOffersResource.submit({
-					invoice_data: invoiceData,
-					selected_offers: offerNames,
-				})
-
-				const { items: responseItems, freeItems, appliedRules } =
-					parseOfferResponse(response, offerNames)
-
-				suppressOfferReapply.value = true
-				applyServerDiscounts(responseItems)
-				processFreeItems(freeItems)
-				filterActiveOffers(appliedRules)
-			} catch (error) {
-				console.error("Error re-applying offers:", error)
-			}
-		}
-
+		// Skip revalidation if suppressed (e.g., during offer application)
 		if (suppressOfferReapply.value) {
 			suppressOfferReapply.value = false
+			return
+		}
+
+		// Only validate if there are applied offers
+		if (appliedOffers.value.length === 0 || invoiceItems.value.length === 0) {
+			return
+		}
+
+		try {
+			// Build current cart snapshot for validation
+			const cartSnapshot = buildCartSnapshot()
+
+			// Check each applied offer against current cart state
+			const invalidOffers = []
+			for (const appliedOffer of appliedOffers.value) {
+				const offer = appliedOffer.offer
+				if (!offer) continue
+
+				// Use offersStore to check eligibility
+				offersStore.updateCartSnapshot(cartSnapshot)
+				const { eligible, reason } = offersStore.checkOfferEligibility(offer)
+
+				if (!eligible) {
+					invalidOffers.push({
+						...appliedOffer,
+						reason
+					})
+				}
+			}
+
+			// If any offers are invalid, remove them and reapply remaining
+			if (invalidOffers.length > 0) {
+				const validOfferCodes = appliedOffers.value
+					.filter(o => !invalidOffers.find(inv => inv.code === o.code))
+					.map(o => o.code)
+
+				// Show warning about removed offers
+				const offerNames = invalidOffers.map(o => o.name).join(', ')
+				showWarning(`Offer removed: ${offerNames}. Cart no longer meets requirements.`)
+
+				if (validOfferCodes.length === 0) {
+					// All offers invalid - clear everything
+					suppressOfferReapply.value = true
+					appliedOffers.value = []
+					processFreeItems([])
+
+					// Reset all item rates to original (remove discounts)
+					invoiceItems.value.forEach(item => {
+						if (item.pricing_rules && item.pricing_rules.length > 0) {
+							item.discount_percentage = 0
+							item.discount_amount = 0
+							item.pricing_rules = []
+							recalculateItem(item)
+						}
+					})
+					rebuildIncrementalCache()
+				} else {
+					// Reapply only valid offers
+					const invoiceData = buildInvoiceDataForOffers(currentProfile)
+					const response = await applyOffersResource.submit({
+						invoice_data: invoiceData,
+						selected_offers: validOfferCodes,
+					})
+
+					const { items: responseItems, freeItems, appliedRules } =
+						parseOfferResponse(response, validOfferCodes)
+
+					suppressOfferReapply.value = true
+					applyServerDiscounts(responseItems)
+					processFreeItems(freeItems)
+					filterActiveOffers(appliedRules)
+
+					// Update appliedOffers to only include valid ones
+					appliedOffers.value = appliedOffers.value.filter(entry =>
+						appliedRules.includes(entry.code)
+					)
+				}
+			}
+		} catch (error) {
+			console.error("Error validating offers:", error)
+		}
+	}
+
+	/**
+	 * Builds cart snapshot for offer validation
+	 */
+	function buildCartSnapshot() {
+		const items = invoiceItems.value
+		const totalQty = items.reduce((sum, item) => sum + (item.quantity || 0), 0)
+		const itemCodes = items.map(item => item.item_code)
+		const itemGroups = items.map(item => item.item_group).filter(Boolean)
+		const brands = items.map(item => item.brand).filter(Boolean)
+
+		return {
+			subtotal: subtotal.value,
+			itemCount: totalQty,
+			itemCodes: [...new Set(itemCodes)],
+			itemGroups: [...new Set(itemGroups)],
+			brands: [...new Set(brands)]
 		}
 	}
 
@@ -628,18 +712,33 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		}
 	}
 
-	// Watch for cart changes to update offer snapshot
+	// Watch for cart changes to update offer snapshot and validate offers
 	// Watch subtotal and create a reactive hash of items to detect any changes
 	watch(
 		[
 			subtotal,
 			() => invoiceItems.value.map(item => `${item.item_code}:${item.quantity}`).join(',')
 		],
-		() => {
+		async () => {
 			// Defer to next tick to prevent blocking UI
-			nextTick(() => {
-				syncOfferSnapshot()
-			})
+			await nextTick()
+
+			// Update offer snapshot for eligibility checking
+			syncOfferSnapshot()
+
+			// Validate applied offers - remove any that no longer meet requirements
+			if (appliedOffers.value.length > 0 && posProfile.value) {
+				// Get current profile from posProfile
+				const currentProfile = {
+					customer: customer.value?.name || customer.value,
+					company: posProfile.value.company,
+					selling_price_list: posProfile.value.selling_price_list,
+					currency: posProfile.value.currency,
+				}
+
+				// Validate and auto-remove invalid offers
+				await reapplyOffer(currentProfile)
+			}
 		},
 		{ immediate: true, flush: "post" },
 	)

@@ -91,6 +91,14 @@ export const usePOSOffersStore = defineStore("posOffers", () => {
 			}
 		}
 
+		// Check maximum quantity (e.g., offer only valid for up to 2 items)
+		if (offer?.max_qty && itemCount > offer.max_qty) {
+			return {
+				eligible: false,
+				reason: `Maximum ${offer.max_qty} items allowed for this offer`,
+			}
+		}
+
 		// Check minimum amount
 		if (offer?.min_amt && subtotal < offer.min_amt) {
 			return {
