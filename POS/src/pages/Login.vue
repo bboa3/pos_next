@@ -127,25 +127,28 @@ onMounted(() => {
 	loginForm.email = ""
 	loginForm.password = ""
 	showPassword.value = false
-	showShiftDialog.value = false
 
 	// Clear any login errors
 	if (session.login.error) {
 		session.login.reset()
 	}
 
-	// Clear cart and UI state to ensure clean slate
-	cartStore.clearCart()
-	uiStore.resetAllDialogs()
+	// Only clear state if user is NOT logged in
+	// If user is already logged in (e.g., after successful login), don't clear their session
+	if (!session.isLoggedIn) {
+		showShiftDialog.value = false
+		cartStore.clearCart()
+		uiStore.resetAllDialogs()
 
-	// Clear any stale shift state
-	shiftState.value = {
-		pos_opening_shift: null,
-		pos_profile: null,
-		company: null,
-		isOpen: false,
+		// Clear any stale shift state
+		shiftState.value = {
+			pos_opening_shift: null,
+			pos_profile: null,
+			company: null,
+			isOpen: false,
+		}
+		localStorage.removeItem("pos_shift_data")
 	}
-	localStorage.removeItem("pos_shift_data")
 })
 
 function submit() {
@@ -183,14 +186,26 @@ watch(
 	},
 )
 
+// Watch for dialog being closed via X button (v-model update)
+// When user closes dialog without action, navigate to POSSale
+watch(showShiftDialog, (isOpen, wasOpen) => {
+	// Only navigate if dialog was open and is now closed, and user is logged in
+	if (wasOpen === true && isOpen === false && session.isLoggedIn) {
+		router.push({ name: "POSSale" })
+	}
+})
+
 function handleShiftOpened() {
 	// Navigate to POS sale after shift is opened
 	router.push({ name: "POSSale" })
 }
 
 function handleDialogClosed({ reason }) {
-	// Navigate to /pos when dialog is cancelled
-	if (reason === "cancelled") {
+	// Navigate to /pos when dialog is cancelled or resumed
+	// "cancelled" means user closed dialog without action
+	// "resumed" means user chose to resume existing shift
+	// In both cases, navigate to POSSale (existing shift will be active)
+	if (reason === "cancelled" || reason === "resumed") {
 		router.push({ name: "POSSale" })
 	}
 }
