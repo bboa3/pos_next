@@ -7,6 +7,88 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2025-11-23
+
+### Added
+- **Country Code Selector for Customer Phone Numbers**
+  - Added country code selector with flag icons for customer phone input
+  - Visual country flag display for better user experience
+  - Support for international phone number formats
+- **Invoice Detail View**
+  - Implemented comprehensive invoice detail view with proper API endpoints
+  - Enhanced invoice information display and navigation
+- **User Profile Management**
+  - Added user profile image display in POS header
+  - Implemented reactive user data management system
+  - Real-time user information updates
+
+### Changed
+- **Print Functionality**
+  - Updated print endpoint to use printview for better browser compatibility
+  - Improved cross-browser printing experience
+- **Node.js Version Update**
+  - Updated Node.js version to 20 in CI workflow for better performance and security
+
+### Fixed
+- **Warehouse Availability Check**
+  - Added warehouse availability check for out-of-stock items
+  - Prevents selection of items not available in selected warehouse
+- **Disabled Items Filtering**
+  - Filter disabled items from Items Selector and search results
+  - Only show active items available for sale
+- **Customer API**
+  - Fixed indentation in customer API for better code readability
+  - Load all customers without hardcoded limit for better scalability
+- **Return Invoice Dialog**
+  - Enhanced return invoice dialog layout and status display
+  - Adjusted dialog sizes for better UX across different screen sizes
+  - Improved mobile responsiveness for return invoice dialog
+- **Shift Dialog Navigation**
+  - Navigate to POSSale when shift dialog is closed via X button
+  - Better user flow when dismissing shift dialog
+- **User Authentication Race Condition**
+  - Resolved race condition where user appears as Guest after login
+  - Fixed authentication state synchronization issues
+- **Automatic Offer Validation**
+  - Added automatic offer validation and removal when cart conditions change
+  - Ensures promotional offers remain valid based on current cart state
+- **Login Error Messages**
+  - Show descriptive error message when inputting wrong credentials
+  - Navigate to /pos when clicking cancel button of ShiftDialog
+
+### Improved
+- **Return Invoice UI**
+  - Extracted payment icon utility for better code reusability
+  - Improved return invoice UI consistency and styling
+- **Cart UX Improvements**
+  - **Customer Section:**
+    - Added quick customer creation button next to search input
+    - Large touch-friendly button (44px+) with user-plus icon
+    - Improved search input with better sizing and rounded corners
+    - Professional customer card design with gradient avatar
+  - **Empty Cart Quick Actions:**
+    - Implemented 2x3 grid with 6 action buttons
+    - Quick access to: View Shift, Draft Invoices, Invoice History, Return Invoice, Close Shift, Create Customer
+    - Icon backgrounds with subtle hover effects
+    - Touch-friendly sizing meeting accessibility standards
+  - **Cart Items Section:**
+    - Relocated Offers & Coupon buttons to dedicated section below customer bar
+    - Larger buttons with improved styling and badge visibility
+    - Better spacing and padding throughout
+  - **Action Buttons:**
+    - Checkout and Hold Order now side-by-side (50/50 width)
+    - Saves ~70px vertical space for more cart visibility
+    - Consistent sizing and rounded styling
+  - **Touch & Mobile Improvements:**
+    - All buttons meet 44px+ minimum touch target
+    - Increased padding and better text sizes
+    - Consistent rounded styling and proper hover/active states
+
+### Removed
+- **POS Profile Feature Cleanup**
+  - Removed create_pos_invoice_instead_of_sales_invoice feature from POS Profile
+  - Simplified POS Profile configuration
+
 ## [1.8.0] - 2025-11-17
 
 ### Added
@@ -437,7 +519,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shift management
 - Stock tracking
 
-[Unreleased]: https://github.com/BrainWise-DEV/POSNext/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/BrainWise-DEV/POSNext/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/BrainWise-DEV/POSNext/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/BrainWise-DEV/POSNext/compare/v1.7.1...v1.8.0
 [1.7.1]: https://github.com/BrainWise-DEV/POSNext/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/BrainWise-DEV/POSNext/compare/v1.6.1...v1.7.0
