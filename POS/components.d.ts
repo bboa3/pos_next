@@ -51,5 +51,6 @@ declare module 'vue' {
     StatusBadge: typeof import('./src/components/common/StatusBadge.vue')['default']
     Toast: typeof import('./src/components/common/Toast.vue')['default']
     UserMenu: typeof import('./src/components/common/UserMenu.vue')['default']
+    WarehouseAvailabilityDialog: typeof import('./src/components/sale/WarehouseAvailabilityDialog.vue')['default']
   }
 }

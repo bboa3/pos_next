@@ -1323,6 +1323,107 @@ def get_stock_quantities(item_codes, warehouse):
 
 
 @frappe.whitelist()
+def get_item_warehouse_availability(item_code, company=None):
+	"""
+	Get stock availability for an item across all warehouses.
+	Useful for showing cashiers where out-of-stock items are available.
+
+	Handles:
+	- Regular items: Shows stock in all warehouses
+	- Item variants: Shows stock for the specific variant
+	- Template items (has_variants): Shows combined stock of all variants
+
+	Args:
+		item_code: Item code or template item code
+		company: Optional company filter
+
+	Returns:
+		List of warehouses with stock:
+		[
+			{
+				"warehouse": str,
+				"warehouse_name": str,
+				"actual_qty": float,
+				"reserved_qty": float,
+				"available_qty": float,
+				"company": str
+			}
+		]
+	"""
+	try:
+		# Check if item exists
+		item_doc = frappe.get_cached_doc("Item", item_code)
+
+		# Determine which items to check stock for
+		items_to_check = [item_code]
+
+		# If this is a template item, include all its variants
+		if item_doc.has_variants:
+			variants = frappe.get_all(
+				"Item",
+				filters={"variant_of": item_code, "disabled": 0},
+				fields=["name"]
+			)
+			items_to_check.extend([v.name for v in variants])
+
+		# Build warehouse filter
+		warehouse_filters = {
+			"disabled": 0,
+			"is_group": 0  # Only show leaf warehouses, not groups
+		}
+		if company:
+			warehouse_filters["company"] = company
+
+		# Get all active non-group warehouses
+		warehouses = frappe.get_all(
+			"Warehouse",
+			filters=warehouse_filters,
+			fields=["name", "warehouse_name", "company"],
+			order_by="warehouse_name"
+		)
+
+		# Get stock for all items in all warehouses
+		stock_data = frappe.db.sql("""
+			SELECT
+				warehouse,
+				SUM(actual_qty) as actual_qty,
+				SUM(reserved_qty) as reserved_qty
+			FROM `tabBin`
+			WHERE item_code IN %(items)s
+			AND warehouse IN %(warehouses)s
+			GROUP BY warehouse
+			HAVING SUM(actual_qty) > 0
+			ORDER BY SUM(actual_qty) DESC
+		""", {
+			"items": items_to_check,
+			"warehouses": [w.name for w in warehouses]
+		}, as_dict=1)
+
+		# Build warehouse map for quick lookup
+		warehouse_map = {w.name: w for w in warehouses}
+
+		# Enrich stock data with warehouse details
+		result = []
+		for stock in stock_data:
+			warehouse = warehouse_map.get(stock.warehouse)
+			if warehouse:
+				result.append({
+					"warehouse": stock.warehouse,
+					"warehouse_name": warehouse.warehouse_name,
+					"actual_qty": flt(stock.actual_qty),
+					"reserved_qty": flt(stock.reserved_qty),
+					"available_qty": flt(stock.actual_qty) - flt(stock.reserved_qty),
+					"company": warehouse.company
+				})
+
+		return result
+
+	except Exception as e:
+		frappe.log_error(frappe.get_traceback(), "Get Warehouse Availability Error")
+		frappe.throw(_("Error fetching warehouse availability: {0}").format(str(e)))
+
+
+@frappe.whitelist()
 def get_product_bundle_availability(item_code, warehouse):
 	"""
 	Get Product Bundle availability with detailed component information.

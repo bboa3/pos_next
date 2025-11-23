@@ -277,7 +277,7 @@
 						@touchend.passive="getOptimizedClickHandler(item).touchend"
 						@click="getOptimizedClickHandler(item).click"
 						:class="[
-							'relative bg-white border border-gray-200 rounded-lg p-1.5 sm:p-2.5 touch-manipulation transition-[border-color,box-shadow] duration-100 cursor-pointer hover:border-blue-400 hover:shadow-md',
+							'group relative bg-white border border-gray-200 rounded-lg p-1.5 sm:p-2.5 touch-manipulation transition-[border-color,box-shadow] duration-100 cursor-pointer hover:border-blue-400 hover:shadow-md',
 						]"
 					>
 						<!-- Stock Badge - Positioned at top right of card -->
@@ -299,15 +299,36 @@
 
 						<!-- Item Image -->
 						<div class="relative aspect-square bg-gray-100 rounded-md mb-1.5 sm:mb-2 overflow-hidden">
-							<LazyImage
-								v-if="item.image"
-								:src="item.image"
-								:alt="item.item_name"
-								container-class="relative w-full h-full"
-								img-class="w-full h-full object-cover"
-								root-margin="100px"
-							>
-								<template #error>
+							<!-- Image with conditional blur on hover -->
+							<div :class="[
+								'w-full h-full transition-all duration-300',
+								(item.is_stock_item || item.is_bundle) && (item.actual_qty ?? item.stock_qty ?? 0) <= 0 ? 'group-hover:blur-sm group-hover:brightness-75' : ''
+							]">
+								<LazyImage
+									v-if="item.image"
+									:src="item.image"
+									:alt="item.item_name"
+									container-class="relative w-full h-full"
+									img-class="w-full h-full object-cover"
+									root-margin="100px"
+								>
+									<template #error>
+										<svg
+											class="h-8 w-8 sm:h-10 sm:w-10 text-gray-300"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+											/>
+										</svg>
+									</template>
+								</LazyImage>
+								<div v-else class="w-full h-full flex items-center justify-center">
 									<svg
 										class="h-8 w-8 sm:h-10 sm:w-10 text-gray-300"
 										fill="none"
@@ -321,23 +342,23 @@
 											d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
 										/>
 									</svg>
-								</template>
-							</LazyImage>
-							<div v-else class="w-full h-full flex items-center justify-center">
-								<svg
-									class="h-8 w-8 sm:h-10 sm:w-10 text-gray-300"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-									/>
-								</svg>
+								</div>
 							</div>
+
+							<!-- Warehouse Availability Info Icon - Minimal centered overlay that appears on hover for out of stock items -->
+							<button
+								v-if="(item.is_stock_item || item.is_bundle) && (item.actual_qty ?? item.stock_qty ?? 0) <= 0"
+								@click.stop="showWarehouseAvailability(item)"
+								class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+								title="Check availability in other warehouses"
+								aria-label="Check warehouse availability"
+							>
+								<div class="p-2.5 bg-white/80 backdrop-blur-sm rounded-full">
+									<svg class="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+									</svg>
+								</div>
+							</button>
 						</div>
 
 						<!-- Item Details -->
@@ -480,7 +501,7 @@
 							@touchmove.passive="getOptimizedClickHandler(item).touchmove"
 							@touchend.passive="getOptimizedClickHandler(item).touchend"
 							@click="getOptimizedClickHandler(item).click"
-							class="cursor-pointer hover:bg-blue-50 hover:shadow-md transition-[background-color,box-shadow] duration-100 touch-manipulation active:bg-blue-100"
+							class="group cursor-pointer hover:bg-blue-50 hover:shadow-md transition-[background-color,box-shadow] duration-100 touch-manipulation active:bg-blue-100"
 						>
 							<td class="px-2 sm:px-3 py-2 whitespace-nowrap w-[50px] sm:w-[60px]">
 								<div class="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded flex items-center justify-center overflow-hidden">
@@ -515,18 +536,37 @@
 								<div class="text-xs sm:text-sm font-semibold text-blue-600">{{ formatCurrency(item.rate || item.price_list_rate || 0) }}</div>
 							</td>
 							<td class="px-2 sm:px-3 py-2 whitespace-nowrap w-[70px] sm:w-[100px]">
-								<span
+								<div
 									v-if="item.is_stock_item || item.is_bundle"
-									:class="[
-										'inline-block px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-md shadow-sm',
-										'text-[10px] sm:text-sm font-bold',
-										getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).color,
-										getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).textColor
-									]"
-									:title="`${getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).label}: ${Math.floor(item.actual_qty ?? item.stock_qty ?? 0)} ${item.is_bundle ? 'Bundles' : (item.uom || item.stock_uom || 'Nos')}`"
+									class="relative inline-flex"
 								>
-									{{ Math.floor(item.actual_qty ?? item.stock_qty ?? 0) }}
-								</span>
+									<!-- Quantity Badge -->
+									<span
+										:class="[
+											'inline-block px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-md shadow-sm transition-all',
+											'text-[10px] sm:text-sm font-bold',
+											getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).color,
+											getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).textColor,
+											(item.actual_qty ?? item.stock_qty ?? 0) <= 0 ? 'group-hover:blur-sm group-hover:brightness-90' : ''
+										]"
+										:title="`${getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).label}: ${Math.floor(item.actual_qty ?? item.stock_qty ?? 0)} ${item.is_bundle ? 'Bundles' : (item.uom || item.stock_uom || 'Nos')}`"
+									>
+										{{ Math.floor(item.actual_qty ?? item.stock_qty ?? 0) }}
+									</span>
+									<!-- Centered Info Icon Overlay for out of stock items -->
+									<button
+										v-if="(item.actual_qty ?? item.stock_qty ?? 0) <= 0"
+										@click.stop="showWarehouseAvailability(item)"
+										class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+										title="Check availability in other warehouses"
+									>
+										<div class="p-1.5 bg-white/90 backdrop-blur-sm rounded-full">
+											<svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+												<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+											</svg>
+										</div>
+									</button>
+								</div>
 								<span
 									v-else
 									class="text-xs sm:text-sm text-gray-400 italic"
@@ -649,10 +689,22 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- Warehouse Availability Dialog -->
+	<WarehouseAvailabilityDialog
+		v-if="warehouseDialogItem"
+		:show="showWarehouseDialog"
+		:item-code="warehouseDialogItem.itemCode"
+		:item-name="warehouseDialogItem.itemName"
+		:uom="warehouseDialogItem.uom"
+		:company="warehouseDialogItem.company"
+		@close="showWarehouseDialog = false"
+	/>
 </template>
 
 <script setup>
 import LazyImage from "@/components/common/LazyImage.vue"
+import WarehouseAvailabilityDialog from "@/components/sale/WarehouseAvailabilityDialog.vue"
 import { useItemSearchStore } from "@/stores/itemSearch"
 import { usePOSSettingsStore } from "@/stores/posSettings"
 import { useStock } from "@/composables/useStock"
@@ -695,7 +747,6 @@ const {
 	itemGroups,
 	loading,
 	loadingMore,
-	searching,
 	hasMore,
 	cacheSyncing,
 	cacheStats,
@@ -717,6 +768,10 @@ const autoSearchTimer = ref(null) // Timer for auto-search when typing stops
 const lastAutoSwitchCount = ref(0)
 const lastFilterSignature = ref("")
 const showSortDropdown = ref(false) // Sort dropdown visibility
+
+// Warehouse availability dialog state
+const showWarehouseDialog = ref(false)
+const warehouseDialogItem = ref(null)
 
 // Infinite scroll refs
 const gridScrollContainer = ref(null)
@@ -1130,6 +1185,17 @@ function toggleAutoAdd() {
 
 function formatCurrency(amount) {
 	return formatCurrencyUtil(Number.parseFloat(amount || 0), props.currency)
+}
+
+// Show warehouse availability dialog
+function showWarehouseAvailability(item) {
+	warehouseDialogItem.value = {
+		itemCode: item.item_code,
+		itemName: item.item_name,
+		uom: item.uom || item.stock_uom || 'Nos',
+		company: settingsStore.company
+	}
+	showWarehouseDialog.value = true
 }
 
 // Expose methods for parent component
