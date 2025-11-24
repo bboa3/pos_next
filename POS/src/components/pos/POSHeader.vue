@@ -8,7 +8,7 @@
 				<button
 					class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-md flex-shrink-0 hover:from-blue-600 hover:to-blue-700 active:scale-95 transition-all"
 					:aria-label="'POS Next'"
-					title="POS Next"
+					:title="__('POS Next')"
 				>
 					<svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
 						<path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 4h4v3h-4V4zm10 16H4V9h16v11z"/>
@@ -22,7 +22,7 @@
 				<div class="flex items-center space-x-1 sm:space-x-4 min-w-0 flex-1 overflow-hidden">
 					<div class="min-w-0 flex-shrink overflow-hidden">
 						<div class="flex items-center gap-1 sm:gap-2">
-							<h1 class="text-xs sm:text-base font-bold text-gray-900 truncate flex-shrink">POS Next</h1>
+							<h1 class="text-xs sm:text-base font-bold text-gray-900 truncate flex-shrink">{{ __('POS Next') }}</h1>
 							<span class="hidden sm:inline-flex relative items-center px-1 sm:px-2 py-0.5 text-[8px] sm:text-[10px] font-bold bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-md shadow-sm hover:shadow-md transition-shadow flex-shrink-0">
 								<span class="absolute inset-0 bg-white/20 rounded-md animate-pulse"></span>
 								<span class="relative">v{{ appVersion }}</span>
@@ -47,7 +47,7 @@
 							variant="green"
 							size="xs"
 							:icon="shiftIcon"
-							label="Shift Open:"
+							:label="__('Shift Open:')"
 							:value="shiftDuration"
 						/>
 					</div>
@@ -67,8 +67,8 @@
 							'p-2 sm:p-2 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors relative group touch-manipulation',
 							isSyncing ? 'animate-pulse' : ''
 						]"
-						:title="isOffline ? `Offline (${pendingInvoicesCount} pending)` : 'Online - Click to sync'"
-						:aria-label="isOffline ? 'Offline mode active' : 'Online mode active'"
+						:title="isOffline ? __('Offline ({0} pending)', [pendingInvoicesCount]) : __('Online - Click to sync')"
+						:aria-label="isOffline ? __('Offline mode active') : __('Online mode active')"
 					>
 						<svg
 							v-if="!isOffline"
@@ -138,7 +138,7 @@
 
 								<!-- Header -->
 								<div class="flex items-center justify-between mb-1.5 sm:mb-2 pb-1.5 sm:pb-2 border-b border-gray-700">
-									<span class="font-semibold text-[11px] sm:text-xs">Cache</span>
+									<span class="font-semibold text-[11px] sm:text-xs">{{ __('Cache') }}</span>
 									<span class="px-1.5 sm:px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold uppercase" :class="getCacheStatusBadgeClass()">
 										{{ getCacheStatus() }}
 									</span>
@@ -147,28 +147,28 @@
 								<!-- Stats -->
 								<div class="space-y-1 sm:space-y-1.5 text-[10px] sm:text-xs">
 									<div class="flex items-center justify-between">
-										<span class="text-gray-400">Items:</span>
+										<span class="text-gray-400">{{ __('Items:') }}</span>
 										<span class="font-semibold">{{ cacheStats?.items || 0 }}</span>
 									</div>
 									<div v-if="cacheStats?.lastSync" class="flex items-center justify-between">
-										<span class="text-gray-400">Last Sync:</span>
+										<span class="text-gray-400">{{ __('Last Sync:') }}</span>
 										<span class="font-semibold text-[9px] sm:text-[10px]">{{ formatLastSync() }}</span>
 									</div>
 									<div v-if="cacheSyncing" class="flex items-center justify-between">
-										<span class="text-gray-400">Status:</span>
+										<span class="text-gray-400">{{ __('Status:') }}</span>
 										<span class="text-orange-400 font-semibold flex items-center gap-1">
 											<svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 animate-spin" fill="none" viewBox="0 0 24 24">
 												<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 												<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
 											</svg>
-											Syncing...
+											{{ __('Syncing...') }}
 										</span>
 									</div>
 									<div v-if="stockSyncActive" class="flex items-center justify-between">
-										<span class="text-gray-400">Auto-Sync:</span>
+										<span class="text-gray-400">{{ __('Auto-Sync:') }}</span>
 										<span class="text-green-400 font-semibold flex items-center gap-1">
 											<div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-											Active
+											{{ __('Active') }}
 										</span>
 									</div>
 								</div>
@@ -182,7 +182,7 @@
 										<svg class="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
 										</svg>
-										Clear Cache
+										{{ __('Clear Cache') }}
 									</button>
 								</div>
 							</div>
@@ -193,7 +193,7 @@
 					<div class="hidden md:block">
 						<ActionButton
 							:icon="printerIcon"
-							title="Print Invoice"
+							:title="__('Print Invoice')"
 							@click="$emit('printer-click')"
 						/>
 					</div>
@@ -201,13 +201,13 @@
 					<!-- Refresh -->
 					<ActionButton
 						:icon="refreshIcon"
-						:title="isRefreshing ? 'Refreshing...' : 'Refresh Items'"
+						:title="isRefreshing ? __('Refreshing...') : __('Refresh Items')"
 						@click="$emit('refresh-click')"
 						:class="[
 							'touch-manipulation p-1 sm:p-2',
 							isRefreshing ? 'animate-spin' : ''
 						]"
-						:aria-label="isRefreshing ? 'Refreshing items...' : 'Refresh items list'"
+						:aria-label="isRefreshing ? __('Refreshing items...') : __('Refresh items list')"
 					/>
 
 					<div class="w-px h-4 sm:h-6 bg-gray-200 mx-0.5 sm:mx-2"></div>
@@ -341,12 +341,12 @@ function getCacheIconColor() {
 
 function getCacheStatus() {
 	if (!props.cacheStats || props.cacheStats.items === 0) {
-		return "Empty"
+		return __("Empty")
 	}
 	if (props.cacheSyncing) {
-		return "Syncing"
+		return __("Syncing")
 	}
-	return "Ready"
+	return __("Ready")
 }
 
 function getCacheStatusBadgeClass() {
@@ -361,7 +361,7 @@ function getCacheStatusBadgeClass() {
 
 function formatLastSync() {
 	if (!props.cacheStats?.lastSync) {
-		return "Never"
+		return __("Never")
 	}
 	const date = new Date(props.cacheStats.lastSync)
 	return date.toLocaleTimeString("en-US", {
@@ -373,12 +373,12 @@ function formatLastSync() {
 
 function getCacheAriaLabel() {
 	if (!props.cacheStats || props.cacheStats.items === 0) {
-		return "Cache empty"
+		return __("Cache empty")
 	}
 	if (props.cacheSyncing) {
-		return "Cache syncing"
+		return __("Cache syncing")
 	}
-	return "Cache ready"
+	return __("Cache ready")
 }
 
 // SVG Path Icons

@@ -37,10 +37,10 @@
 
 							<!-- Title & Message -->
 							<h3 class="text-2xl font-bold text-gray-900 text-center mb-3">
-								Clear Cache?
+								{{ __('Clear Cache?') }}
 							</h3>
 							<p class="text-gray-600 text-center mb-8 leading-relaxed">
-								This will clear all cached items, customers, and stock data. Invoices and drafts will be preserved.
+								{{ __('This will clear all cached items, customers, and stock data. Invoices and drafts will be preserved.') }}
 							</p>
 
 							<!-- Buttons -->
@@ -49,13 +49,13 @@
 									@click="$emit('cancel')"
 									class="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all active:scale-95"
 								>
-									Cancel
+									{{ __('Cancel') }}
 								</button>
 								<button
 									@click="handleConfirm"
 									class="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all active:scale-95 shadow-lg shadow-red-500/30"
 								>
-									Clear Cache
+									{{ __('Clear Cache') }}
 								</button>
 							</div>
 						</div>
@@ -86,10 +86,10 @@
 
 								<!-- Text -->
 								<h3 class="text-xl font-bold text-gray-900 mb-2">
-									Clearing Cache...
+									{{ __('Clearing Cache...') }}
 								</h3>
 								<p class="text-gray-500 text-center">
-									Please wait while we clear your cached data
+									{{ __('Please wait while we clear your cached data') }}
 								</p>
 
 								<!-- Progress dots animation -->

@@ -1,11 +1,11 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'Close POS Shift', size: '4xl' }">
+  <Dialog v-model="open" :options="{ title: __('Close POS Shift'), size: '4xl' }">
     <template #body-content>
       <div class="space-y-3 md:space-y-6">
         <div v-if="closingDataResource.loading" class="text-center py-8 md:py-12">
           <div class="inline-block animate-spin rounded-full h-12 w-12 md:h-16 md:w-16 border-b-4 border-blue-600"></div>
-          <p class="mt-3 md:mt-4 text-base md:text-lg font-medium text-gray-600">Loading shift data...</p>
-          <p class="text-xs md:text-sm text-gray-500">Calculating totals and reconciliation...</p>
+          <p class="mt-3 md:mt-4 text-base md:text-lg font-medium text-gray-600">{{ __('Loading shift data...') }}</p>
+          <p class="text-xs md:text-sm text-gray-500">{{ __('Calculating totals and reconciliation...') }}</p>
         </div>
 
         <div v-else-if="closingData" class="space-y-3 md:space-y-6">
@@ -17,7 +17,7 @@
                 <p class="text-xs md:text-sm text-gray-500 mt-1">{{ formatDateTime(closingData.period_start_date) }}</p>
               </div>
               <div class="text-left sm:text-right">
-                <div class="text-xs text-gray-500 uppercase">Duration</div>
+                <div class="text-xs text-gray-500 uppercase">{{ __('Duration') }}</div>
                 <div class="text-base md:text-lg font-semibold text-gray-900">{{ getShiftDuration() }}</div>
               </div>
             </div>
@@ -26,30 +26,30 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
               <!-- Total Sales -->
               <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
-                <div class="text-blue-600 text-xs uppercase font-medium mb-1">Total Sales</div>
+                <div class="text-blue-600 text-xs uppercase font-medium mb-1">{{ __('Total Sales') }}</div>
                 <div class="text-lg md:text-2xl font-bold text-blue-900 mb-0.5 md:mb-1 truncate">{{ formatCurrency(closingData.grand_total) }}</div>
-                <div class="text-blue-600 text-xs">{{ invoiceCount }} invoices</div>
+                <div class="text-blue-600 text-xs">{{ __('{0} invoices', [invoiceCount]) }}</div>
               </div>
 
               <!-- Net Amount -->
               <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 md:p-4">
-                <div class="text-gray-600 text-xs uppercase font-medium mb-1">Net Amount</div>
+                <div class="text-gray-600 text-xs uppercase font-medium mb-1">{{ __('Net Amount') }}</div>
                 <div class="text-lg md:text-2xl font-bold text-gray-900 mb-0.5 md:mb-1 truncate">{{ formatCurrency(closingData.net_total) }}</div>
-                <div class="text-gray-600 text-xs">Before tax</div>
+                <div class="text-gray-600 text-xs">{{ __('Before tax') }}</div>
               </div>
 
               <!-- Items Sold -->
               <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 md:p-4">
-                <div class="text-gray-600 text-xs uppercase font-medium mb-1">Items Sold</div>
+                <div class="text-gray-600 text-xs uppercase font-medium mb-1">{{ __('Items Sold') }}</div>
                 <div class="text-lg md:text-2xl font-bold text-gray-900 mb-0.5 md:mb-1">{{ formatQuantity(closingData.total_quantity) }}</div>
-                <div class="text-gray-600 text-xs">Total items</div>
+                <div class="text-gray-600 text-xs">{{ __('Total items') }}</div>
               </div>
 
               <!-- Tax Collected -->
               <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 md:p-4">
-                <div class="text-gray-600 text-xs uppercase font-medium mb-1">Tax Collected</div>
+                <div class="text-gray-600 text-xs uppercase font-medium mb-1">{{ __('Tax Collected') }}</div>
                 <div class="text-lg md:text-2xl font-bold text-gray-900 mb-0.5 md:mb-1 truncate">{{ formatCurrency(totalTax) }}</div>
-                <div class="text-gray-600 text-xs">Total tax</div>
+                <div class="text-gray-600 text-xs">{{ __('Total tax') }}</div>
               </div>
             </div>
           </div>
@@ -63,9 +63,9 @@
                 </svg>
               </div>
               <div>
-                <h3 class="text-xs md:text-sm font-medium text-yellow-900">No Sales During This Shift</h3>
+                <h3 class="text-xs md:text-sm font-medium text-yellow-900">{{ __('No Sales During This Shift') }}</h3>
                 <p class="text-xs md:text-sm text-yellow-700 mt-1 md:mt-2">
-                  No invoices were created. Closing amounts should match opening amounts.
+                  {{ __('No invoices were created. Closing amounts should match opening amounts.') }}
                 </p>
               </div>
             </div>
@@ -80,8 +80,11 @@
               class="w-full px-3 py-3 md:px-6 md:py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
             >
               <div class="text-left">
-                <h3 class="text-sm md:text-lg font-medium text-gray-900">Invoice Details</h3>
-                <p class="text-xs md:text-sm text-gray-500">{{ invoiceCount }} transactions • {{ formatCurrency(closingData.grand_total) }}</p>
+                <h3 class="text-sm md:text-lg font-medium text-gray-900">{{ __('Invoice Details') }}</h3>
+                <p class="text-xs md:text-sm text-gray-500">{{ __('{0} transactions • {1}', [
+                  invoiceCount,
+                  formatCurrency(closingData.grand_total)
+                ]) }}</p>
               </div>
               <svg
                 :class="['h-4 w-4 md:h-5 md:w-5 text-gray-400 transition-transform', showInvoiceDetails ? 'transform rotate-180' : '']"
@@ -99,7 +102,7 @@
                 <div v-for="(invoice, idx) in closingData.pos_transactions" :key="idx" class="p-3 hover:bg-gray-50">
                   <div class="flex justify-between items-start mb-2">
                     <span class="text-xs font-medium text-gray-900">
-                      {{ invoice.pos_invoice || invoice.sales_invoice || 'N/A' }}
+                      {{ invoice.pos_invoice || invoice.sales_invoice || __('N/A') }}
                     </span>
                     <span class="text-sm font-semibold text-gray-900">
                       {{ formatCurrency(invoice.grand_total) }}
@@ -112,7 +115,7 @@
                 </div>
                 <div class="bg-gray-50 p-3">
                   <div class="flex justify-between items-center">
-                    <span class="text-xs font-semibold text-gray-700">Total:</span>
+                    <span class="text-xs font-semibold text-gray-700">{{ __('Total:') }}</span>
                     <span class="text-sm font-bold text-gray-900">
                       {{ formatCurrency(closingData.grand_total) }}
                     </span>
@@ -125,17 +128,17 @@
                 <table class="min-w-full divide-y divide-gray-200">
                   <thead class="bg-gray-50">
                     <tr>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invoice</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
-                      <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Invoice') }}</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Customer') }}</th>
+                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Time') }}</th>
+                      <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ __('Amount') }}</th>
                     </tr>
                   </thead>
                   <tbody class="bg-white divide-y divide-gray-200">
                     <tr v-for="(invoice, idx) in closingData.pos_transactions" :key="idx" class="hover:bg-gray-50">
                       <td class="px-6 py-4 whitespace-nowrap">
                         <span class="text-sm font-medium text-gray-900">
-                          {{ invoice.pos_invoice || invoice.sales_invoice || 'N/A' }}
+                          {{ invoice.pos_invoice || invoice.sales_invoice || __('N/A') }}
                         </span>
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
@@ -154,7 +157,7 @@
                   <tfoot class="bg-gray-50">
                     <tr>
                       <td colspan="3" class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
-                        Total:
+                        {{ __('Total:') }}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap text-right">
                         <span class="text-base font-bold text-gray-900">
@@ -177,9 +180,9 @@
               <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                 <div>
                   <div class="flex items-center gap-2">
-                    <h3 class="text-sm md:text-lg font-semibold text-gray-900">Payment Reconciliation</h3>
+                    <h3 class="text-sm md:text-lg font-semibold text-gray-900">{{ __('Payment Reconciliation') }}</h3>
                     <span v-if="hideExpectedAmount && showSuccessReport" class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      ✓ Shift Closed
+                      {{ __('✓ Shift Closed') }}
                     </span>
                   </div>
                   <p class="text-xs md:text-sm text-gray-600">
@@ -187,7 +190,7 @@
                   </p>
                 </div>
                 <div v-if="shouldShowSummary && getTotalDifference !== 0" class="text-left sm:text-right">
-                  <div class="text-xs text-gray-500 uppercase">Total Variance</div>
+                  <div class="text-xs text-gray-500 uppercase">{{ __('Total Variance') }}</div>
                   <div :class="[
                     'text-lg md:text-xl font-bold',
                     getTotalDifference > 0 ? 'text-blue-600' : 'text-red-600'
@@ -228,7 +231,7 @@
                         min="0"
                         placeholder="0.00"
                         :disabled="submitResource.loading"
-                        :aria-label="`Enter actual amount for ${payment.mode_of_payment}`"
+                        :aria-label="__('Enter actual amount for {0}', [payment.mode_of_payment])"
                         class="text-base md:text-lg text-center font-semibold"
                       />
                     </div>
@@ -256,22 +259,24 @@
                       </div>
                       <div>
                         <h4 class="text-sm md:text-base font-semibold text-gray-900">{{ payment.mode_of_payment }}</h4>
-                        <p class="text-xs md:text-sm text-gray-600">
-                          Expected: <span class="font-medium">{{ formatCurrency(payment.expected_amount) }}</span>
-                        </p>
+                        <TranslatedHTML
+                          :tag="'p'"
+                          class="text-xs md:text-sm text-gray-600"
+                          :inner="__('Expected: &lt;span class=&quot;font-medium&quot;&gt;{0}&lt;/span&gt;', [formatCurrency(payment.expected_amount)])"
+                        />
                       </div>
                     </div>
 
                     <!-- Status Badge -->
                     <div v-if="payment.closing_amount !== null && payment.closing_amount !== undefined" class="flex-shrink-0">
                       <span v-if="payment.difference === 0" class="inline-flex items-center px-2 md:px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        ✓ Balanced
+                        {{ __('✓ Balanced') }}
                       </span>
                       <span v-else-if="payment.difference > 0" class="inline-flex items-center px-2 md:px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        Over {{ formatCurrency(payment.difference) }}
+                        {{ __('Over {0}', [formatCurrency(payment.difference)]) }}
                       </span>
                       <span v-else class="inline-flex items-center px-2 md:px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                        Short {{ formatCurrency(Math.abs(payment.difference)) }}
+                        {{ __('Short {0}', [formatCurrency(Math.abs(payment.difference))]) }}
                       </span>
                     </div>
                   </div>
@@ -280,16 +285,16 @@
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-3">
                     <!-- Opening Amount -->
                     <div class="bg-white rounded-lg p-2 md:p-3 border border-gray-200">
-                      <label class="block text-xs font-medium text-gray-500 uppercase mb-0.5 md:mb-1">Opening</label>
+                      <label class="block text-xs font-medium text-gray-500 uppercase mb-0.5 md:mb-1">{{ __('Opening') }}</label>
                       <div class="text-base md:text-lg font-semibold text-gray-900">
                         {{ formatCurrency(payment.opening_amount) }}
                       </div>
-                      <div class="text-xs text-gray-500 mt-0.5 md:mt-1 hidden sm:block">Shift start</div>
+                      <div class="text-xs text-gray-500 mt-0.5 md:mt-1 hidden sm:block">{{ __('Shift start') }}</div>
                     </div>
 
                     <!-- Expected Amount -->
                     <div class="bg-white rounded-lg p-2 md:p-3 border border-gray-200">
-                      <label class="block text-xs font-medium text-gray-500 uppercase mb-0.5 md:mb-1">Expected</label>
+                      <label class="block text-xs font-medium text-gray-500 uppercase mb-0.5 md:mb-1">{{ __('Expected') }}</label>
                       <div class="text-base md:text-lg font-semibold text-gray-900">
                         {{ formatCurrency(payment.expected_amount) }}
                       </div>
@@ -297,14 +302,14 @@
                         <span v-if="getSalesForPayment(payment) > 0">
                           +{{ formatCurrency(getSalesForPayment(payment)) }}
                         </span>
-                        <span v-else>No sales</span>
+                        <span v-else>{{ __('No sales') }}</span>
                       </div>
                     </div>
 
                     <!-- Actual/Closing Amount -->
                     <div class="bg-white rounded-lg p-2 md:p-3 border border-gray-300">
                       <label class="block text-xs font-medium text-gray-700 uppercase mb-0.5 md:mb-1">
-                        Actual Amount *
+                        {{ __('Actual Amount *') }}
                       </label>
                       <Input
                         :modelValue="payment.closing_amount"
@@ -318,7 +323,7 @@
                         class="text-base md:text-lg"
                       />
                       <div class="text-xs text-gray-500 mt-0.5 md:mt-1 hidden sm:block">
-                        {{ showSuccessReport ? 'Final Amount' : 'Count & enter' }}
+                        {{ showSuccessReport ? __('Final Amount') : __('Count & enter') }}
                       </div>
                     </div>
                   </div>
@@ -331,12 +336,12 @@
                     <div class="flex items-center justify-between gap-2">
                       <div class="flex-1">
                         <p :class="['text-xs md:text-sm font-medium', payment.difference > 0 ? 'text-blue-900' : 'text-red-900']">
-                          {{ payment.difference > 0 ? 'Cash Over' : 'Cash Short' }}
+                          {{ payment.difference > 0 ? __('Cash Over') : __('Cash Short') }}
                         </p>
                         <p :class="['text-xs', payment.difference > 0 ? 'text-blue-700' : 'text-red-700']">
                           {{ payment.difference > 0
-                            ? 'You have more than expected.'
-                            : 'You have less than expected.'
+                            ? __('You have more than expected.')
+                            : __('You have less than expected.')
                           }}
                         </p>
                       </div>
@@ -353,15 +358,15 @@
             <div v-if="shouldShowSummary" class="bg-gray-50 px-3 py-3 md:px-6 md:py-4 border-t border-gray-200">
               <div class="grid grid-cols-3 gap-2 md:gap-4">
                 <div>
-                  <p class="text-xs md:text-sm text-gray-600">Total Expected</p>
+                  <p class="text-xs md:text-sm text-gray-600">{{ __('Total Expected') }}</p>
                   <p class="text-base md:text-xl font-semibold text-gray-900">{{ formatCurrency(getTotalExpected) }}</p>
                 </div>
                 <div class="text-center md:text-right">
-                  <p class="text-xs md:text-sm text-gray-600">Total Actual</p>
+                  <p class="text-xs md:text-sm text-gray-600">{{ __('Total Actual') }}</p>
                   <p class="text-base md:text-xl font-semibold text-gray-900">{{ formatCurrency(getTotalActual) }}</p>
                 </div>
                 <div class="text-right">
-                  <p class="text-xs md:text-sm text-gray-600">Net Variance</p>
+                  <p class="text-xs md:text-sm text-gray-600">{{ __('Net Variance') }}</p>
                   <p :class="[
                     'text-base md:text-xl font-bold',
                     getTotalDifference === 0 ? 'text-green-600' :
@@ -377,7 +382,7 @@
           <!-- Tax Summary (hidden in entry mode when hideExpectedAmount is enabled) -->
           <div v-if="shouldShowSummary && closingData.taxes && closingData.taxes.length > 0" class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
             <div class="px-3 py-3 md:px-6 md:py-4 bg-gray-50 border-b border-gray-200">
-              <h3 class="text-sm md:text-lg font-medium text-gray-900">Tax Summary</h3>
+              <h3 class="text-sm md:text-lg font-medium text-gray-900">{{ __('Tax Summary') }}</h3>
             </div>
             <div class="p-3 md:p-6">
               <div class="space-y-2 md:space-y-3">
@@ -393,7 +398,7 @@
               </div>
               <div class="mt-3 md:mt-4 pt-3 md:pt-4 border-t border-gray-200">
                 <div class="flex items-center justify-between">
-                  <span class="text-xs md:text-sm font-medium text-gray-700">Total Tax Collected</span>
+                  <span class="text-xs md:text-sm font-medium text-gray-700">{{ __('Total Tax Collected') }}</span>
                   <span class="text-base md:text-lg font-bold text-gray-900">{{ formatCurrency(totalTax) }}</span>
                 </div>
               </div>
@@ -407,14 +412,14 @@
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
               </svg>
               <div class="flex-1">
-                <h4 class="text-xs md:text-sm font-medium text-red-800">Error Closing Shift</h4>
+                <h4 class="text-xs md:text-sm font-medium text-red-800">{{ __('Error Closing Shift') }}</h4>
                 <p class="text-xs md:text-sm text-red-700 mt-1">{{ errorMessage || submitResource.error }}</p>
                 <button
                   v-if="errorMessage"
                   @click="errorMessage = ''"
                   class="mt-2 text-xs text-red-600 hover:text-red-800 underline"
                 >
-                  Dismiss
+                  {{ __('Dismiss') }}
                 </button>
               </div>
             </div>
@@ -428,7 +433,7 @@
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
             </svg>
             <div>
-              <h3 class="text-xs md:text-sm font-medium text-red-800">Failed to Load Shift Data</h3>
+              <h3 class="text-xs md:text-sm font-medium text-red-800">{{ __('Failed to Load Shift Data') }}</h3>
               <p class="text-xs md:text-sm text-red-700 mt-1">{{ errorMessage || closingDataResource.error }}</p>
             </div>
           </div>
@@ -445,18 +450,18 @@
           :disabled="submitResource.loading"
           class="order-2 sm:order-1"
         >
-          {{ showSuccessReport ? 'Close' : 'Cancel' }}
+          {{ showSuccessReport ? __('Close') : __('Cancel') }}
         </Button>
 
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 order-1 sm:order-2">
           <!-- Validation Warning (only in entry mode) -->
           <div v-if="!canSubmit && closingData && !showSuccessReport" class="text-xs md:text-sm text-yellow-600 font-medium text-center sm:text-right">
-            Please enter all closing amounts
+            {{ __('Please enter all closing amounts') }}
           </div>
 
           <!-- Success message (shown in report view) -->
           <div v-if="showSuccessReport" class="text-xs md:text-sm text-green-600 font-medium text-center sm:text-right">
-            ✓ Shift closed successfully
+            {{ __('✓ Shift closed successfully') }}
           </div>
 
           <!-- Submit/Close button (only shown in entry mode) -->
@@ -468,7 +473,7 @@
             :loading="submitResource.loading"
             :disabled="!canSubmit"
           >
-            {{ submitResource.loading ? 'Closing Shift...' : 'Close Shift' }}
+            {{ submitResource.loading ? __('Closing Shift...') : __('Close Shift') }}
           </Button>
         </div>
       </div>
@@ -483,6 +488,7 @@ import { storeToRefs } from "pinia"
 import { useShift } from "../composables/useShift"
 import { useFormatters } from "../composables/useFormatters"
 import { usePOSSettingsStore } from "../stores/posSettings"
+import TranslatedHTML from "./common/TranslatedHTML.vue"
 
 const props = defineProps({
 	modelValue: {
@@ -694,7 +700,7 @@ function getSalesForPayment(payment) {
 }
 
 function getShiftDuration() {
-	if (!closingData.value || !closingData.value.period_start_date) return "N/A"
+	if (!closingData.value || !closingData.value.period_start_date) return __("N/A")
 
 	const start = new Date(closingData.value.period_start_date)
 	const end = new Date()
@@ -704,9 +710,9 @@ function getShiftDuration() {
 	const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
 
 	if (hours > 0) {
-		return `${hours}h ${minutes}m`
+    return __('{0}h {1}m', [hours, minutes])
 	}
-	return `${minutes}m`
+	return __('{0}m', [minutes])
 }
 
 function getPaymentIcon(method) {

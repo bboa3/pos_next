@@ -1,16 +1,16 @@
 <template>
-	<Dialog v-model="show" :options="{ title: 'Create New Customer', size: 'md' }">
+	<Dialog v-model="show" :options="{ title: __('Create New Customer'), size: 'md' }">
 		<template #body-content>
 			<div class="space-y-4">
 				<!-- Customer Name -->
 				<div>
 					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Customer Name <span class="text-red-500">*</span>
+						{{ __('Customer Name') }} <span class="text-red-500">*</span>
 					</label>
 					<Input
 						v-model="customerData.customer_name"
 						type="text"
-						placeholder="Enter customer name"
+						:placeholder="__('Enter customer name')"
 						required
 					/>
 				</div>
@@ -18,7 +18,7 @@
 				<!-- Mobile Number with Country Code -->
 				<div>
 					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Mobile Number
+						{{ __('Mobile Number') }}
 					</label>
 					<div class="flex gap-2">
 						<!-- Country Code Searchable Dropdown -->
@@ -51,7 +51,7 @@
 										ref="countrySearchRef"
 										v-model="countrySearchQuery"
 										type="text"
-										placeholder="Search country or code..."
+										:placeholder="__('Search country or code...')"
 										class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 										@keydown.escape="showCountryDropdown = false"
 									/>
@@ -77,7 +77,7 @@
 										<span class="text-sm text-gray-500">{{ country.isd }}</span>
 									</button>
 									<div v-if="filteredCountries.length === 0" class="px-4 py-8 text-center text-sm text-gray-500">
-										No countries found
+										{{ __('No countries found') }}
 									</div>
 								</div>
 							</div>
@@ -87,7 +87,7 @@
 						<input
 							v-model="phoneNumber"
 							type="tel"
-							placeholder="Enter phone number"
+							:placeholder="__('Enter phone number')"
 							class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 							@input="updateMobileNumber"
 						/>
@@ -97,25 +97,25 @@
 				<!-- Email -->
 				<div>
 					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Email
+						{{ __('Email') }}
 					</label>
 					<Input
 						v-model="customerData.email_id"
 						type="email"
-						placeholder="Enter email address"
+						:placeholder="__('Enter email address')"
 					/>
 				</div>
 
 				<!-- Customer Group -->
 				<div>
 					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Customer Group
+						{{ __('Customer Group') }}
 					</label>
 					<select
 						v-model="customerData.customer_group"
 						class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 					>
-						<option value="">Select Customer Group</option>
+						<option value="">{{ __('Select Customer Group') }}</option>
 						<option v-for="group in customerGroups" :key="group" :value="group">
 							{{ group }}
 						</option>
@@ -125,13 +125,13 @@
 				<!-- Territory -->
 				<div>
 					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Territory
+						{{ __('Territory') }}
 					</label>
 					<select
 						v-model="customerData.territory"
 						class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 					>
-						<option value="">Select Territory</option>
+						<option value="">{{ __('Select Territory') }}</option>
 						<option v-for="territory in territories" :key="territory" :value="territory">
 							{{ territory }}
 						</option>
@@ -149,15 +149,15 @@
 							<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
 						</svg>
 						<div class="flex-1">
-							<p class="text-sm font-medium text-amber-900">Permission Required</p>
-							<p class="text-xs text-amber-700 mt-0.5">You don't have permission to create customers. Contact your administrator.</p>
+							<p class="text-sm font-medium text-amber-900">{{ __('Permission Required') }}</p>
+							<p class="text-xs text-amber-700 mt-0.5">{{ __("You don't have permission to create customers. Contact your administrator.") }}</p>
 						</div>
 					</div>
 				</div>
 
 				<div class="flex space-x-2">
 					<Button variant="subtle" @click="show = false">
-						Cancel
+						{{ __('Cancel') }}
 					</Button>
 					<Button
 						variant="solid"
@@ -165,7 +165,7 @@
 						:loading="createCustomerResource.loading || checkingPermission"
 						:disabled="!customerData.customer_name || !hasPermission"
 					>
-						Create Customer
+						{{ __('Create Customer') }}
 					</Button>
 				</div>
 			</div>
@@ -367,22 +367,22 @@ const createCustomerResource = createResource({
 				doctype: "Customer",
 				customer_name: customerData.value.customer_name,
 				customer_type: "Individual",
-				customer_group: customerData.value.customer_group || "Individual",
-				territory: customerData.value.territory || "All Territories",
+				customer_group: customerData.value.customer_group || __('Individual'),
+				territory: customerData.value.territory || __('All Territories'),
 				mobile_no: customerData.value.mobile_no || "",
 				email_id: customerData.value.email_id || "",
 			},
 		}
 	},
 	onSuccess(data) {
-		showSuccess(`Customer ${data.customer_name} created successfully`)
+		showSuccess(__('Customer {0} created successfully', [data.customer_name]))
 
 		emit("customer-created", data)
 		show.value = false
 	},
 	onError(error) {
 		log.error("Error creating customer", error)
-		showError(error.message || "Failed to create customer")
+		showError(error.message || __("Failed to create customer"))
 	},
 })
 
@@ -470,7 +470,7 @@ const checkPermissions = async () => {
 }
 
 const handleCreate = async () => {
-	if (!customerData.value.customer_name) return showError("Customer Name is required")
+	if (!customerData.value.customer_name) return showError(__("Customer Name is required"))
 	await createCustomerResource.submit()
 }
 

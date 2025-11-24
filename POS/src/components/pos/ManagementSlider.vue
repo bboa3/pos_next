@@ -10,11 +10,11 @@
 					? 'bg-blue-100 text-blue-600'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
 			]"
-			:title="'Dashboard'"
+			:title="__('Dashboard')"
 		>
 			<FeatherIcon name="layout" class="w-5 h-5" />
 			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-				Dashboard
+				{{ __('Dashboard') }}
 			</div>
 		</button>
 
@@ -27,11 +27,11 @@
 					? 'bg-green-100 text-green-600'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
 			]"
-			:title="'Promotions'"
+			:title="__('Promotions')"
 		>
 			<FeatherIcon name="tag" class="w-5 h-5" />
 			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-				Promotions
+				{{ __('Promotions') }}
 			</div>
 		</button>
 
@@ -44,11 +44,11 @@
 					? 'bg-purple-100 text-purple-600'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
 			]"
-			:title="'Products'"
+			:title="__('Products')"
 		>
 			<FeatherIcon name="package" class="w-5 h-5" />
 			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-				Products
+				{{ __('Products') }}
 			</div>
 		</button>
 
@@ -61,11 +61,11 @@
 					? 'bg-orange-100 text-orange-600'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
 			]"
-			:title="'Reports'"
+			:title="__('Reports')"
 		>
 			<FeatherIcon name="bar-chart-2" class="w-5 h-5" />
 			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-				Reports
+				{{ __('Reports') }}
 			</div>
 		</button>
 
@@ -78,11 +78,11 @@
 					? 'bg-indigo-100 text-indigo-600'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
 			]"
-			:title="'Invoice Management'"
+			:title="__('Invoice Management')"
 		>
 			<FeatherIcon name="file-text" class="w-5 h-5" />
 			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-				Invoice Management
+				{{ __('Invoice Management') }}
 			</div>
 		</button>
 
@@ -98,11 +98,11 @@
 					? 'bg-gray-100 text-gray-900'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
 			]"
-			:title="'Settings'"
+			:title="__('Settings')"
 		>
 			<FeatherIcon name="settings" class="w-5 h-5" />
 			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-				Settings
+				{{ __('Settings') }}
 			</div>
 		</button>
 	</div>

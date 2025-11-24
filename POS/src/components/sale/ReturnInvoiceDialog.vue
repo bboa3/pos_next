@@ -1,14 +1,14 @@
 <template>
 	<Dialog
-		v-model="show"
-		:options="{ title: 'Create Return Invoice', size: '5xl' }"
-	>
+        v-model="show"
+        :options="{ title: __('Create Return Invoice'), size: '5xl' }"
+    >
 		<template #body-content>
 			<div class="space-y-4">
 				<!-- Recent Invoices List -->
 				<div>
 					<label class="block text-sm font-medium text-gray-700 mb-3">
-						Select Invoice to Return
+						{{ __('Select Invoice to Return') }}
 					</label>
 
 					<!-- Search/Filter Input -->
@@ -16,7 +16,7 @@
 									<Input
 										v-model="invoiceListFilter"
 										type="text"
-										placeholder="Search by invoice number or customer name..."
+										:placeholder="__('Search by invoice number or customer name...')"
 										class="w-full"
 									/>
 								</div>
@@ -24,7 +24,7 @@
 								<!-- Loading State -->
 								<div v-if="loadInvoicesResource.loading" class="text-center py-8">
 									<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-									<p class="mt-2 text-xs text-gray-500">Loading invoices...</p>
+									<p class="mt-2 text-xs text-gray-500">{{ __('Loading invoices...') }}</p>
 								</div>
 
 								<!-- Invoice List -->
@@ -52,7 +52,7 @@
 										</div>
 									</div>
 									<p v-if="!loadInvoicesResource.loading && filteredInvoiceList.length === 0" class="text-center py-8 text-gray-500 text-sm">
-										No invoices found
+										{{ __('No invoices found') }}
 									</p>
 								</div>
 				</div>
@@ -60,7 +60,7 @@
 		</template>
 		<template #actions>
 			<Button variant="subtle" @click="show = false">
-				Close
+				{{ __('Close') }}
 			</Button>
 		</template>
 	</Dialog>
@@ -68,7 +68,7 @@
 	<!-- Return Process Modal -->
 	<Dialog
 		v-model="returnModal.visible"
-		:options="{ title: 'Process Return', size: '5xl' }"
+		:options="{ title: __('Process Return'), size: '5xl' }"
 	>
 		<template #body-content>
 			<div class="space-y-4">
@@ -91,16 +91,16 @@
 						</div>
 						<div class="space-y-2">
 							<div>
-								<p class="text-xs text-gray-500">Customer</p>
+								<p class="text-xs text-gray-500">{{ __('Customer') }}</p>
 								<p class="text-sm font-semibold text-gray-900">{{ originalInvoice.customer_name }}</p>
 							</div>
 							<div class="flex items-center justify-between">
 								<div>
-									<p class="text-xs text-gray-500">Date</p>
+									<p class="text-xs text-gray-500">{{ __('Date') }}</p>
 									<p class="text-sm font-semibold text-gray-900">{{ formatDate(originalInvoice.posting_date) }}</p>
 								</div>
 								<div class="text-right">
-									<p class="text-xs text-gray-500 mb-1">Total</p>
+									<p class="text-xs text-gray-500 mb-1">{{ __('Total') }}</p>
 									<p class="text-xl font-bold text-gray-900">
 										{{ formatCurrency(originalInvoice.grand_total) }}
 									</p>
@@ -125,17 +125,17 @@
 							</div>
 							<div class="mt-3 grid grid-cols-2 gap-3">
 								<div>
-									<p class="text-xs text-gray-500">Customer</p>
+									<p class="text-xs text-gray-500">{{ __('Customer') }}</p>
 									<p class="text-sm font-semibold text-gray-900">{{ originalInvoice.customer_name }}</p>
 								</div>
 								<div>
-									<p class="text-xs text-gray-500">Date</p>
+									<p class="text-xs text-gray-500">{{ __('Date') }}</p>
 									<p class="text-sm font-semibold text-gray-900">{{ formatDate(originalInvoice.posting_date) }}</p>
 								</div>
 							</div>
 						</div>
 						<div class="text-right ml-4">
-							<p class="text-xs text-gray-500 mb-1">Total Amount</p>
+							<p class="text-xs text-gray-500 mb-1">{{ __('Total Amount') }}</p>
 							<p class="text-2xl font-bold text-gray-900">
 								{{ formatCurrency(originalInvoice.grand_total) }}
 							</p>
@@ -147,14 +147,14 @@
 				<div v-if="originalInvoice">
 								<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
 									<label class="text-sm font-medium text-gray-700">
-										Select Items to Return
+										{{ __('Select Items to Return') }}
 									</label>
 									<div class="flex gap-2 self-start sm:self-auto">
 										<Button size="sm" variant="subtle" @click="selectAllItems">
-											<span class="text-xs whitespace-nowrap">Select All</span>
+											<span class="text-xs whitespace-nowrap">{{ __('Select All') }}</span>
 										</Button>
 										<Button size="sm" variant="subtle" @click="deselectAllItems">
-											<span class="text-xs whitespace-nowrap">Clear All</span>
+											<span class="text-xs whitespace-nowrap">{{ __('Clear All') }}</span>
 										</Button>
 									</div>
 								</div>
@@ -191,7 +191,7 @@
 															{{ item.item_code }}
 														</p>
 														<p v-if="item.already_returned > 0" class="text-xs text-amber-600 mt-1">
-															⚠️ {{ item.already_returned }} already returned
+															{{ __('⚠️ {0} already returned', [item.already_returned]) }}
 														</p>
 													</div>
 												</div>
@@ -199,7 +199,7 @@
 
 											<!-- Quantity Controls -->
 											<div class="flex items-center space-x-3 bg-gray-50 rounded-lg px-3 py-2 border border-gray-200" @click.stop>
-												<span class="text-xs font-medium text-gray-600">Return Qty:</span>
+												<span class="text-xs font-medium text-gray-600">{{ __('Return Qty:') }}</span>
 												<div class="flex items-center space-x-2">
 													<button
 														@click="decrementQty(item)"
@@ -231,7 +231,7 @@
 														</svg>
 													</button>
 												</div>
-												<span class="text-xs font-semibold text-gray-700">of {{ item.qty }}</span>
+												<span class="text-xs font-semibold text-gray-700">{{ __('of {0}', [item.qty], "item qty") }}</span>
 											</div>
 
 											<!-- Rate & Amount -->
@@ -261,7 +261,7 @@
 														{{ item.item_code }}
 													</p>
 													<p v-if="item.already_returned > 0" class="text-xs text-amber-600 mt-1">
-														⚠️ {{ item.already_returned }} already returned
+														{{ __('⚠️ {0} already returned', [item.already_returned]) }}
 													</p>
 												</div>
 											</div>
@@ -269,8 +269,8 @@
 											<!-- Quantity Controls -->
 											<div class="space-y-2" @click.stop>
 												<div class="flex items-center justify-between">
-													<span class="text-xs font-medium text-gray-600">Return Qty:</span>
-													<span class="text-xs text-gray-500">of {{ item.qty }}</span>
+													<span class="text-xs font-medium text-gray-600">{{ __('Return Qty:') }}</span>
+													<span class="text-xs text-gray-500">{{ __('of {0}', [item.qty], "item qty") }}</span>
 												</div>
 												<div class="flex items-center gap-2">
 													<button
@@ -303,7 +303,7 @@
 
 											<!-- Price -->
 											<div class="flex items-center justify-between px-1 pt-2 border-t border-gray-100">
-												<span class="text-xs text-gray-600">Amount:</span>
+												<span class="text-xs text-gray-600">{{ __('Amount:') }}</span>
 												<div class="text-right">
 													<p class="text-base font-bold text-gray-900">
 														{{ formatCurrency(item.rate * item.return_qty) }}
@@ -315,7 +315,7 @@
 									</div>
 								</div>
 								<p v-if="returnItems.length === 0" class="text-center py-8 text-gray-500">
-									No items available for return
+									{{ __('No items available for return') }}
 								</p>
 							</div>
 
@@ -323,10 +323,10 @@
 							<div v-if="selectedItems.length > 0">
 								<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
 									<label class="text-sm font-medium text-gray-700">
-										Refund Payment Methods
+										{{ __('Refund Payment Methods') }}
 									</label>
 									<Button size="sm" variant="subtle" @click="addPaymentRow" class="self-start sm:self-auto">
-										<span class="text-xs">+ Add Payment</span>
+										<span class="text-xs">{{ __('+ Add Payment') }}</span>
 									</Button>
 								</div>
 
@@ -347,7 +347,7 @@
 													v-model="payment.mode_of_payment"
 													class="flex-1 px-3 py-3 border-2 border-gray-300 rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
 												>
-													<option value="">Select method...</option>
+													<option value="">{{ __('Select method...', null, 'payment') }}</option>
 													<option v-for="method in paymentMethods" :key="method.mode_of_payment" :value="method.mode_of_payment">
 														{{ method.mode_of_payment }}
 													</option>
@@ -365,7 +365,7 @@
 
 											<!-- Amount Input Row -->
 											<div class="flex items-center gap-3 pl-1">
-												<label class="text-sm font-medium text-gray-600 w-20">Amount:</label>
+												<label class="text-sm font-medium text-gray-600 w-20">{{ __('Amount:') }}</label>
 												<input
 													v-model.number="payment.amount"
 													type="number"
@@ -390,7 +390,7 @@
 													v-model="payment.mode_of_payment"
 													class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
 												>
-													<option value="">Select payment method...</option>
+													<option value="">{{ __('Select payment method...') }}</option>
 													<option v-for="method in paymentMethods" :key="method.mode_of_payment" :value="method.mode_of_payment">
 														{{ method.mode_of_payment }}
 													</option>
@@ -404,7 +404,7 @@
 													step="1"
 													min="0"
 													:max="returnTotal"
-													placeholder="Amount"
+													:placeholder="__('Amount')"
 													class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
 												/>
 											</div>
@@ -424,11 +424,11 @@
 								<!-- Payment Summary -->
 								<div class="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
 									<div class="flex items-center justify-between text-sm">
-										<span class="text-gray-600">Total Refund:</span>
+										<span class="text-gray-600">{{ __('Total Refund:') }}</span>
 										<span class="font-bold text-gray-900">{{ formatCurrency(returnTotal) }}</span>
 									</div>
 									<div class="flex items-center justify-between text-sm mt-1">
-										<span class="text-gray-600">Payment Total:</span>
+										<span class="text-gray-600">{{ __('Payment Total:') }}</span>
 										<span :class="[
 											'font-bold',
 											totalPaymentAmount === returnTotal ? 'text-green-600' : 'text-red-600'
@@ -437,7 +437,7 @@
 										</span>
 									</div>
 									<p v-if="totalPaymentAmount !== returnTotal" class="mt-2 text-xs text-amber-600">
-										⚠️ Payment total must equal refund amount
+										{{ __('⚠️ Payment total must equal refund amount') }}
 									</p>
 								</div>
 							</div>
@@ -448,17 +448,17 @@
 									<svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"/>
 									</svg>
-									<h3 class="text-sm font-bold text-gray-900">Return Summary</h3>
+									<h3 class="text-sm font-bold text-gray-900">{{ __('Return Summary') }}</h3>
 								</div>
 								<div class="space-y-3">
 									<div class="flex justify-between items-center">
-										<span class="text-sm text-gray-600">Items to Return:</span>
+										<span class="text-sm text-gray-600">{{ __('Items to Return:') }}</span>
 										<span class="px-2 py-1 bg-white rounded-lg text-sm font-bold text-gray-900 border border-red-200">
 											{{ selectedItems.length }}
 										</span>
 									</div>
 									<div class="flex justify-between items-center pt-2 border-t border-red-200">
-										<span class="text-sm sm:text-base font-semibold text-gray-700">Refund Amount:</span>
+										<span class="text-sm sm:text-base font-semibold text-gray-700">{{ __('Refund Amount:') }}</span>
 										<span class="text-xl sm:text-2xl font-bold text-red-600">
 											{{ formatCurrency(returnTotal) }}
 										</span>
@@ -468,13 +468,15 @@
 
 							<!-- Return Reason -->
 							<div v-if="selectedItems.length > 0">
-								<label class="block text-sm font-medium text-gray-700 mb-2">
-									Return Reason <span class="text-gray-400">(optional)</span>
-								</label>
+								<TranslatedHTML 
+									:tag="'label'"
+									class="block text-sm font-medium text-gray-700 mb-2"
+									:inner="__('Return Reason &lt;span class=&quot;text-gray-400&quot;&gt;(optional)&lt;/span&gt;')"
+								/>
 								<textarea
 									v-model="returnReason"
 									rows="3"
-									placeholder="Enter reason for return (e.g., defective product, wrong item, customer request)..."
+									:placeholder="__('Enter reason for return (e.g., defective product, wrong item, customer request)...')"
 									class="w-full px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
 								></textarea>
 				</div>
@@ -485,11 +487,11 @@
 				<p v-if="submitError" class="text-xs text-red-600">{{ submitError }}</p>
 				<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2 sm:gap-3">
 					<p v-if="selectedItems.length > 0" class="text-xs text-gray-500 flex-shrink-0 order-2 sm:order-1">
-						{{ selectedItems.length }} item(s) selected
+						{{ __('{0} item(s) selected', [selectedItems.length]) }}
 					</p>
 					<div class="flex gap-2 w-full sm:w-auto sm:ml-auto flex-shrink-0 order-1 sm:order-2">
 						<Button variant="subtle" @click="closeReturnModal" class="flex-1 sm:flex-initial">
-							<span class="text-sm">Cancel</span>
+							<span class="text-sm">{{ __('Cancel') }}</span>
 						</Button>
 						<Button
 							variant="solid"
@@ -499,7 +501,7 @@
 							:loading="isSubmitting"
 							class="flex-1 sm:flex-initial"
 						>
-							<span class="text-sm whitespace-nowrap">Create Return</span>
+							<span class="text-sm whitespace-nowrap">{{ __('Create Return') }}</span>
 						</Button>
 					</div>
 				</div>
@@ -525,7 +527,7 @@
 		</template>
 		<template #actions>
 			<div class="flex justify-end w-full">
-				<Button variant="solid" theme="red" @click="closeErrorDialog">OK</Button>
+				<Button variant="solid" theme="red" @click="closeErrorDialog">{{ __('OK') }}</Button>
 			</div>
 		</template>
 	</Dialog>
@@ -536,6 +538,7 @@ import { useToast } from "@/composables/useToast"
 import { getPaymentIcon } from "@/utils/payment"
 import { Button, Dialog, Input, createResource } from "frappe-ui"
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue"
+import TranslatedHTML from "../common/TranslatedHTML.vue"
 
 const { showSuccess, showError, showWarning } = useToast()
 
@@ -558,7 +561,7 @@ const submitError = ref("")
 const isSubmitting = ref(false)
 const errorDialog = reactive({
 	visible: false,
-	title: "Validation Error",
+	title: __("Validation Error"),
 	message: "",
 })
 const returnModal = reactive({
@@ -581,7 +584,7 @@ const loadInvoicesResource = createResource({
 	},
 	onError(error) {
 		console.error("Error loading invoices:", error)
-		showError("Failed to load recent invoices")
+		showError(__("Failed to load recent invoices"))
 	},
 })
 
@@ -614,11 +617,11 @@ const fetchInvoiceResource = createResource({
 		if (data) {
 			// Validate that invoice can be returned
 			if (data.docstatus !== 1) {
-				showWarning("Invoice must be submitted to create a return")
+				showWarning(__("Invoice must be submitted to create a return"))
 				return
 			}
 			if (data.is_return === 1) {
-				showWarning("Cannot create return against a return invoice")
+				showWarning(__("Cannot create return against a return invoice"))
 				return
 			}
 
@@ -626,7 +629,7 @@ const fetchInvoiceResource = createResource({
 			const availableItems = data.items.filter((item) => item.qty > 0)
 
 			if (availableItems.length === 0) {
-				showWarning("All items from this invoice have already been returned")
+				showWarning(__("All items from this invoice have already been returned"))
 				originalInvoice.value = null
 				returnItems.value = []
 				return
@@ -652,7 +655,7 @@ const fetchInvoiceResource = createResource({
 	},
 	onError(error) {
 		console.error("Error fetching invoice:", error)
-		showError("Failed to load invoice details")
+		showError(__("Failed to load invoice details"))
 	},
 })
 
@@ -686,7 +689,7 @@ const createReturnResource = createResource({
 				amount: -Math.abs(payment.amount), // Negative for refunds
 			})),
 			remarks:
-				returnReason.value || `Return against ${originalInvoice.value.name}`,
+				returnReason.value || __('Return against {0}', [originalInvoice.value.name]),
 		}
 
 		// Return in the correct format: invoice as JSON string
@@ -713,7 +716,7 @@ const createReturnResource = createResource({
 
 		// Close return modal and go back to invoice list
 		closeReturnModal()
-		showSuccess(`Return invoice ${data.name} created successfully`)
+		showSuccess(__('Return invoice {0} created successfully', [data.name]))
 	},
 	onError(error) {
 		isSubmitting.value = false
@@ -833,7 +836,7 @@ watch(returnTotal, (newTotal) => {
 // Methods
 function extractErrorMessage(
 	error,
-	fallback = "Failed to create return invoice",
+	fallback = __("Failed to create return invoice"),
 ) {
 	if (!error) return fallback
 
@@ -877,7 +880,7 @@ function extractErrorMessage(
 	return fallback
 }
 
-function openErrorDialog(message, title = "Validation Error") {
+function openErrorDialog(message, title = __("Validation Error")) {
 	errorDialog.title = title
 	errorDialog.message = message
 	errorDialog.visible = true
@@ -912,9 +915,12 @@ function validateSelectedItems() {
 	}
 	invalidItems.forEach(normalizeItemQty)
 	const details = invalidItems
-		.map((item) => `${item.item_name || item.item_code}: maximum ${item.qty}`)
+		.map((item) => __('{0}: maximum {1}', [
+			(item.item_name || item.item_code),
+			item.qty
+		]))
 		.join("\n")
-	const message = `Adjust return quantities before submitting.\n\n${details}`
+	const message = __('Adjust return quantities before submitting.\n\n{0}', [details])
 	submitError.value = message
 	openErrorDialog(message)
 	return false

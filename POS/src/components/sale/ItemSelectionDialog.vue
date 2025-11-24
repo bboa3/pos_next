@@ -21,7 +21,7 @@
 				<!-- Loading State -->
 				<div v-if="loading" class="flex items-center justify-center py-8">
 					<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-					<p class="ml-3 text-sm text-gray-500">Loading options...</p>
+					<p class="ml-3 text-sm text-gray-500">{{ __('Loading options...') }}</p>
 				</div>
 
 				<!-- Variant Options with Attribute Selection -->
@@ -67,7 +67,7 @@
 							<div class="text-right">
 								<p class="text-sm font-bold text-blue-600">{{ formatCurrency(matchedVariant.rate || 0) }}</p>
 								<p class="text-xs" :class="(matchedVariant.stock ?? matchedVariant.data?.actual_qty ?? 0) > 0 ? 'text-green-600' : 'text-red-600'">
-									Stock: {{ matchedVariant.stock ?? matchedVariant.data?.actual_qty ?? 0 }}
+									 {{ __('Stock: {0}', [(matchedVariant.stock ?? matchedVariant.data?.actual_qty ?? 0)]) }}
 								</p>
 							</div>
 						</div>
@@ -75,7 +75,7 @@
 
 					<!-- Warning if combination not found -->
 					<div v-else-if="allAttributesSelected" class="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-						<p class="text-xs text-orange-700">This combination is not available</p>
+						<p class="text-xs text-orange-700">{{ __('This combination is not available') }}</p>
 					</div>
 				</div>
 
@@ -114,20 +114,36 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
 						</svg>
 					</div>
-					<p class="text-sm font-medium text-gray-900">No {{ mode === 'variant' ? 'Variants' : 'Options' }} Available</p>
+					<p class="text-sm font-medium text-gray-900">
+						{{ mode === 'variant'
+							? __('No Variants Available')
+							: __('No Options Available')
+						}}
+					</p>
 					<p v-if="mode === 'variant'" class="text-xs text-gray-500 mt-2">
-						This item template <strong>{{ item?.item_name }}</strong> has no variants created yet.
+						<TranslatedHTML 
+							:inner="__('This item template &lt;strong&gt;{0}&lt;strong&gt; has no variants created yet.', [item?.item_name])"
+						/>
 					</p>
 					<p v-else class="text-xs text-gray-500 mt-2">
-						No additional unit of measures configured for this item.
+						{{ __('No additional units of measurement configured for this item.') }}
 					</p>
 					<div v-if="mode === 'variant'" class="mt-4">
-						<p class="text-xs text-gray-600 mb-2">To create variants:</p>
+						<p class="text-xs text-gray-600 mb-2">{{ __('To create variants:') }}</p>
 						<ol class="text-xs text-gray-600 text-left max-w-xs mx-auto space-y-1">
-							<li>1. Go to <strong>Item Master</strong> → <strong>{{ item?.item_code }}</strong></li>
-							<li>2. Click <strong>"Make Variants"</strong> button</li>
-							<li>3. Select attribute combinations</li>
-							<li>4. Click <strong>"Create"</strong></li>
+							<TranslatedHTML 
+								:tag="'li'"
+								:inner="__('1. Go to &lt;strong&gt;Item Master&lt;strong&gt; → &lt;strong&gt;{0}&lt;strong&gt;', [item?.item_code])"
+							/>
+							<TranslatedHTML
+								:tag="'li'"
+								:inner="__('2. Click &lt;strong&gt;&quot;Make Variants&quot;&lt;strong&gt; button')"
+							/>
+							<li>{{ __('3. Select attribute combinations') }}</li>
+							<TranslatedHTML
+								:tag="'li'"
+								:inner="__('4. Click &lt;strong&gt;&quot;Create&quot;&lt;strong&gt;')"
+							/>
 						</ol>
 					</div>
 				</div>
@@ -137,7 +153,7 @@
 		<template #actions>
 			<div class="flex space-x-2 w-full">
 				<Button class="flex-1" variant="subtle" @click="cancel">
-					Cancel
+					{{ __('Cancel') }}
 				</Button>
 				<Button class="flex-1" variant="solid" theme="blue" @click="confirm" :disabled="!selectedOption">
 					{{ confirmButtonText }}
@@ -152,6 +168,7 @@ import { formatCurrency as formatCurrencyUtil } from "@/utils/currency"
 import { Button, Dialog } from "frappe-ui"
 import { createResource } from "frappe-ui"
 import { computed, ref, watch } from "vue"
+import TranslatedHTML from "../common/TranslatedHTML.vue"
 
 const props = defineProps({
 	modelValue: Boolean,
@@ -182,18 +199,18 @@ const selectedAttributes = ref({}) // For variant attribute selection
 // Computed properties for dialog customization
 const dialogTitle = computed(() => {
 	return props.mode === "variant"
-		? "Select Item Variant"
-		: "Select Unit of Measure"
+		? __("Select Item Variant")
+		: __("Select Unit of Measure")
 })
 
 const dialogDescription = computed(() => {
 	return props.mode === "variant"
-		? "Choose a variant of this item:"
-		: "Select the unit of measure for this item:"
+		? __("Choose a variant of this item:")
+		: __("Select the unit of measure for this item:")
 })
 
 const confirmButtonText = computed(() => {
-	return props.mode === "variant" ? "Add to Cart" : "Add to Cart"
+	return props.mode === "variant" ? __("Add to Cart") : __("Add to Cart")
 })
 
 // Computed: Build a map of all available attribute values
@@ -258,7 +275,7 @@ const variantsResource = createResource({
 			description: v.item_code,
 			attributes: v.attributes || {},
 			rate: v.rate || 0,
-			priceLabel: `per ${v.stock_uom}`,
+			priceLabel: __('per {0}', [v.stock_uom]),
 			stock: v.actual_qty ?? 0,
 			data: v, // Full variant data
 		}))
@@ -322,9 +339,9 @@ function buildUomOptions() {
 		uom: props.item.stock_uom,
 		conversion_factor: 1,
 		label: props.item.stock_uom,
-		description: "Stock unit",
+		description: __("Stock unit"),
 		rate: getUomPrice(props.item.stock_uom, 1),
-		priceLabel: `per ${props.item.stock_uom}`,
+		priceLabel: __('per {0}', [props.item.stock_uom]),
 	})
 
 	// Additional UOMs
@@ -337,7 +354,7 @@ function buildUomOptions() {
 				label: uomData.uom,
 				description: `1 ${uomData.uom} = ${uomData.conversion_factor} ${props.item.stock_uom}`,
 				rate: getUomPrice(uomData.uom, uomData.conversion_factor),
-				priceLabel: `per ${uomData.uom}`,
+				priceLabel: __('per {0}', [uomData.uom]),
 			})
 		})
 	}

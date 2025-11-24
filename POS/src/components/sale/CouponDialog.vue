@@ -1,5 +1,5 @@
 <template>
-	<Dialog v-model="show" :options="{ title: 'Apply', size: 'md' }">
+	<Dialog v-model="show" :options="{ title: __('Apply'), size: 'md' }">
 		<template #body-content>
 			<div class="space-y-4">
 				<!-- Info Banner -->
@@ -11,8 +11,8 @@
 								clip-rule="evenodd" />
 						</svg>
 						<div class="flex-1">
-							<p class="text-xs font-medium text-blue-900">Have a coupon code?</p>
-							<p class="text-xs text-blue-700 mt-0.5">Enter your promotional or gift card code below</p>
+							<p class="text-xs font-medium text-blue-900">{{ __('Have a coupon code?') }}</p>
+							<p class="text-xs text-blue-700 mt-0.5">{{ __('Enter your promotional or gift card code below') }}</p>
 						</div>
 					</div>
 				</div>
@@ -20,10 +20,10 @@
 				<!-- Coupon Code Input -->
 				<div v-if="!appliedDiscount">
 					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Coupon Code
+						{{ __('Coupon Code') }}
 					</label>
 					<div class="flex space-x-2">
-						<Input v-model="couponCode" type="text" placeholder="ENTER-CODE-HERE" class="flex-1 uppercase"
+						<Input v-model="couponCode" type="text" :placeholder="__('ENTER-CODE-HERE')" class="flex-1 uppercase"
 							@keyup.enter="applyCoupon" :disabled="applying" />
 						<Button @click="applyCoupon" :loading="applying" theme="blue" variant="solid" class="flex-shrink-0">
 							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,7 +32,7 @@
 							</svg>
 						</Button>
 					</div>
-					<p class="text-xs text-gray-500 mt-1">Code is case-insensitive</p>
+					<p class="text-xs text-gray-500 mt-1">{{ __('Code is case-insensitive') }}</p>
 				</div>
 
 				<!-- My Gift Cards -->
@@ -45,7 +45,7 @@
 									d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"
 									clip-rule="evenodd" />
 							</svg>
-							<span>My Gift Cards ({{ giftCards.length }})</span>
+							<span>{{ __('My Gift Cards ({0})', [giftCards.length]) }}</span>
 						</div>
 					</label>
 					<div class="space-y-2 max-h-60 overflow-y-auto pr-1">
@@ -93,16 +93,16 @@
 							</svg>
 						</div>
 						<h4 class="text-sm font-bold text-green-900">
-							Coupon Applied Successfully!
+							{{ __('Coupon Applied Successfully!') }}
 						</h4>
 					</div>
 					<div class="bg-white rounded-lg p-3">
 						<div class="flex justify-between items-center mb-2">
-							<span class="text-xs text-gray-600">Coupon Code</span>
+							<span class="text-xs text-gray-600">{{ __('Coupon Code') }}</span>
 							<span class="text-sm font-bold text-gray-900">{{ appliedDiscount.code }}</span>
 						</div>
 						<div class="flex justify-between items-center">
-							<span class="text-xs text-gray-600">Discount Amount</span>
+							<span class="text-xs text-gray-600">{{ __('Discount Amount') }}</span>
 							<span class="text-lg font-bold text-green-600">
 								-{{ formatCurrency(appliedDiscount.amount) }}
 							</span>
@@ -132,11 +132,11 @@
 								d="M6 18L18 6M6 6l12 12" />
 						</svg>
 					</template>
-					Remove
+					{{ __('Remove') }}
 				</Button>
 				<div class="flex space-x-2 ml-auto">
 					<Button variant="subtle" @click="show = false">
-						Close
+						{{ __('Close') }}
 					</Button>
 				</div>
 			</div>
@@ -160,7 +160,7 @@ const props = defineProps({
 	subtotal: {
 		type: Number,
 		required: true,
-		note: "Cart subtotal BEFORE tax - used for discount calculations",
+		note: __("Cart subtotal BEFORE tax - used for discount calculations"),
 	},
 	items: Array,
 	posProfile: String,
@@ -259,7 +259,7 @@ function applyGiftCard(card) {
 
 async function applyCoupon() {
 	if (!couponCode.value.trim()) {
-		errorMessage.value = "Please enter a coupon code"
+		errorMessage.value = __("Please enter a coupon code")
 		return
 	}
 
@@ -276,7 +276,7 @@ async function applyCoupon() {
 
 		if (!validationData || !validationData.valid) {
 			errorMessage.value =
-				validationData?.message || "The coupon code you entered is not valid"
+				validationData?.message || __("The coupon code you entered is not valid")
 			showError(errorMessage.value)
 			return
 		}
@@ -285,7 +285,7 @@ async function applyCoupon() {
 
 		// Check minimum amount (on subtotal before tax)
 		if (coupon.min_amount && props.subtotal < coupon.min_amount) {
-			errorMessage.value = `This coupon requires a minimum purchase of ${formatCurrency(coupon.min_amount)}`
+			errorMessage.value = __('This coupon requires a minimum purchase of ', [formatCurrency(coupon.min_amount)])
 			showWarning(errorMessage.value)
 			return
 		}
@@ -319,12 +319,12 @@ async function applyCoupon() {
 
 		emit("discount-applied", appliedDiscount.value)
 
-		showSuccess(`${couponCode.value.toUpperCase()} applied successfully`)
+		showSuccess(__('{0} applied successfully', [couponCode.value.toUpperCase()]))
 
 		errorMessage.value = ""
 	} catch (error) {
 		console.error("Error applying coupon:", error)
-		errorMessage.value = "Failed to apply coupon. Please try again."
+		errorMessage.value = __("Failed to apply coupon. Please try again.")
 		showError(errorMessage.value)
 	} finally {
 		applying.value = false
@@ -334,7 +334,7 @@ async function applyCoupon() {
 function removeDiscount() {
 	appliedDiscount.value = null
 	emit("discount-removed")
-	showSuccess("Discount has been removed")
+	showSuccess(__("Discount has been removed"))
 }
 
 function formatCurrency(amount) {

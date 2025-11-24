@@ -11,7 +11,7 @@
 defineProps({
 	text: {
 		type: String,
-		default: "Loading...",
+		default: __("Loading..."),
 	},
 })
 </script>

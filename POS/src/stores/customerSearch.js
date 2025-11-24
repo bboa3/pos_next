@@ -172,7 +172,7 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 		if (/^\d+$/.test(term)) {
 			recs.push({
 				type: "phone",
-				text: `Search by phone: ${term}`,
+				text: __('Search by phone: {0}', [term]),
 				icon: "📱",
 			})
 		}
@@ -181,7 +181,7 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 		if (term.includes("@")) {
 			recs.push({
 				type: "email",
-				text: `Search by email: ${term}`,
+				text: __('Search by email: {0}', [term]),
 				icon: "✉️",
 			})
 		}
@@ -193,7 +193,7 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 		if (!exactMatch && filteredCustomers.value.length < 5) {
 			recs.push({
 				type: "create",
-				text: `Create new customer "${term}"`,
+				text: __('Create new customer: {0}', [term]),
 				icon: "➕",
 			})
 		}

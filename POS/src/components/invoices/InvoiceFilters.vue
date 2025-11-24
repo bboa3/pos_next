@@ -10,7 +10,7 @@
 					v-model="store.searchTerm"
 					type="text"
 					class="search-input"
-					placeholder="Search invoices..."
+					:placeholder="__('Search invoices...')"
 				/>
 				<button
 					v-if="store.searchTerm"
@@ -68,7 +68,7 @@
 					<svg class="chip-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
 					</svg>
-					More
+					{{ __('More') }}
 					<span v-if="hasAdvancedFilters" class="count-badge">{{ advancedFiltersCount }}</span>
 				</button>
 			</div>
@@ -78,9 +78,11 @@
 		<Transition name="fade">
 			<div v-if="store.hasActiveFilters" class="active-summary">
 				<div class="summary-content">
-					<span class="summary-text">
-						<strong>{{ filterStats?.filtered || 0 }}</strong> of <strong>{{ filterStats?.total || 0 }}</strong> invoices
-					</span>
+					<TranslatedHTML 
+						class="summary-text"
+						:inner="__('&lt;strong&gt;{0}&lt;/strong&gt; of &lt;strong&gt;{1}&lt;/strong&gt; invoice(s)', 
+							[(filterStats?.filtered || 0), (filterStats?.total || 0)]) "
+					/>
 					<div class="active-pills">
 						<button
 							v-for="filter in store.filterSummary"
@@ -96,7 +98,7 @@
 					</div>
 				</div>
 				<button @click="store.clearAllFilters()" class="clear-all">
-					Clear all
+					{{ __('Clear all') }}
 				</button>
 			</div>
 		</Transition>
@@ -111,12 +113,12 @@
 							<svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
 							</svg>
-							Customer
+							{{ __('Customer') }}
 						</label>
 						<AutocompleteSelect
 							v-model="store.customer"
 							:options="props.uniqueCustomers"
-							placeholder="Search customers..."
+							:placeholder="__('Search customers...')"
 							icon="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
 						/>
 					</div>
@@ -126,12 +128,12 @@
 							<svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
 							</svg>
-							Product
+							{{ __('Product') }}
 						</label>
 						<AutocompleteSelect
 							v-model="store.product"
 							:options="props.uniqueProducts"
-							placeholder="Search products..."
+							:placeholder="__('Search products...')"
 							icon="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
 						/>
 					</div>
@@ -144,7 +146,7 @@
 							<svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
 							</svg>
-							From Date
+							{{ __('From Date') }}
 						</label>
 						<input
 							v-model="store.dateFrom"
@@ -158,7 +160,7 @@
 							<svg class="label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
 							</svg>
-							To Date
+							{{ __('To Date') }}
 						</label>
 						<input
 							v-model="store.dateTo"
@@ -174,20 +176,20 @@
 						v-model="saveFilterName"
 						type="text"
 						class="save-input"
-						placeholder="Save these filters as..."
+						:placeholder="__('Save these filters as...')"
 						@keyup.enter="saveFilters"
 					/>
 					<button @click="saveFilters" :disabled="!saveFilterName" class="save-btn">
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
 						</svg>
-						Save
+						{{ __('Save') }}
 					</button>
 				</div>
 
 				<!-- Saved Filters -->
 				<div v-if="store.savedFilters.length > 0" class="saved-filters">
-					<div class="saved-header">Saved Filters</div>
+					<div class="saved-header">{{ __('Saved Filters') }}</div>
 					<div class="saved-list">
 						<button
 							v-for="preset in store.savedFilters"
@@ -219,6 +221,7 @@
 import AutocompleteSelect from "@/components/common/AutocompleteSelect.vue"
 import { useInvoiceFiltersStore } from "@/stores/invoiceFilters"
 import { computed, ref } from "vue"
+import TranslatedHTML from "../common/TranslatedHTML.vue"
 
 const props = defineProps({
 	uniqueCustomers: {
@@ -241,22 +244,22 @@ const saveFilterName = ref("")
 
 // Quick date presets (simplified)
 const quickDates = [
-	{ label: "Today", value: "today", action: () => store.setToday() },
+	{ label: __("Today"), value: "today", action: () => store.setToday() },
 	{
-		label: "Yesterday",
+		label: __("Yesterday"),
 		value: "yesterday",
 		action: () => store.setYesterday(),
 	},
-	{ label: "This Week", value: "week", action: () => store.setThisWeek() },
-	{ label: "This Month", value: "month", action: () => store.setThisMonth() },
+	{ label: __("This Week"), value: "week", action: () => store.setThisWeek() },
+	{ label: __("This Month"), value: "month", action: () => store.setThisMonth() },
 ]
 
 // Status options (only show meaningful ones)
 const statusOptions = [
-	{ label: "Paid", value: "Paid" },
-	{ label: "Unpaid", value: "Unpaid" },
-	{ label: "Partial", value: "Partly Paid" },
-	{ label: "Overdue", value: "Overdue" },
+	{ label: __("Paid"), value: "Paid" },
+	{ label: __("Unpaid"), value: "Unpaid" },
+	{ label: __("Partial"), value: "Partly Paid" },
+	{ label: __("Overdue"), value: "Overdue" },
 ]
 
 // Advanced filters (customer, product, custom date)
@@ -334,7 +337,7 @@ function loadSavedFilter(name) {
 }
 
 function deleteSavedFilter(name) {
-	if (confirm(`Delete "${name}"?`)) {
+	if (confirm(__('Delete "{0}"?', [name]))) {
 		store.deleteFilterPreset(name)
 	}
 }

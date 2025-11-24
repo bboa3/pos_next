@@ -273,7 +273,7 @@ if (typeof window !== "undefined") {
 				console.log(`Successfully synced ${result.success} invoices`)
 				if (window.frappe?.msgprint) {
 					window.frappe.msgprint({
-						title: "Sync Complete",
+						title: __("Sync Complete"),
 						message: `Successfully synced ${result.success} offline invoices`,
 						indicator: "green",
 					})

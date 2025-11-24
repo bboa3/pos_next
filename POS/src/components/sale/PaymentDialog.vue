@@ -1,5 +1,5 @@
 <template>
-	<Dialog v-model="show" :options="{ title: 'Complete Payment', size: '2xl' }">
+	<Dialog v-model="show" :options="{ title: __('Complete Payment'), size: '2xl' }">
 		<template #body-content>
 			<div class="space-y-4">
 				<!-- INFORMATION SECTION (TOP) -->
@@ -8,20 +8,20 @@
 				<div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
 					<div class="flex justify-between items-start mb-3">
 						<div>
-							<div class="text-xs font-medium text-gray-600 mb-1">Total Amount</div>
+							<div class="text-xs font-medium text-gray-600 mb-1">{{ __('Total Amount') }}</div>
 							<div class="text-3xl font-bold text-gray-900">
 								{{ formatCurrency(grandTotal) }}
 							</div>
 						</div>
 						<div class="text-right">
 							<div v-if="remainingAmount > 0" class="mb-2">
-								<div class="text-xs font-medium text-orange-600 mb-1">Remaining</div>
+								<div class="text-xs font-medium text-orange-600 mb-1">{{ __('Remaining') }}</div>
 								<div class="text-xl font-bold text-orange-600">
 									{{ formatCurrency(remainingAmount) }}
 								</div>
 							</div>
 							<div v-if="changeAmount > 0">
-								<div class="text-xs font-medium text-green-600 mb-1">Change</div>
+								<div class="text-xs font-medium text-green-600 mb-1">{{ __('Change') }}</div>
 								<div class="text-xl font-bold text-green-600">
 									{{ formatCurrency(changeAmount) }}
 								</div>
@@ -30,7 +30,7 @@
 								<svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
 									<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
 								</svg>
-								<span class="text-xs font-semibold">Paid in Full</span>
+								<span class="text-xs font-semibold">{{ __('Paid in Full') }}</span>
 							</div>
 						</div>
 					</div>
@@ -46,7 +46,7 @@
 						></div>
 					</div>
 					<div class="text-xs text-gray-600 mt-1">
-						{{ formatCurrency(totalPaid) }} paid of {{ formatCurrency(grandTotal) }}
+						{{ __('{0} paid of {1}', [formatCurrency(totalPaid), formatCurrency(grandTotal)]) }}
 					</div>
 				</div>
 
@@ -105,16 +105,16 @@
 							</div>
 							<div>
 								<div class="text-xs font-semibold text-gray-800">
-									{{ totalAvailableCredit >= 0 ? 'Customer Credit Available' : 'Customer Outstanding Balance' }}
+									{{ totalAvailableCredit >= 0 ? __('Customer Credit Available') : __('Customer Outstanding Balance') }}
 								</div>
 								<div v-if="totalAvailableCredit > 0" class="text-xs text-emerald-700">
-									Credit can be applied to invoice
+									{{ __('Credit can be applied to invoice') }}
 								</div>
 								<div v-else-if="totalAvailableCredit < 0" class="text-xs text-red-700">
-									Amount owed by customer
+									{{ __('Amount owed by customer') }}
 								</div>
 								<div v-else class="text-xs text-gray-600">
-									No outstanding balance
+									{{ __('No outstanding balance') }}
 								</div>
 							</div>
 						</div>
@@ -129,7 +129,7 @@
 										: 'text-gray-700'
 								]"
 							>
-								{{ totalAvailableCredit >= 0 ? 'Available' : 'Outstanding' }}
+								{{ totalAvailableCredit >= 0 ? __('Available') : __('Outstanding') }}
 							</div>
 							<div
 								:class="[
@@ -157,10 +157,15 @@
 								</svg>
 							</div>
 							<span class="text-xs font-bold text-purple-900">
-								Sales Person{{ settingsStore.isMultipleSalesPersons ? 's' : '' }}
+								{{ settingsStore.isMultipleSalesPersons
+									? __('Sales Persons')
+									: __('Sales Person')
+								}}
 							</span>
 							<span v-if="selectedSalesPersons.length > 0" class="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-0.5 rounded">
-								{{ settingsStore.isSingleSalesPerson ? '1 selected' : `${selectedSalesPersons.length} selected` }}
+								{{ settingsStore.isSingleSalesPerson 
+									? __('1 selected') 
+									: __('{0} selected', [selectedSalesPersons.length]) }}
 							</span>
 						</div>
 						<button
@@ -168,7 +173,7 @@
 							@click="clearSalesPersons"
 							class="text-xs text-purple-700 hover:text-purple-900 font-semibold px-2 py-1 bg-purple-100 hover:bg-purple-200 rounded transition-colors"
 						>
-							{{ settingsStore.isSingleSalesPerson ? 'Clear' : 'Clear All' }}
+							{{ settingsStore.isSingleSalesPerson ? __('Clear') : __('Clear All') }}
 						</button>
 					</div>
 
@@ -177,7 +182,7 @@
 						<input
 							v-model="salesPersonSearch"
 							type="text"
-							placeholder="Search sales person..."
+							:placeholder="__('Search sales person...')"
 							class="w-full px-3 py-2 pl-9 text-xs border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
 						/>
 						<svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,7 +192,7 @@
 
 					<!-- Selected Sales Persons (Chips) -->
 					<div v-if="selectedSalesPersons.length > 0" class="mb-2 space-y-1.5">
-						<div class="text-[10px] font-semibold text-purple-700 uppercase tracking-wide mb-1">Selected:</div>
+						<div class="text-[10px] font-semibold text-purple-700 uppercase tracking-wide mb-1">{{ __('Selected:') }}</div>
 						<div
 							v-for="person in selectedSalesPersons"
 							:key="person.sales_person"
@@ -232,7 +237,7 @@
 								<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
 							</svg>
 							<span class="text-xs font-medium text-yellow-800">
-								Total: {{ totalAllocation }}% (should be 100%)
+								{{ __('Total: {0}% (should be 100%)', [totalAllocation]) }}
 							</span>
 						</div>
 					</div>
@@ -254,7 +259,7 @@
 										{{ person.sales_person_name || person.name }}
 									</div>
 									<div v-if="person.commission_rate" class="text-[10px] text-gray-500">
-										Commission: {{ person.commission_rate }}%
+										{{ __('Commission: {0}%', [person.commission_rate]) }}
 									</div>
 								</div>
 							</div>
@@ -266,17 +271,17 @@
 						<svg class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
 						</svg>
-						<div class="text-xs text-gray-500">Search to add sales persons</div>
+						<div class="text-xs text-gray-500">{{ __('Search to add sales persons') }}</div>
 					</div>
 
 					<!-- Loading State -->
 					<div v-if="loadingSalesPersons" class="text-center py-3">
-						<div class="text-xs text-gray-500">Loading sales persons...</div>
+						<div class="text-xs text-gray-500">{{ __('Loading sales persons...') }}</div>
 					</div>
 
 					<!-- No Results -->
 					<div v-if="salesPersonSearch && filteredSalesPersons.length === 0 && !loadingSalesPersons" class="text-center py-3">
-						<div class="text-xs text-gray-500">No sales persons found</div>
+						<div class="text-xs text-gray-500">{{ __('No sales persons found') }}</div>
 					</div>
 				</div>
 
@@ -289,7 +294,7 @@
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
 								</svg>
 							</div>
-							<span class="text-[11px] font-bold text-orange-900">Additional Discount</span>
+							<span class="text-[11px] font-bold text-orange-900">{{ __('Additional Discount') }}</span>
 							<span v-if="localAdditionalDiscount > 0" class="text-[10px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded">
 								-{{ formatCurrency(additionalDiscountType === 'percentage' ? (subtotal * localAdditionalDiscount / 100) : localAdditionalDiscount) }}
 							</span>
@@ -299,7 +304,7 @@
 							@click="clearAdditionalDiscount"
 							class="text-[10px] text-orange-700 hover:text-orange-900 font-semibold px-1.5 py-0.5 bg-orange-100 hover:bg-orange-200 rounded transition-colors"
 						>
-							Clear
+							{{ __('Clear') }}
 						</button>
 					</div>
 					<div class="grid grid-cols-[100px_1fr] gap-1.5">
@@ -309,8 +314,8 @@
 							@change="handleAdditionalDiscountTypeChange"
 							class="w-full px-1.5 py-1.5 text-[11px] font-medium border border-orange-300 rounded focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent bg-white"
 						>
-							<option value="percentage">% Percent</option>
-							<option value="amount">{{ currency }} Amount</option>
+							<option value="percentage">{{ __('% Percent') }}</option>
+							<option value="amount">{{ __('{0} Amount', [currency]) }}</option>
 						</select>
 						<!-- Discount Value Input (Compact) -->
 						<div class="relative">
@@ -335,9 +340,9 @@
 
 				<!-- Payment Methods Grid -->
 				<div>
-					<h3 class="text-sm font-semibold text-gray-700 mb-3">Payment Methods</h3>
+					<h3 class="text-sm font-semibold text-gray-700 mb-3">{{ __('Payment Methods') }}</h3>
 					<div class="text-xs text-gray-500 mb-2">
-						Select payment method to add
+						{{ __('Select payment method to add') }}
 					</div>
 					<div class="grid grid-cols-2 md:grid-cols-3 gap-3">
 						<button
@@ -360,7 +365,7 @@
 											<div class="font-semibold text-sm text-gray-900">
 												{{ method.mode_of_payment }}
 											</div>
-											<div class="text-xs text-gray-500">{{ method.type || "Cash" }}</div>
+											<div class="text-xs text-gray-500">{{ method.type || __('Cash') }}</div>
 										</div>
 									</div>
 								</div>
@@ -372,7 +377,7 @@
 							</div>
 							<div v-if="getMethodTotal(method.mode_of_payment) > 0"
 								class="mt-2 pt-2 border-t border-gray-200">
-								<div class="text-xs text-gray-500">Added</div>
+								<div class="text-xs text-gray-500">{{ __('Added') }}</div>
 								<div class="font-bold text-blue-600">
 									{{ formatCurrency(getMethodTotal(method.mode_of_payment)) }}
 								</div>
@@ -384,7 +389,7 @@
 				<!-- Quick Amount Buttons -->
 				<div v-if="remainingAmount > 0 && lastSelectedMethod" class="bg-gray-50 rounded-lg p-4 border border-gray-200">
 					<div class="text-xs font-medium text-gray-600 mb-2">
-						Quick amounts for {{ lastSelectedMethod.mode_of_payment }}
+						{{ __('Quick amounts for {0}', [lastSelectedMethod.mode_of_payment]) }}
 					</div>
 					<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
 						<button
@@ -397,7 +402,7 @@
 						</button>
 					</div>
 					<div class="mt-2">
-						<div class="text-xs font-medium text-gray-600 mb-1">Custom amount</div>
+						<div class="text-xs font-medium text-gray-600 mb-1">{{ __('Custom amount') }}</div>
 						<div class="flex space-x-2">
 							<Input
 								v-model="customAmount"
@@ -414,7 +419,7 @@
 								@click="addCustomPayment(lastSelectedMethod, customAmount)"
 								:disabled="!customAmount || customAmount <= 0"
 							>
-								Add
+								{{ __('Add') }}
 							</Button>
 						</div>
 					</div>
@@ -422,7 +427,7 @@
 
 				<!-- Active Payment Entries -->
 				<div v-if="paymentEntries.length > 0">
-					<h3 class="text-sm font-semibold text-gray-700 mb-3">Payment Breakdown</h3>
+					<h3 class="text-sm font-semibold text-gray-700 mb-3">{{ __('Payment Breakdown') }}</h3>
 					<div class="space-y-2 max-h-64 overflow-y-auto">
 						<div
 							v-for="(entry, index) in paymentEntries"
@@ -469,14 +474,14 @@
 					@click="clearAll"
 					theme="red"
 				>
-					Clear All
+					{{ __('Clear All') }}
 				</Button>
 				<div v-else></div>
 
 				<!-- Right: Main Action Buttons -->
 				<div class="flex items-center space-x-2">
 					<Button variant="subtle" @click="show = false">
-						Cancel
+						{{ __('Cancel') }}
 					</Button>
 
 					<!-- Apply Credit Button (if available) -->
@@ -490,7 +495,7 @@
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
 							</svg>
 						</template>
-						Apply Credit
+						{{ __('Apply Credit') }}
 					</Button>
 
 					<!-- Pay on Account Button (if credit sales enabled) -->
@@ -508,7 +513,7 @@
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
 						</svg>
-						<span class="truncate">Pay on Account</span>
+						<span class="truncate">{{ __('Pay on Account') }}</span>
 					</button>
 
 					<!-- Complete/Partial Payment Button -->
@@ -844,12 +849,12 @@ const paymentButtonText = computed(() => {
 	})
 
 	if (totalPaid.value >= props.grandTotal) {
-		return "Complete Payment"
+		return __("Complete Payment")
 	}
 	if (props.allowPartialPayment && totalPaid.value > 0) {
-		return "Partial Payment"
+		return __("Partial Payment")
 	}
-	return "Complete Payment"
+	return __("Complete Payment")
 })
 
 const quickAmounts = computed(() => {
@@ -950,7 +955,7 @@ function quickAddPayment(method) {
 	paymentEntries.value.push({
 		mode_of_payment: method.mode_of_payment,
 		amount: Number.parseFloat(remainingAmount.value.toFixed(2)),
-		type: method.type || "Cash",
+		type: method.type || __('Cash'),
 	})
 
 	console.log('[PaymentDialog] Payment added, new entries:', paymentEntries.value)
@@ -971,7 +976,7 @@ function addCustomPayment(method, amount) {
 	paymentEntries.value.push({
 		mode_of_payment: method.mode_of_payment,
 		amount: amt,
-		type: method.type || "Cash",
+		type: method.type || __('Cash'),
 	})
 
 	console.log('[PaymentDialog] Payment added, new entries:', paymentEntries.value)
@@ -1103,7 +1108,7 @@ function handleAdditionalDiscountChange() {
 			localAdditionalDiscount.value = settingsStore.maxDiscountAllowed
 			discountValue = settingsStore.maxDiscountAllowed
 			// Show warning toast
-			showWarning(`Maximum allowed discount is ${settingsStore.maxDiscountAllowed}%`)
+			showWarning(__('Maximum allowed discount is {0}%', [settingsStore.maxDiscountAllowed]))
 		}
 
 		// Ensure percentage is between 0-100
@@ -1126,7 +1131,8 @@ function handleAdditionalDiscountChange() {
 				localAdditionalDiscount.value = maxAmount
 				discountAmount = maxAmount
 				// Show warning toast
-				showWarning(`Maximum allowed discount is ${settingsStore.maxDiscountAllowed}% (${props.currency} ${maxAmount.toFixed(2)})`)
+				showWarning(__('Maximum allowed discount is {0}% ({1} {2})', 
+				[settingsStore.maxDiscountAllowed, props.currency, maxAmount.toFixed(2)]))
 			}
 		}
 	}

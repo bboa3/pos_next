@@ -1,7 +1,7 @@
 <template>
-	<Dialog v-model="show" :options="{ title: 'Select Customer', size: 'md' }">
+	<Dialog v-model="show" :options="{ title: __('Select Customer'), size: 'md' }">
 		<template #body-title>
-			<span class="sr-only">Search and select a customer for the transaction</span>
+			<span class="sr-only">{{ __('Search and select a customer for the transaction') }}</span>
 		</template>
 		<template #body-content>
 			<div class="space-y-4">
@@ -30,11 +30,11 @@
 						:value="searchTerm"
 						@input="handleSearchInput"
 						type="text"
-						placeholder="Search customers by name, mobile, or email..."
+						:placeholder="__('Search customers by name, mobile, or email...')"
 						class="w-full border border-gray-300 rounded-md px-3 py-2 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 						@keydown="handleKeydown"
 						autofocus
-						aria-label="Search customers"
+						:aria-label="__('Search customers')"
 					/>
 					<!-- Clear Button -->
 					<div v-if="searchTerm" class="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -45,9 +45,9 @@
 						</button>
 					</div>
 					<p v-if="!loading && allCustomers.length > 0" class="text-xs text-gray-500 mt-1">
-						<span v-if="showingRecent" class="text-blue-600 font-medium">⭐ Recent & Frequent</span>
-						<span v-else>{{ customers.length }} of {{ allCustomers.length }} customers</span>
-						<span v-if="customers.length > 0" class="text-gray-400 ml-1">• Use ↑↓ to navigate, Enter to select</span>
+						<span v-if="showingRecent" class="text-blue-600 font-medium">{{ __('⭐ Recent & Frequent') }}</span>
+						<span v-else>{{ __('{0} of {1} customers', [customers.length, allCustomers.length]) }}</span>
+						<span v-if="customers.length > 0" class="text-gray-400 ml-1">{{ __('• Use ↑↓ to navigate, Enter to select') }}</span>
 					</p>
 				</div>
 
@@ -69,7 +69,7 @@
 						<div
 							class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"
 						></div>
-						<p class="mt-2 text-sm text-gray-500">Loading customers...</p>
+						<p class="mt-2 text-sm text-gray-500">{{ __('Loading customers...') }}</p>
 					</div>
 
 					<div
@@ -89,9 +89,9 @@
 								d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
 							/>
 						</svg>
-						<p class="mt-2 text-sm text-gray-500">No customers available</p>
+						<p class="mt-2 text-sm text-gray-500">{{ __('No customers available') }}</p>
 						<p class="text-xs text-gray-400 mt-1">
-							Create your first customer to get started
+							{{ __('Create your first customer to get started') }}
 						</p>
 					</div>
 
@@ -112,9 +112,9 @@
 								d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
 							/>
 						</svg>
-						<p class="mt-2 text-sm font-medium text-gray-700">No results for "{{ searchTerm }}"</p>
+						<p class="mt-2 text-sm font-medium text-gray-700">{{ __('No results for "{0}"', [searchTerm]) }}</p>
 						<p class="text-xs text-gray-500 mt-1">
-							Try a different search term or create a new customer
+							{{ __('Try a different search term or create a new customer') }}
 						</p>
 					</div>
 
@@ -161,14 +161,14 @@
 						@click="createNewCustomer"
 						class="w-full py-2 px-4 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
 					>
-						+ Create New Customer
+						{{ __('+ Create New Customer') }}
 					</button>
 				</div>
 			</div>
 		</template>
 
 		<template #actions>
-			<Button variant="subtle" @click="show = false">Cancel</Button>
+			<Button variant="subtle" @click="show = false">{{ __('Cancel') }}</Button>
 		</template>
 	</Dialog>
 

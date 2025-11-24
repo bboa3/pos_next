@@ -36,7 +36,7 @@
 						<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
 						</svg>
-						<span>View Shift</span>
+						<span>{{ __('View Shift') }}</span>
 					</button>
 					<button
 						@click="uiStore.showDraftDialog = true"
@@ -45,7 +45,7 @@
 						<svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
 						</svg>
-						<span>Draft Invoices</span>
+						<span>{{ __('Draft Invoices') }}</span>
 						<span v-if="draftsStore.draftsCount > 0" class="ml-auto text-xs bg-purple-600 text-white px-1.5 py-0.5 rounded-full">
 							{{ draftsStore.draftsCount }}
 						</span>
@@ -57,7 +57,7 @@
 						<svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
 						</svg>
-						<span>Invoice History</span>
+						<span>{{ __('Invoice History') }}</span>
 					</button>
 					<button
 						v-if="offlineStore.pendingInvoicesCount > 0"
@@ -67,7 +67,7 @@
 						<svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
 						</svg>
-						<span>Offline Invoices</span>
+						<span>{{ __('Offline Invoices') }}</span>
 						<span class="ml-auto text-xs bg-orange-600 text-white px-1.5 py-0.5 rounded-full">
 							{{ offlineStore.pendingInvoicesCount }}
 						</span>
@@ -79,7 +79,7 @@
 						<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
 						</svg>
-						<span>Return Invoice</span>
+						<span>{{ __('Return Invoice') }}</span>
 					</button>
 				</template>
 				<template #additional-actions>
@@ -90,7 +90,7 @@
 						<svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
 						</svg>
-						<span>Close Shift</span>
+						<span>{{ __('Close Shift') }}</span>
 					</button>
 				</template>
 			</POSHeader>
@@ -118,7 +118,7 @@
 							? 'text-blue-600 border-b-3 border-blue-600 bg-blue-50'
 							: 'text-gray-600 hover:text-gray-800 hover:bg-gray-50 active:bg-gray-100'
 					]"
-					:aria-label="'View items'"
+					:aria-label="__('View items')"
 					:aria-selected="uiStore.mobileActiveTab === 'items'"
 					role="tab"
 				>
@@ -126,7 +126,7 @@
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
 						</svg>
-						<span>Items</span>
+						<span>{{ __('Items') }}</span>
 					</div>
 				</button>
 				<button
@@ -137,7 +137,7 @@
 							? 'text-blue-600 border-b-3 border-blue-600 bg-blue-50'
 							: 'text-gray-600 hover:text-gray-800 hover:bg-gray-50 active:bg-gray-100'
 					]"
-					:aria-label="'View cart'"
+					:aria-label="__('View cart')"
 					:aria-selected="uiStore.mobileActiveTab === 'cart'"
 					role="tab"
 				>
@@ -145,7 +145,7 @@
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
 						</svg>
-						<span>Cart</span>
+						<span>{{ __('Cart') }}</span>
 						<span v-if="cartStore.itemCount > 0" class="bg-blue-600 text-white text-[10px] font-bold rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center shadow-sm">
 							{{ cartStore.itemCount }}
 						</span>
@@ -243,7 +243,7 @@
 				v-if="!uiStore.isDesktop && uiStore.mobileActiveTab === 'items' && cartStore.itemCount > 0"
 				@click="uiStore.setMobileTab('cart')"
 				class="lg:hidden fixed bottom-20 right-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full p-4 shadow-2xl hover:shadow-3xl hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 transition-[background,box-shadow,transform] duration-200 z-50 touch-manipulation active:scale-95 ring-4 ring-blue-100"
-				:aria-label="'View cart with ' + cartStore.itemCount + ' items'"
+				:aria-label="__('View cart with {0} items', [cartStore.itemCount])"
 			>
 				<div class="relative">
 					<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -268,15 +268,15 @@
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
 					</svg>
 				</div>
-				<h3 class="mt-4 text-lg font-medium text-gray-900">Welcome to POS Next</h3>
-				<p class="mt-2 text-sm text-gray-500">Please open a shift to start making sales</p>
+				<h3 class="mt-4 text-lg font-medium text-gray-900">{{ __('Welcome to POS Next') }}</h3>
+				<p class="mt-2 text-sm text-gray-500">{{ __('Please open a shift to start making sales') }}</p>
 				<Button
 					variant="solid"
 					theme="blue"
 					@click="uiStore.showOpenShiftDialog = true"
 					class="mt-6"
 				>
-					Open Shift
+					{{ __('Open Shift') }}
 				</Button>
 			</div>
 		</div>
@@ -453,22 +453,22 @@
 		<!-- Clear Cart Confirmation Dialog -->
 		<Dialog
 			v-model="uiStore.showClearCartDialog"
-			:options="{ title: 'Clear Cart?', size: 'xs' }"
+			:options="{ title: __('Clear Cart?'), size: 'xs' }"
 		>
 			<template #body-content>
 				<div class="py-3">
 					<p class="text-sm text-gray-600">
-						Remove all {{ cartStore.itemCount }} items from cart?
+						{{ __('Remove all {0} items from cart?', [cartStore.itemCount]) }}
 					</p>
 				</div>
 			</template>
 			<template #actions>
 				<div class="flex space-x-2 w-full">
 					<Button class="flex-1" variant="subtle" @click="uiStore.showClearCartDialog = false">
-						Cancel
+						{{ __('Cancel') }}
 					</Button>
 					<Button class="flex-1" variant="solid" theme="red" @click="confirmClearCart">
-						Clear All
+						{{ __('Clear All') }}
 					</Button>
 				</div>
 			</template>
@@ -477,7 +477,7 @@
 		<!-- Logout Confirmation Dialog -->
 		<Dialog
 			v-model="uiStore.showLogoutDialog"
-			:options="{ title: 'Sign Out Confirmation', size: 'md' }"
+			:options="{ title: __('Sign Out Confirmation'), size: 'md' }"
 			:dismissable="!session.logout.loading"
 		>
 			<template #body-content>
@@ -490,10 +490,10 @@
 							</svg>
 						</div>
 						<h3 class="text-lg font-bold text-red-600 mb-2">
-							Your Shift is Still Open!
+							{{ __('Your Shift is Still Open!') }}
 						</h3>
 						<p class="text-sm text-gray-600 max-w-sm mx-auto">
-							Close your shift first to save all transactions properly
+							{{ __('Close your shift first to save all transactions properly') }}
 						</p>
 					</div>
 
@@ -508,7 +508,7 @@
 							<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
 							</svg>
-							Close Shift & Sign Out
+							{{ __('Close Shift & Sign Out') }}
 						</button>
 
 						<!-- Alternative Actions -->
@@ -518,14 +518,14 @@
 								:disabled="session.logout.loading"
 								class="px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold text-sm rounded-lg shadow-md hover:shadow-red-500/30 transition-[background,box-shadow,opacity] duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
 							>
-								Skip & Sign Out
+								{{ __('Skip & Sign Out') }}
 							</button>
 							<button
 								@click="uiStore.showLogoutDialog = false"
 								:disabled="session.logout.loading"
 								class="px-4 py-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-sm rounded-lg transition-[background-color,border-color,opacity] duration-200 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300 hover:border-gray-400"
 							>
-								Cancel
+								{{ __('Cancel') }}
 							</button>
 						</div>
 					</div>
@@ -540,10 +540,10 @@
 							</svg>
 						</div>
 						<h3 class="text-lg font-bold text-red-600 mb-2">
-							Sign Out?
+							{{ __('Sign Out?') }}
 						</h3>
 						<p class="text-sm text-gray-600">
-							You will be logged out of POS Next
+							{{ __('You will be logged out of POS Next') }}
 						</p>
 					</div>
 
@@ -553,20 +553,20 @@
 							:disabled="session.logout.loading"
 							class="px-5 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-blue-500/30 transition-[background-color,box-shadow,opacity,transform] duration-200 disabled:opacity-50 transform hover:scale-[1.02] active:scale-[0.98]"
 						>
-							Cancel
+							{{ __('Cancel') }}
 						</button>
 						<button
 							@click="confirmLogout"
 							:disabled="session.logout.loading"
 							class="px-5 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-red-500/30 transition-[background,box-shadow,opacity,transform] duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
 						>
-							<span v-if="!session.logout.loading">Sign Out</span>
+							<span v-if="!session.logout.loading">{{ __('Sign Out') }}</span>
 							<span v-else class="flex items-center justify-center">
 								<svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
 									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 								</svg>
-								Signing Out...
+								{{ __('Signing Out...') }}
 							</span>
 						</button>
 					</div>
@@ -577,7 +577,7 @@
 		<!-- Success Dialog -->
 		<Dialog
 			v-model="uiStore.showSuccessDialog"
-			:options="{ title: 'Invoice Created Successfully', size: 'md' }"
+			:options="{ title: __('Invoice Created Successfully'), size: 'md' }"
 		>
 			<template #body-content>
 				<div class="text-center py-6">
@@ -587,20 +587,20 @@
 						</svg>
 					</div>
 					<h3 class="mt-4 text-lg font-medium text-gray-900">
-						Invoice {{ uiStore.lastInvoiceName }} created successfully!
+						{{ __('Invoice {0} created successfully!', [uiStore.lastInvoiceName]) }}
 					</h3>
 					<p class="mt-2 text-sm text-gray-500">
-						Total: {{ formatCurrency(uiStore.lastInvoiceTotal) }}
+						{{ __('Total: {0}', [formatCurrency(uiStore.lastInvoiceTotal)]) }}
 					</p>
 				</div>
 			</template>
 			<template #actions>
 				<div class="flex space-x-2">
 					<Button variant="subtle" @click="uiStore.showSuccessDialog = false">
-						Close
+						{{ __('Close') }}
 					</Button>
 					<Button variant="solid" theme="blue" @click="() => { handlePrintInvoice({ name: uiStore.lastInvoiceName }); uiStore.showSuccessDialog = false }">
-						Print Invoice
+						{{ __('Print Invoice') }}
 					</Button>
 				</div>
 			</template>
@@ -609,12 +609,12 @@
 		<!-- Error Dialog -->
 		<Dialog
 			v-model="uiStore.showErrorDialog"
-			:options="{ title: uiStore.errorDialogTitle || 'Error', size: 'md' }"
+			:options="{ title: uiStore.errorDialogTitle || __('Error'), size: 'md' }"
 		>
 			<template #body-content>
 				<div class="py-3">
 					<p class="text-sm text-gray-700 whitespace-pre-line">
-						{{ uiStore.errorDialogMessage || 'An unexpected error occurred.' }}
+						{{ uiStore.errorDialogMessage || __('An unexpected error occurred.') }}
 					</p>
 					<div v-if="uiStore.errorDetails" class="mt-3 pt-3 border-t border-gray-200">
 						<p class="text-xs text-gray-500">{{ uiStore.errorDetails }}</p>
@@ -629,19 +629,19 @@
 						theme="red"
 						@click="handleDeleteFailedInvoice"
 					>
-						Delete Invoice
+						{{ __('Delete Invoice') }}
 					</Button>
 					<div v-else></div>
 					<div class="flex space-x-2">
 						<Button variant="subtle" @click="uiStore.clearError()">
-							Close
+							{{ __('Close') }}
 						</Button>
 						<Button
 							v-if="uiStore.errorRetryAction"
 							variant="solid"
 							@click="handleErrorRetry"
 						>
-							Try Again
+							{{ __('Try Again') }}
 						</Button>
 					</div>
 				</div>
@@ -904,14 +904,15 @@ onMounted(async () => {
 			cartStore.rebuildIncrementalCache()
 
 			const message = changes.hasOwnProperty('tax_inclusive')
-				? 'Tax mode updated. Cart recalculated with new tax settings.'
-				: 'Discount settings changed. Cart recalculated.'
+				? __('Tax mode updated. Cart recalculated with new tax settings.')
+				: __('Discount settings changed. Cart recalculated.')
 
 			showSuccess(message)
 		} else if (changes.hasOwnProperty('tax_inclusive')) {
 			// Show feedback even if cart is empty
-			const mode = changes.tax_inclusive.new ? 'inclusive' : 'exclusive'
-			showSuccess(`Prices are now ${mode} of tax. This will apply to new items added to cart.`)
+			showSuccess(changes.tax_inclusive.new
+				? __('Prices are now tax-inclusive. This will apply to new items added to cart.')
+				: __('Prices are now tax-exclusive. This will apply to new items added to cart.'))
 		}
 	})
 
@@ -923,8 +924,8 @@ onMounted(async () => {
 			const isNowAllowed = changes.allow_negative_stock.new
 
 			const message = isNowAllowed
-				? 'Negative stock sales are now allowed'
-				: 'Negative stock sales are now restricted'
+				? __('Negative stock sales are now allowed')
+				: __('Negative stock sales are now restricted')
 
 			showSuccess(message)
 		}
@@ -939,11 +940,11 @@ onMounted(async () => {
 
 		// Show notification for specific important changes
 		const changeLabels = {
-			allow_credit_sale: 'Credit Sale',
-			allow_return: 'Returns',
-			allow_write_off_change: 'Write Off Change',
-			allow_partial_payment: 'Partial Payment',
-			silent_print: 'Silent Print'
+			allow_credit_sale: __('Credit Sale'),
+			allow_return: __('Returns'),
+			allow_write_off_change: __('Write Off Change'),
+			allow_partial_payment: __('Partial Payment'),
+			silent_print: __('Silent Print')
 		}
 
 		const changedSettings = Object.keys(changes)
@@ -952,7 +953,7 @@ onMounted(async () => {
 			.join(', ')
 
 		if (changedSettings) {
-			showSuccess(`${changedSettings} settings applied immediately`)
+			showSuccess(__('{0} settings applied immediately', [changedSettings]))
 		}
 	})
 
@@ -1310,12 +1311,12 @@ async function handleShiftOpened() {
 		// Load tax rules with tax_inclusive setting
 		await cartStore.loadTaxRules(shiftStore.profileName, posSettingsStore.settings)
 	}
-	showSuccess("You can now start making sales")
+	showSuccess(__("You can now start making sales"))
 }
 
 function handleShiftClosed() {
 	uiStore.showCloseShiftDialog = false
-	showSuccess("Shift closed successfully")
+	showSuccess(__("Shift closed successfully"))
 
 	// Check if logout should happen after closing shift
 	if (logoutAfterClose.value) {
@@ -1337,9 +1338,9 @@ function handleItemSelected(item, autoAdd = false) {
 			cartStore.addItem(item, 1, true, shiftStore.currentProfile)
 		} catch (error) {
 			uiStore.showError(
-				"Insufficient Stock",
+				__("Insufficient Stock"),
 				error.message,
-				`Item: ${item.item_code}`,
+				__("Item: {0}", [item.item_code]),
 			)
 		}
 		return
@@ -1352,8 +1353,9 @@ function handleItemSelected(item, autoAdd = false) {
 		const actualQty = Math.floor(item.actual_qty ?? item.stock_qty ?? 0)
 
 		if (actualQty <= 0) {
-			const itemType = item.is_bundle ? "Bundle" : "Item"
-			showError(`"${item.item_name}" cannot be added to cart. ${itemType} is out of stock. Allow Negative Stock is disabled.`)
+			showError(item.is_bundle
+			 ? __('"{0}" cannot be added to cart. Bundle is out of stock. Allow Negative Stock is disabled.', [item.item_name])
+			 : __('"{0}" cannot be added to cart. Item is out of stock. Allow Negative Stock is disabled.', [item.item_name]))
 			return
 		}
 	}
@@ -1384,9 +1386,9 @@ function handleItemSelected(item, autoAdd = false) {
 		cartStore.addItem(item, 1, false, shiftStore.currentProfile)
 	} catch (error) {
 		uiStore.showError(
-			"Insufficient Stock",
+			__("Insufficient Stock"),
 			error.message,
-			`Item: ${item.item_code}`,
+			__("Item: {0}", [item.item_code]),
 		)
 	}
 }
@@ -1407,7 +1409,7 @@ function handleCustomerSelected(selectedCustomer) {
 	if (selectedCustomer) {
 		cartStore.setCustomer(selectedCustomer)
 		uiStore.showCustomerDialog = false
-		showSuccess(`${selectedCustomer.customer_name} selected`)
+		showSuccess(__('{0} selected', [selectedCustomer.customer_name]))
 
 		if (pendingPaymentAfterCustomer.value) {
 			pendingPaymentAfterCustomer.value = false
@@ -1425,13 +1427,13 @@ function handleCreateCustomer(searchValue) {
 
 function handleProceedToPayment() {
 	if (cartStore.isEmpty) {
-		showWarning("Please add items to cart before proceeding to payment")
+		showWarning(__("Please add items to cart before proceeding to payment"))
 		return
 	}
 
 	const customerValue = cartStore.customer?.name || cartStore.customer
 	if (!customerValue && !shiftStore.profileCustomer) {
-		showWarning("Please select a customer before proceeding")
+		showWarning(__("Please select a customer before proceeding"))
 		uiStore.showCustomerDialog = true
 		pendingPaymentAfterCustomer.value = true
 		return
@@ -1471,7 +1473,7 @@ async function handlePaymentCompleted(paymentData) {
 	try {
 		const customerValue = cartStore.customer?.name || cartStore.customer
 		if (!customerValue && !shiftStore.profileCustomer) {
-			showWarning("Please select a customer before proceeding")
+			showWarning(__("Please select a customer before proceeding"))
 			uiStore.showPaymentDialog = false
 			uiStore.showCustomerDialog = true
 			return
@@ -1515,7 +1517,7 @@ async function handlePaymentCompleted(paymentData) {
 			// Reset cart hash after successful payment
 			previousCartHash = ""
 
-			showWarning("Invoice saved and will sync when online")
+			showWarning(__("Invoice saved and will sync when online"))
 		} else {
 			// Get item codes from cart before clearing
 			const soldItemCodes = cartStore.invoiceItems.map(item => item.item_code)
@@ -1523,7 +1525,7 @@ async function handlePaymentCompleted(paymentData) {
 			const result = await cartStore.submitInvoice()
 
 			if (result) {
-				const invoiceName = result.name || result.message?.name || "Unknown"
+				const invoiceName = result.name || result.message?.name || __('Unknown')
 				const invoiceTotal = result.grand_total || result.total || 0
 
 				uiStore.showPaymentDialog = false
@@ -1537,14 +1539,14 @@ async function handlePaymentCompleted(paymentData) {
 				if (shiftStore.autoPrintEnabled) {
 					try {
 						await handlePrintInvoice({ name: invoiceName })
-						showSuccess(`Invoice ${invoiceName} created and sent to printer`)
+						showSuccess(__('Invoice {0} created and sent to printer', [invoiceName]))
 					} catch (error) {
 						log.error("Auto-print error:", error)
-						showWarning(`Invoice ${invoiceName} created but print failed`)
+						showWarning(__('Invoice {0} created but print failed', [invoiceName]))
 					}
 				} else {
 					uiStore.showSuccess(invoiceName, invoiceTotal)
-					showSuccess(`Invoice ${invoiceName} created successfully`)
+					showSuccess(__('Invoice {0} created successfully', [invoiceName]))
 				}
 			}
 		}
@@ -1554,8 +1556,8 @@ async function handlePaymentCompleted(paymentData) {
 
 		const errorContext = parseError(error)
 		uiStore.showError(
-			errorContext.title || "Error",
-			errorContext.message || "An unexpected error occurred",
+			errorContext.title || __('Error'),
+			errorContext.message || __("An unexpected error occurred"),
 			errorContext.technicalDetails || null,
 			errorContext.retryable ? "payment" : null,
 		)
@@ -1580,7 +1582,7 @@ function confirmClearCart() {
 	// Reset cart hash when cart is cleared
 	previousCartHash = ""
 	uiStore.showClearCartDialog = false
-	showSuccess("All items removed from cart")
+	showSuccess(__("All items removed from cart"))
 }
 
 async function handleOptionSelected(option) {
@@ -1604,7 +1606,7 @@ async function handleOptionSelected(option) {
 					cartStore.addItem(variant, cartStore.pendingItemQty, false, shiftStore.currentProfile)
 					uiStore.showItemSelectionDialog = false
 					cartStore.clearPendingItem()
-					showSuccess(`${variant.item_name} added to cart`)
+					showSuccess(__('{0} added to cart', [variant.item_name]))
 				} catch (error) {
 					showError(error.message)
 				}
@@ -1635,7 +1637,7 @@ async function handleOptionSelected(option) {
 					cartStore.addItem(itemToAdd, cartStore.pendingItemQty, false, shiftStore.currentProfile)
 					uiStore.showItemSelectionDialog = false
 					cartStore.clearPendingItem()
-					showSuccess(`${itemToAdd.item_name} (${option.uom}) added to cart`)
+					showSuccess(__('{0} ({1}) added to cart', [itemToAdd.item_name, option.uom]))
 				} catch (error) {
 					showError(error.message)
 				}
@@ -1643,7 +1645,7 @@ async function handleOptionSelected(option) {
 		}
 	} catch (error) {
 		log.error("Error handling option selection:", error)
-		showError("Failed to process selection. Please try again.")
+		showError(__("Failed to process selection. Please try again."))
 	}
 }
 
@@ -1711,7 +1713,7 @@ async function handleLoadDraft(draft) {
 }
 
 function handleReturnCreated(returnInvoice) {
-	showSuccess(`Return invoice ${returnInvoice.name} created successfully`)
+	showSuccess(__('Return invoice {0} created successfully', [returnInvoice.name]))
 }
 
 function handleDiscountApplied(discount) {
@@ -1752,13 +1754,13 @@ function handleBatchSerialSelected(batchSerial) {
 
 function handleCreateReturnFromHistory(invoice) {
 	uiStore.showReturnDialog = true
-	showWarning(`Creating return for invoice ${invoice.name}`)
+	showWarning(__('Creating return for invoice {0}', [invoice.name]))
 }
 
 function handleCustomerCreated(newCustomer) {
 	cartStore.setCustomer(newCustomer)
 	uiStore.showCreateCustomerDialog = false
-	showSuccess(`${newCustomer.customer_name} created and selected`)
+	showSuccess(__('{0} created and selected', [newCustomer.customer_name]))
 }
 
 async function handleRefresh() {
@@ -1828,7 +1830,7 @@ async function confirmClearCache() {
 				clearCacheOverlayRef.value.reset()
 			}
 
-			showSuccess("All cached data has been cleared successfully")
+			showSuccess(__("All cached data has been cleared successfully"))
 		} else {
 			throw new Error('Failed to clear cache completely')
 		}
@@ -1841,7 +1843,7 @@ async function confirmClearCache() {
 			clearCacheOverlayRef.value.reset()
 		}
 
-		showError("Failed to clear cache. Please try again.")
+		showError(__("Failed to clear cache. Please try again."))
 	}
 }
 
@@ -1867,7 +1869,7 @@ async function handleEditOfflineInvoice(invoice) {
 
 		await offlineStore.deleteOfflineInvoice(invoice.id)
 
-		showSuccess("Invoice loaded to cart for editing")
+		showSuccess(__("Invoice loaded to cart for editing"))
 	} catch (error) {
 		log.error("Error editing offline invoice:", error)
 	}
@@ -1888,12 +1890,12 @@ async function handleSyncClick() {
 		return
 	}
 
-	showSuccess("No pending invoices to sync")
+	showSuccess(__("No pending invoices to sync"))
 }
 
 async function handleSyncAll() {
 	if (offlineStore.isOffline) {
-		showWarning("Cannot sync while offline")
+		showWarning(__("Cannot sync while offline"))
 		return
 	}
 
@@ -1911,13 +1913,13 @@ async function handleSyncAll() {
 
 			uiStore.showError(
 				errorContext.title,
-				`Failed to sync invoice for ${firstError.customer}\n\n${errorContext.message}\n\nYou can delete this invoice from the offline queue if you don't need it.`,
-				errorContext.technicalDetails || `Invoice ID: ${firstError.invoiceId}`,
+				__("Failed to sync invoice for {0}\n\n${1}\n\nYou can delete this invoice from the offline queue if you don't need it.", [firstError.customer, errorContext.message]),
+				errorContext.technicalDetails || __('Invoice ID: {0}', [firstError.invoiceId]),
 				"sync",
 				{ failedInvoiceId: firstError.invoiceId },
 			)
 		} else if (result.failed > 0) {
-			showWarning(`${result.failed} invoice(s) failed to sync`)
+			showWarning(__('{0} invoice(s) failed to sync', [result.failed]))
 		}
 	} catch (error) {
 		log.error("Sync error:", error)
@@ -2128,15 +2130,15 @@ async function handleWarehouseChanged(newWarehouse) {
 			await itemsSelectorRef.value.loadItems()
 		}
 
-		showSuccess(`Switched to ${newWarehouse}. Stock quantities refreshed.`)
+		showSuccess(__('Switched to {0}. Stock quantities refreshed.', [newWarehouse]))
 	} catch (error) {
 		log.error("Error handling warehouse change:", error)
-		showWarning(`Warehouse updated but failed to reload stock. Please refresh manually.`)
+		showWarning(__('Warehouse updated but failed to reload stock. Please refresh manually.'))
 	}
 }
 
 function handlePromotionSaved(data) {
-	showSuccess(data.message || "Promotion saved successfully")
+	showSuccess(data.message || __("Promotion saved successfully"))
 }
 
 // Optimized tab switching for mobile with RAF for smooth transitions

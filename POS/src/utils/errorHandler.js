@@ -56,8 +56,8 @@ function cleanErrorMessage(rawMessage) {
  */
 export function parseError(error) {
 	const context = {
-		title: "Error",
-		message: "An unexpected error occurred",
+		title: __("Error"),
+		message: __("An unexpected error occurred"),
 		type: "error", // error, warning, validation
 		retryable: false,
 		technicalDetails: null,
@@ -65,26 +65,26 @@ export function parseError(error) {
 
 	// Build technical details
 	const detailsParts = []
-	if (error.exc_type) detailsParts.push(`Type: ${error.exc_type}`)
+	if (error.exc_type) detailsParts.push(__('Type: {0}', [error.exc_type]))
 	if (error.httpStatus || error.status)
-		detailsParts.push(`Status: ${error.httpStatus || error.status}`)
-	if (error.exception) detailsParts.push(`Exception: ${error.exception}`)
+		detailsParts.push(__('Status: {0}', [error.httpStatus || error.status]))
+	if (error.exception) detailsParts.push(__('Exception: {0}', [error.exception], "Error"))
 	context.technicalDetails =
 		detailsParts.length > 0 ? detailsParts.join(" | ") : null
 
 	// Detect error type from status code
 	if (error.httpStatus === 417 || error.status === 417) {
 		context.type = "validation"
-		context.title = "Validation Error"
+		context.title = __("Validation Error")
 	} else if (error.httpStatus === 403 || error.status === 403) {
 		context.type = "error"
-		context.title = "Permission Denied"
+		context.title = __("Permission Denied")
 	} else if (error.httpStatus === 404 || error.status === 404) {
 		context.type = "warning"
-		context.title = "Not Found"
+		context.title = __("Not Found")
 	} else if (error.httpStatus >= 500 || error.status >= 500) {
 		context.type = "error"
-		context.title = "Server Error"
+		context.title = __("Server Error")
 	}
 
 	// Extract primary message
@@ -123,7 +123,7 @@ export function parseError(error) {
 		normalizedMessage.includes("negative stock")
 	) {
 		context.type = "warning"
-		context.title = "Insufficient Stock"
+		context.title = __("Insufficient Stock")
 
 		// Parse the message to extract item and quantity information
 		// Example: "1.0 units of Item IPhone 17-WHI needed in Warehouse Goods In Transit - BrD"
@@ -141,7 +141,7 @@ export function parseError(error) {
 			context.message === "An unexpected error occurred"
 		) {
 			context.message =
-				"Not enough stock available in the warehouse.\n\nPlease reduce the quantity or check stock availability."
+				__("Not enough stock available in the warehouse.\n\nPlease reduce the quantity or check stock availability.")
 		}
 
 		context.retryable = true
@@ -149,7 +149,7 @@ export function parseError(error) {
 	// Validation Errors
 	else if (excType === "validationerror" || context.type === "validation") {
 		context.type = "validation"
-		context.title = "Validation Error"
+		context.title = __("Validation Error")
 		context.retryable = true
 	}
 	// Price List Errors
@@ -158,7 +158,7 @@ export function parseError(error) {
 		normalizedMessage.includes("price not found")
 	) {
 		context.type = "warning"
-		context.title = "Pricing Error"
+		context.title = __("Pricing Error")
 		context.retryable = true
 	}
 	// Customer/Party Errors
@@ -167,7 +167,7 @@ export function parseError(error) {
 		normalizedMessage.includes("party")
 	) {
 		context.type = "validation"
-		context.title = "Customer Error"
+		context.title = __("Customer Error")
 		context.retryable = true
 	}
 	// Tax Errors
@@ -176,7 +176,7 @@ export function parseError(error) {
 		normalizedMessage.includes("account")
 	) {
 		context.type = "warning"
-		context.title = "Tax Configuration Error"
+		context.title = __("Tax Configuration Error")
 		context.retryable = false
 	}
 	// Payment Errors
@@ -185,7 +185,7 @@ export function parseError(error) {
 		normalizedMessage.includes("mode of payment")
 	) {
 		context.type = "validation"
-		context.title = "Payment Error"
+		context.title = __("Payment Error")
 		context.retryable = true
 	}
 	// Series/Naming Errors
@@ -194,7 +194,7 @@ export function parseError(error) {
 		normalizedMessage.includes("naming")
 	) {
 		context.type = "error"
-		context.title = "Naming Series Error"
+		context.title = __("Naming Series Error")
 		context.retryable = false
 	}
 	// Permission Errors
@@ -203,7 +203,7 @@ export function parseError(error) {
 		normalizedMessage.includes("not allowed")
 	) {
 		context.type = "error"
-		context.title = "Permission Denied"
+		context.title = __("Permission Denied")
 		context.retryable = false
 	}
 	// Network/Connection Errors
@@ -214,9 +214,9 @@ export function parseError(error) {
 		normalizedMessage.includes("fetch")
 	) {
 		context.type = "warning"
-		context.title = "Connection Error"
+		context.title = __("Connection Error")
 		context.message =
-			"Unable to connect to server. Check your internet connection."
+			__("Unable to connect to server. Check your internet connection.")
 		context.retryable = true
 	}
 	// Duplicate Errors
@@ -225,7 +225,7 @@ export function parseError(error) {
 		normalizedMessage.includes("already exists")
 	) {
 		context.type = "validation"
-		context.title = "Duplicate Entry"
+		context.title = __("Duplicate Entry")
 		context.retryable = false
 	}
 
@@ -240,27 +240,27 @@ export function parseError(error) {
  */
 export function formatErrorReport(errorContext, additionalInfo = {}) {
 	const lines = [
-		"Error Report - POS Next",
+		__("Error Report - POS Next"),
 		"=".repeat(40),
-		`Title: ${errorContext.title}`,
-		`Type: ${errorContext.type}`,
-		`Message: ${errorContext.message}`,
+		__('Title: {0}', [errorContext.title]),
+		__('Type: {0}', [errorContext.type]),
+		__('Message: {0}', [errorContext.message]),
 		"",
 	]
 
 	if (errorContext.technicalDetails) {
-		lines.push(`Technical: ${errorContext.technicalDetails}`)
+		lines.push(__('Technical: {0}', [errorContext.technicalDetails]))
 		lines.push("")
 	}
 
 	if (additionalInfo.timestamp) {
-		lines.push(`Timestamp: ${additionalInfo.timestamp}`)
+		lines.push(__('Timestamp: {0}', [additionalInfo.timestamp]))
 	}
 	if (additionalInfo.user) {
-		lines.push(`User: ${additionalInfo.user}`)
+		lines.push(__('User: {0}', [additionalInfo.user]))
 	}
 	if (additionalInfo.posProfile) {
-		lines.push(`POS Profile: ${additionalInfo.posProfile}`)
+		lines.push(__('POS Profile: {0}', [additionalInfo.posProfile]))
 	}
 
 	return lines.join("\n")

@@ -14,8 +14,8 @@
 						<div class="flex items-center space-x-3">
 							<FeatherIcon name="tag" class="w-5 h-5 text-gray-700" />
 							<div>
-								<h2 class="text-lg font-semibold text-gray-900">Promotion & Coupon Management</h2>
-								<p class="text-sm text-gray-600">Manage promotional schemes and coupons</p>
+								<h2 class="text-lg font-semibold text-gray-900">{{ __('Promotion & Coupon Management') }}</h2>
+								<p class="text-sm text-gray-600">{{ __('Manage promotional schemes and coupons') }}</p>
 							</div>
 						</div>
 						<div class="flex items-center space-x-2">
@@ -45,7 +45,7 @@
 							>
 								<div class="flex items-center space-x-2">
 									<FeatherIcon name="percent" class="w-4 h-4" />
-									<span>Promotional Schemes</span>
+									<span>{{ __('Promotional Schemes') }}</span>
 								</div>
 							</button>
 							<button
@@ -59,7 +59,7 @@
 							>
 								<div class="flex items-center space-x-2">
 									<FeatherIcon name="gift" class="w-4 h-4" />
-									<span>Coupons</span>
+									<span>{{ __('Coupons') }}</span>
 								</div>
 							</button>
 						</div>
@@ -76,7 +76,7 @@
 								<FormControl
 									type="text"
 									v-model="searchQuery"
-									placeholder="Search promotions..."
+									:placeholder="__('Search promotions...')"
 								>
 									<template #prefix>
 										<FeatherIcon name="search" class="w-4 h-4 text-gray-500" />
@@ -87,11 +87,11 @@
 									type="select"
 									v-model="filterStatus"
 									:options="[
-										{ label: 'All Status', value: 'all' },
-										{ label: 'Active Only', value: 'active' },
-										{ label: 'Expired Only', value: 'expired' },
-										{ label: 'Not Started', value: 'not_started' },
-										{ label: 'Disabled Only', value: 'disabled' }
+										{ label: __('All Status'), value: 'all' },
+										{ label: __('Active Only'), value: 'active' },
+										{ label: __('Expired Only'), value: 'expired' },
+										{ label: __('Not Started'), value: 'not_started' },
+										{ label: __('Disabled Only'), value: 'disabled' }
 									]"
 								/>
 							</div>
@@ -107,7 +107,7 @@
 									<template #prefix>
 										<FeatherIcon name="plus-circle" class="w-4 h-4" />
 									</template>
-									Create New Promotion
+									{{ __('Create New Promotion') }}
 								</Button>
 								<!-- Permission Warning -->
 								<div v-else class="px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
@@ -116,7 +116,7 @@
 											<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
 										</svg>
 										<div class="flex-1">
-											<p class="text-xs font-medium text-amber-900">Create permission required</p>
+											<p class="text-xs font-medium text-amber-900">{{ __('Create permission required') }}</p>
 										</div>
 									</div>
 								</div>
@@ -129,7 +129,7 @@
 									<template #prefix>
 										<FeatherIcon name="refresh-cw" class="w-4 h-4" />
 									</template>
-									Refresh
+									{{ __('Refresh') }}
 								</Button>
 							</div>
 
@@ -139,7 +139,7 @@
 								<div v-if="loading && promotions.length === 0" class="flex items-center justify-center py-12">
 									<div class="text-center">
 										<LoadingIndicator class="w-6 h-6 mx-auto mb-2" />
-										<p class="text-sm text-gray-600">Loading...</p>
+										<p class="text-sm text-gray-600">{{ __('Loading...') }}</p>
 									</div>
 								</div>
 
@@ -148,7 +148,7 @@
 									<div class="text-gray-400 mb-3">
 										<FeatherIcon name="inbox" class="w-12 h-12 mx-auto" />
 									</div>
-									<p class="text-sm text-gray-600">No promotions found</p>
+									<p class="text-sm text-gray-600">{{ __('No promotions found') }}</p>
 								</div>
 
 								<!-- Promotion Items -->
@@ -179,7 +179,7 @@
 														theme="blue"
 														size="sm"
 													>
-														Rule
+														{{ __('Rule') }}
 													</Badge>
 													<Badge
 														v-else-if="promotion.source === 'Promotional Scheme'"
@@ -187,17 +187,17 @@
 														theme="purple"
 														size="sm"
 													>
-														Scheme
+														{{ __('Scheme') }}
 													</Badge>
 												</div>
-												<p class="text-xs text-gray-500 mt-0.5">{{ promotion.items_count || 0 }} items</p>
+												<p class="text-xs text-gray-500 mt-0.5">{{ __('{0} items', [promotion.items_count || 0]) }}</p>
 											</div>
 											<Badge
 												variant="subtle"
 												:theme="getStatusTheme(promotion.status)"
 												size="sm"
 											>
-												{{ promotion.status || 'Active' }}
+												{{ promotion.status || __('Active') }}
 											</Badge>
 										</div>
 										<div class="flex items-center justify-between text-xs">
@@ -205,7 +205,7 @@
 												{{ promotion.apply_on }}
 											</Badge>
 											<span class="text-gray-500">
-												{{ promotion.valid_upto ? formatDate(promotion.valid_upto) : 'No expiry' }}
+												{{ promotion.valid_upto ? formatDate(promotion.valid_upto) : __('No expiry') }}
 											</span>
 										</div>
 									</button>
@@ -221,8 +221,8 @@
 									<div class="text-gray-300 mb-4">
 										<FeatherIcon name="tag" class="w-16 h-16 mx-auto" />
 									</div>
-									<h3 class="text-xl font-semibold text-gray-900 mb-2">Select a Promotion</h3>
-									<p class="text-sm text-gray-600 mb-6">Choose a promotion from the list to view and edit, or create a new one to get started</p>
+									<h3 class="text-xl font-semibold text-gray-900 mb-2">{{ __('Select a Promotion') }}</h3>
+									<p class="text-sm text-gray-600 mb-6">{{ __('Choose a promotion from the list to view and edit, or create a new one to get started') }}</p>
 									<Button
 										v-if="permissions.create"
 										@click="handleCreateNew"
@@ -231,10 +231,10 @@
 										<template #prefix>
 											<FeatherIcon name="plus" class="w-4 h-4" />
 										</template>
-										Create New Promotion
+										{{ __('Create New Promotion') }}
 									</Button>
 									<p v-else class="text-sm text-amber-600">
-										You don't have permission to create promotions
+										{{ __("You don't have permission to create promotions") }}
 									</p>
 								</div>
 							</div>
@@ -247,7 +247,7 @@
 										<div>
 											<div class="flex items-center space-x-3">
 												<h3 class="text-xl font-semibold text-gray-900">
-													{{ isCreating ? 'Create New Promotion' : 'Edit Promotion' }}
+													{{ isCreating ? __('Create New Promotion') : __('Edit Promotion') }}
 												</h3>
 												<Badge
 													v-if="!isCreating && selectedPromotion?.source === 'Pricing Rule'"
@@ -255,7 +255,7 @@
 													theme="blue"
 													size="md"
 												>
-													Pricing Rule
+													{{ __('Pricing Rule') }}
 												</Badge>
 												<Badge
 													v-else-if="!isCreating && selectedPromotion?.source === 'Promotional Scheme'"
@@ -263,18 +263,26 @@
 													theme="purple"
 													size="md"
 												>
-													Promotional Scheme
+													{{ __('Promotional Scheme') }}
 												</Badge>
 											</div>
 											<p class="text-sm text-gray-600 mt-1">
-												{{ isCreating ? 'Fill in the details to create a new promotional scheme' : isPricingRule ? 'View pricing rule details (read-only)' : 'Update the promotion details below' }}
+												<span v-if="isCreating">
+													{{ __('Fill in the details to create a new promotional scheme') }}
+												</span>
+												<span v-else-if="isPricingRule">
+													{{ __('View pricing rule details (read-only)') }}
+												</span>
+												<span v-else>
+													{{ __('Update the promotion details below') }}
+												</span>
 											</p>
 										</div>
 										<div class="flex items-center space-x-2">
 											<!-- Show info badge for read-only Pricing Rules -->
 											<div v-if="isPricingRule" class="flex items-center space-x-2 px-3 py-1 bg-blue-50 rounded-lg">
 												<FeatherIcon name="info" class="w-4 h-4 text-blue-600" />
-												<span class="text-xs text-blue-700 font-medium">Read-only: Edit in ERPNext</span>
+												<span class="text-xs text-blue-700 font-medium">{{ __('Read-only: Edit in ERPNext') }}</span>
 											</div>
 
 											<Button
@@ -286,7 +294,7 @@
 												<template #prefix>
 													<FeatherIcon name="trash-2" class="w-4 h-4" />
 												</template>
-												Delete
+												{{ __('Delete') }}
 											</Button>
 											<Button
 												v-if="!isCreating && !isPricingRule && permissions.write"
@@ -297,14 +305,14 @@
 												<template #prefix>
 													<FeatherIcon :name="selectedPromotion.disable ? 'check-circle' : 'x-circle'" class="w-4 h-4" />
 												</template>
-												{{ selectedPromotion.disable ? 'Enable' : 'Disable' }}
+												{{ selectedPromotion.disable ? __('Enable') : __('Disable') }}
 											</Button>
 											<div v-if="!isPricingRule && (permissions.write || permissions.delete)" class="w-px h-6 bg-gray-200"></div>
 											<Button
 												@click="handleCancel"
 												variant="ghost"
 											>
-												{{ isPricingRule ? 'Close' : 'Cancel' }}
+												{{ isPricingRule ? __('Close') : __('Cancel') }}
 											</Button>
 											<Button
 												v-if="!isPricingRule && (isCreating ? permissions.create : permissions.write)"
@@ -315,7 +323,7 @@
 												<template #prefix>
 													<FeatherIcon :name="isCreating ? 'plus' : 'save'" class="w-4 h-4" />
 												</template>
-												{{ isCreating ? 'Create' : 'Update' }}
+												{{ isCreating ? __('Create') : __('Update') }}
 											</Button>
 										</div>
 									</div>
@@ -327,44 +335,44 @@
 											<div class="p-5">
 												<div class="flex items-center space-x-2 mb-4">
 													<FeatherIcon name="info" class="w-4 h-4 text-blue-600" />
-													<h4 class="text-sm font-semibold text-gray-900">Basic Information</h4>
+													<h4 class="text-sm font-semibold text-gray-900">{{ __('Basic Information') }}</h4>
 												</div>
 												<div class="grid grid-cols-3 gap-4">
 													<div class="col-span-3">
 														<FormControl
 															type="text"
-															label="Promotion Name"
+															:label="__('Promotion Name')"
 															v-model="form.name"
 															:disabled="!isCreating"
-															placeholder="e.g., Summer Sale 2025"
+															:placeholder="__('e.g., Summer Sale 2025')"
 															required
 														/>
 													</div>
 
 													<FormControl
 														type="date"
-														label="Valid From"
+														:label="__('Valid From')"
 														v-model="form.valid_from"
 														:disabled="isPricingRule"
 													/>
 
 													<FormControl
 														type="date"
-														label="Valid Until"
+														:label="__('Valid Until')"
 														v-model="form.valid_upto"
 														:disabled="isPricingRule"
 													/>
 
 													<FormControl
 														type="select"
-														label="Apply On"
+														:label="__('Apply On')"
 														v-model="form.apply_on"
 														:disabled="!isCreating || isPricingRule"
 														:options="[
-															{ label: 'Specific Items', value: 'Item Code' },
-															{ label: 'Item Groups', value: 'Item Group' },
-															{ label: 'Brands', value: 'Brand' },
-															{ label: 'Entire Transaction', value: 'Transaction' }
+															{ label: __('Specific Items'), value: 'Item Code' },
+															{ label: __('Item Groups'), value: 'Item Group' },
+															{ label: __('Brands'), value: 'Brand' },
+															{ label: __('Entire Transaction'), value: 'Transaction' }
 														]"
 														required
 													/>
@@ -377,8 +385,8 @@
 											<div class="p-5">
 												<div class="flex items-center space-x-2 mb-4">
 													<FeatherIcon name="list" class="w-4 h-4 text-green-600" />
-													<h4 class="text-sm font-semibold text-gray-900">Select {{ form.apply_on }}</h4>
-													<Badge variant="subtle" theme="red" size="sm">Required</Badge>
+													<h4 class="text-sm font-semibold text-gray-900">{{ __('Select {0}', [form.apply_on]) }}</h4>
+													<Badge variant="subtle" theme="red" size="sm">{{ __('Required') }}</Badge>
 												</div>
 
 												<!-- Item Code Search -->
@@ -388,13 +396,13 @@
 															type="text"
 															v-model="itemSearch"
 															:disabled="!isCreating"
-															placeholder="Search items... (min 2 characters)"
+															:placeholder="__('Search items... (min 2 characters)')"
 														>
 															<template #prefix>
 																<FeatherIcon name="search" class="w-4 h-4 text-gray-500" />
 															</template>
 														</FormControl>
-														<p class="text-xs text-gray-500 mt-1">Searching from {{ itemSearchStore.allItems.length }} cached items</p>
+														<p class="text-xs text-gray-500 mt-1">{{ __('Searching from {0} cached items', [itemSearchStore.allItems.length]) }}</p>
 													</div>
 
 													<!-- Search Results -->
@@ -439,7 +447,7 @@
 														:disabled="!isCreating"
 														@change="addItemGroup"
 														:options="[
-															{ label: '-- Select Item Group --', value: '' },
+															{ label: __('-- Select Item Group --'), value: '' },
 															...itemGroups.map(g => ({ label: g.name, value: g.name }))
 														]"
 													/>
@@ -470,7 +478,7 @@
 														:disabled="!isCreating"
 														@change="addBrand"
 														:options="[
-															{ label: '-- Select Brand --', value: '' },
+															{ label: __('-- Select Brand --'), value: '' },
 															...brands.map(b => ({ label: b.name, value: b.name }))
 														]"
 													/>
@@ -500,14 +508,14 @@
 											<div class="p-5">
 												<div class="flex items-center space-x-2 mb-4">
 													<FeatherIcon name="percent" class="w-4 h-4 text-purple-600" />
-													<h4 class="text-sm font-semibold text-gray-900">Discount Details</h4>
-													<Badge variant="subtle" theme="red" size="sm">Required</Badge>
+													<h4 class="text-sm font-semibold text-gray-900">{{ __('Discount Details') }}</h4>
+													<Badge variant="subtle" theme="red" size="sm">{{ __('Required') }}</Badge>
 												</div>
 
 												<div class="space-y-4">
 													<!-- Discount Type Selection -->
 													<div>
-														<label class="block text-sm font-medium text-gray-700 mb-3">Discount Type</label>
+														<label class="block text-sm font-medium text-gray-700 mb-3">{{ __('Discount Type') }}</label>
 														<div class="grid grid-cols-3 gap-3">
 															<button
 																v-for="type in discountTypes"
@@ -533,7 +541,7 @@
 														<FormControl
 															v-if="form.discount_type !== 'free_item'"
 															type="number"
-															:label="form.discount_type === 'percentage' ? 'Discount (%)' : `Discount (${currency})`"
+															:label="form.discount_type === 'percentage' ? __('Discount (%)') : __('discount ({0})', [currency])"
 															v-model="form.discount_value"
 															placeholder="0"
 															:disabled="isPricingRule"
@@ -542,14 +550,14 @@
 
 														<!-- Free Item Search -->
 														<div v-if="form.discount_type === 'free_item'" class="space-y-2">
-															<label class="block text-sm font-medium text-gray-700">Free Item <span class="text-red-500">*</span></label>
+															<label class="block text-sm font-medium text-gray-700">{{ __('Free Item') }}<span class="text-red-500"> *</span></label>
 
 															<!-- Search Input -->
 															<FormControl
 																v-if="!form.free_item"
 																type="text"
 																v-model="freeItemSearch"
-																placeholder="Search item... (min 2 characters)"
+																:placeholder="__('Search item... (min 2 characters)')"
 															>
 																<template #prefix>
 																	<FeatherIcon name="search" class="w-4 h-4 text-gray-500" />
@@ -590,7 +598,7 @@
 														<FormControl
 															v-if="form.discount_type === 'free_item'"
 															type="number"
-															label="Free Quantity"
+															:label="__('Free Quantity')"
 															v-model="form.free_qty"
 															placeholder="1"
 															:disabled="isPricingRule"
@@ -599,7 +607,7 @@
 
 														<FormControl
 															type="number"
-															label="Minimum Quantity"
+															:label="__('Minimum Quantity')"
 															v-model="form.min_qty"
 															placeholder="0"
 															:disabled="isPricingRule"
@@ -607,7 +615,7 @@
 
 														<FormControl
 															type="number"
-															label="Maximum Quantity"
+															:label="__('Maximum Quantity')"
 															v-model="form.max_qty"
 															placeholder="0"
 															:disabled="isPricingRule"
@@ -615,7 +623,7 @@
 
 														<FormControl
 															type="number"
-															:label="`Minimum Amount (${currency})`"
+															:label="__('Minimum Amount ({0})', [currency])"
 															v-model="form.min_amt"
 															placeholder="0"
 															:disabled="isPricingRule"
@@ -623,7 +631,7 @@
 
 														<FormControl
 															type="number"
-															:label="`Maximum Amount (${currency})`"
+															:label="__('Maximum Amount ({0})', [currency])"
 															v-model="form.max_amt"
 															placeholder="0"
 															:disabled="isPricingRule"
@@ -664,12 +672,14 @@
 									</div>
 								</div>
 								<div class="flex-1">
-									<h3 class="text-lg font-semibold text-gray-900 mb-2">Delete Promotion</h3>
-									<p class="text-sm text-gray-600 mb-1">
-										Are you sure you want to delete <strong>"{{ promotionToDelete?.name }}"</strong>?
-									</p>
+									<h3 class="text-lg font-semibold text-gray-900 mb-2">{{ __('Delete Promotion') }}</h3>
+									<TranslatedHTML
+										:tag="'p'"
+										class="text-sm text-gray-600 mb-1"
+										:inner="__('Are you sure you want to delete &lt;strong&gt;&quot;{0}&quot;&lt;strong&gt;?', [promotionToDelete?.name])"
+									/>
 									<p class="text-sm text-gray-500">
-										This will also delete all associated pricing rules. This action cannot be undone.
+										{{ __('This will also delete all associated pricing rules. This action cannot be undone.') }}
 									</p>
 								</div>
 							</div>
@@ -678,7 +688,7 @@
 									@click="cancelDelete"
 									variant="ghost"
 								>
-									Cancel
+									{{ __('Cancel') }}
 								</Button>
 								<Button
 									@click="confirmDelete"
@@ -688,7 +698,7 @@
 									<template #prefix>
 										<FeatherIcon name="trash-2" class="w-4 h-4" />
 									</template>
-									Delete Promotion
+									{{ __('Delete Promotion') }}
 								</Button>
 							</div>
 						</div>
@@ -714,6 +724,7 @@ import {
 } from "frappe-ui"
 import { FeatherIcon } from "frappe-ui"
 import { computed, onMounted, ref, watch } from "vue"
+import TranslatedHTML from "../common/TranslatedHTML.vue"
 
 // Use shared toast
 const { showSuccess, showError, showWarning } = useToast()
@@ -783,9 +794,9 @@ const selectedBrand = ref("")
 
 // Discount types
 const discountTypes = [
-	{ value: "percentage", label: "Percentage", icon: "percent" },
-	{ value: "amount", label: "Fixed Amount", icon: "dollar-sign" },
-	{ value: "free_item", label: "Free Item", icon: "gift" },
+	{ value: "percentage", label: __("Percentage"), icon: "percent" },
+	{ value: "amount", label: __("Fixed Amount"), icon: "dollar-sign" },
+	{ value: "free_item", label: __("Free Item"), icon: "gift" },
 ]
 
 // Computed
@@ -887,7 +898,7 @@ const itemGroupsResource = createResource({
 	},
 	onError(error) {
 		console.error("Error loading item groups:", error)
-		handleError(error, "Failed to load item groups")
+		handleError(error, __("Failed to load item groups"))
 	},
 })
 
@@ -899,7 +910,7 @@ const brandsResource = createResource({
 	},
 	onError(error) {
 		console.error("Error loading brands:", error)
-		handleError(error, "Failed to load brands")
+		handleError(error, __("Failed to load brands"))
 	},
 })
 
@@ -913,7 +924,7 @@ const savePromotionResource = createResource({
 		loading.value = false
 		const responseData = data?.message || data
 		const successMessage =
-			responseData?.message || "Promotion created successfully"
+			responseData?.message || __("Promotion created successfully")
 
 		showSuccess(successMessage)
 		emit("promotion-saved", responseData)
@@ -922,7 +933,7 @@ const savePromotionResource = createResource({
 	},
 	onError(error) {
 		loading.value = false
-		handleError(error, "Failed to create promotion")
+		handleError(error, __('Failed to create promotion'))
 	},
 })
 
@@ -949,7 +960,7 @@ const updatePromotionResource = createResource({
 		loading.value = false
 		const responseData = data?.message || data
 		const successMessage =
-			responseData?.message || "Promotion updated successfully"
+			responseData?.message || __("Promotion updated successfully")
 
 		showSuccess(successMessage)
 		loadPromotions()
@@ -957,7 +968,7 @@ const updatePromotionResource = createResource({
 	},
 	onError(error) {
 		loading.value = false
-		handleError(error, "Failed to update promotion")
+		handleError(error, __("Failed to update promotion"))
 	},
 })
 
@@ -965,11 +976,11 @@ const toggleResource = createResource({
 	url: "pos_next.api.promotions.toggle_promotion",
 	auto: false,
 	onSuccess() {
-		showSuccess("Promotion status updated successfully")
+		showSuccess(__("Promotion status updated successfully"))
 		loadPromotions()
 	},
 	onError(error) {
-		handleError(error, "Failed to update promotion status")
+		handleError(error, __("Failed to update promotion status"))
 	},
 })
 
@@ -979,7 +990,7 @@ const deleteResource = createResource({
 	onSuccess(data) {
 		const responseData = data?.message || data
 		const successMessage =
-			responseData?.message || "Promotion deleted successfully"
+			responseData?.message || __("Promotion deleted successfully")
 
 		showSuccess(successMessage)
 
@@ -995,7 +1006,7 @@ const deleteResource = createResource({
 		loading.value = false
 		showDeleteConfirm.value = false
 		promotionToDelete.value = null
-		handleError(error, "Failed to delete promotion")
+		handleError(error, __("Failed to delete promotion"))
 	},
 })
 
@@ -1013,7 +1024,7 @@ const promotionDetailsResource = createResource({
 	},
 	onError(error) {
 		loading.value = false
-		handleError(error, "Failed to load promotion details")
+		handleError(error, __("Failed to load promotion details"))
 	},
 })
 
@@ -1076,18 +1087,18 @@ function parseErrorMessage(error) {
 					typeof messages[0] === "string"
 						? JSON.parse(messages[0])
 						: messages[0]
-				return firstMessage.message || error.message || "An error occurred"
+				return firstMessage.message || error.message || __("An error occurred")
 			}
 		}
 		// Fallback to error.message
-		return error.message || "An error occurred"
+		return error.message || __("An error occurred")
 	} catch (e) {
-		return error.message || "An error occurred"
+		return error.message || __("An error occurred")
 	}
 }
 
 // Utility: Show error with proper parsing
-function handleError(error, defaultMessage = "An error occurred") {
+function handleError(error, defaultMessage = __("An error occurred")) {
 	const errorMessage = parseErrorMessage(error)
 	showError(errorMessage || defaultMessage)
 }
@@ -1156,7 +1167,7 @@ function cancelDelete() {
 function handleSubmit() {
 	// Validate
 	if (!form.value.name) {
-		showWarning("Please enter a promotion name")
+		showWarning(__("Please enter a promotion name"))
 		return
 	}
 
@@ -1167,14 +1178,14 @@ function handleSubmit() {
 		)
 		if (duplicate) {
 			showWarning(
-				`Promotion "${form.value.name}" already exists. Please use a different name.`,
+				__('Promotion "{0}" already exists. Please use a different name.', [form.value.name])
 			)
 			return
 		}
 	}
 
 	if (form.value.apply_on !== "Transaction" && form.value.items.length === 0) {
-		showWarning(`Please select at least one ${form.value.apply_on}`)
+		showWarning(__('`Please select at least one {0}`', [form.value.apply_on]))
 		return
 	}
 

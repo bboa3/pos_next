@@ -28,17 +28,17 @@
 					<!-- Text Content -->
 					<div class="flex-1 min-w-0 mr-2">
 						<h3 id="install-banner-title" class="text-xs font-semibold mb-0.5 leading-tight" style="color: #111827;">
-							Install POSNext
+							{{ __('Install POSNext') }}
 						</h3>
 						<p class="text-[10px] leading-tight mb-1" style="color: #4B5563;">
-							Faster access and offline support
+							{{ __('Faster access and offline support') }}
 						</p>
 						<button
 							@click="handleSnooze"
 							class="text-[10px] underline hover:no-underline transition-all"
 							style="color: #6B7280;"
 						>
-							Snooze for 7 days
+							{{ __('Snooze for 7 days') }}
 						</button>
 					</div>
 
@@ -49,14 +49,14 @@
 							class="px-3 py-1.5 text-xs font-medium rounded hover:opacity-90 active:opacity-80 transition-opacity touch-manipulation shadow-sm whitespace-nowrap"
 							style="background-color: #4F46E5; color: #ffffff;"
 						>
-							Install
+							{{  __('Install') }}
 						</button>
 						<button
 							@click="handleDismiss"
 							class="p-1.5 hover:bg-gray-100 rounded transition-colors touch-manipulation flex-shrink-0"
 							style="color: #6B7280;"
-							aria-label="Close"
-							title="Close (shows again next session)"
+							:aria-label="__('Close')"
+							:title="__('Close (shows again next session)')"
 						>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>

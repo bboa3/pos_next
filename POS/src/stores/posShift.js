@@ -38,7 +38,7 @@ export const usePOSShiftStore = defineStore("posShift", () => {
 		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
 		const seconds = Math.floor((diff % (1000 * 60)) / 1000)
 
-		shiftDuration.value = `${hours}h ${minutes}m ${seconds}s`
+		shiftDuration.value = __('{0}h {1}m {2}s', [hours, minutes, seconds])
 	}
 
 	function updateCurrentTime() {
