@@ -82,7 +82,8 @@ def get_pos_settings(pos_profile):
 				"allow_write_off_change",
 				"allow_partial_payment",
 				"decimal_precision",
-				"allow_negative_stock"
+				"allow_negative_stock",
+				"enable_sales_persons"
 			],
 			as_dict=True
 		)
@@ -101,7 +102,8 @@ def get_pos_settings(pos_profile):
 				"allow_write_off_change": 0,
 				"allow_partial_payment": 0,
 				"decimal_precision": "2",
-				"allow_negative_stock": 0
+				"allow_negative_stock": 0,
+				"enable_sales_persons": "Disabled"
 			}
 
 		return pos_settings
@@ -280,3 +282,33 @@ def update_warehouse(pos_profile, warehouse):
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "Update Warehouse Error")
 		frappe.throw(_("Error updating warehouse: {0}").format(str(e)))
+
+
+@frappe.whitelist()
+def get_sales_persons(pos_profile=None):
+	"""Get all active individual sales persons (not groups) for POS"""
+	try:
+		filters = {
+			"enabled": 1,
+			"is_group": 0  # Only get individual sales persons, not group nodes
+		}
+
+		# If company is specified via POS Profile, filter by company (if Sales Person has company field)
+		if pos_profile:
+			company = frappe.db.get_value("POS Profile", pos_profile, "company")
+			# Check if Sales Person doctype has a company field
+			if frappe.db.has_column("Sales Person", "company") and company:
+				filters["company"] = company
+
+		sales_persons = frappe.get_list(
+			"Sales Person",
+			filters=filters,
+			fields=["name", "sales_person_name", "commission_rate", "employee"],
+			order_by="sales_person_name",
+			limit_page_length=0
+		)
+
+		return sales_persons
+	except Exception as e:
+		frappe.log_error(frappe.get_traceback(), "Get Sales Persons Error")
+		return []

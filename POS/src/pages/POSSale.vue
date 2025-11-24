@@ -1488,6 +1488,13 @@ async function handlePaymentCompleted(paymentData) {
 			})
 		}
 
+		// Store sales team data if provided
+		if (paymentData.sales_team && Array.isArray(paymentData.sales_team)) {
+			cartStore.salesTeam = paymentData.sales_team
+		} else {
+			cartStore.salesTeam = []
+		}
+
 		if (offlineStore.isOffline) {
 			const invoiceData = {
 				pos_profile: cartStore.posProfile,
@@ -1495,6 +1502,7 @@ async function handlePaymentCompleted(paymentData) {
 				customer: customerValue || shiftStore.profileCustomer,
 				items: JSON.parse(JSON.stringify(cartStore.invoiceItems)),
 				payments: JSON.parse(JSON.stringify(cartStore.payments)),
+				sales_team: JSON.parse(JSON.stringify(cartStore.salesTeam || [])),
 				grand_total: cartStore.grandTotal,
 				total_tax: cartStore.totalTax,
 				total_discount: cartStore.totalDiscount,

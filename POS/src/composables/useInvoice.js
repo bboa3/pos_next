@@ -7,6 +7,7 @@ export function useInvoice() {
 	const invoiceItems = ref([])
 	const customer = ref(null)
 	const payments = ref([])
+	const salesTeam = ref([]) // Sales team for Sales Invoice
 	const posProfile = ref(null)
 	const posOpeningShift = ref(null) // POS Opening Shift name
 	const additionalDiscount = ref(0)
@@ -626,6 +627,7 @@ export function useInvoice() {
 			// Use toRaw() to ensure we get current, non-reactive values (prevents stale cached quantities)
 			const rawItems = toRaw(invoiceItems.value)
 			const rawPayments = toRaw(payments.value)
+			const rawSalesTeam = toRaw(salesTeam.value)
 
 			const invoiceData = {
 				doctype: "Sales Invoice",
@@ -663,6 +665,14 @@ export function useInvoice() {
 				coupon_code: couponCode.value,
 				is_pos: 1,
 				update_stock: 1, // Critical: Ensures stock is updated
+			}
+
+			// Add sales_team if provided
+			if (rawSalesTeam && rawSalesTeam.length > 0) {
+				invoiceData.sales_team = rawSalesTeam.map((member) => ({
+					sales_person: member.sales_person,
+					allocated_percentage: member.allocated_percentage || 0,
+				}))
 			}
 
 			const draftInvoice = await updateInvoiceResource.submit({
@@ -891,6 +901,7 @@ export function useInvoice() {
 		invoiceItems,
 		customer,
 		payments,
+		salesTeam,
 		posProfile,
 		posOpeningShift,
 		additionalDiscount,

@@ -52,6 +52,8 @@ export const usePOSSettingsStore = defineStore("posSettings", () => {
 		// Miscellaneous
 		input_qty: 0,
 		allow_negative_stock: 0,
+		// Sales Persons
+		enable_sales_persons: "Disabled",
 	})
 
 	const isLoading = ref(false)
@@ -176,6 +178,20 @@ export const usePOSSettingsStore = defineStore("posSettings", () => {
 		Boolean(settings.value.allow_negative_stock),
 	)
 
+	// Computed - Sales Persons
+	const enableSalesPersons = computed(() =>
+		settings.value.enable_sales_persons !== "Disabled"
+	)
+	const salesPersonsMode = computed(() =>
+		settings.value.enable_sales_persons || "Disabled"
+	)
+	const isSingleSalesPerson = computed(() =>
+		settings.value.enable_sales_persons === "Single"
+	)
+	const isMultipleSalesPersons = computed(() =>
+		settings.value.enable_sales_persons === "Multiple"
+	)
+
 	// Resource
 	const settingsResource = createResource({
 		url: "pos_next.pos_next.doctype.pos_settings.pos_settings.get_pos_settings",
@@ -254,6 +270,7 @@ export const usePOSSettingsStore = defineStore("posSettings", () => {
 			allow_change_posting_date: 0,
 			input_qty: 0,
 			allow_negative_stock: 0,
+			enable_sales_persons: "Disabled",
 		}
 		isLoaded.value = false
 	}
@@ -369,6 +386,12 @@ export const usePOSSettingsStore = defineStore("posSettings", () => {
 		// Computed - Miscellaneous
 		inputQty,
 		allowNegativeStock,
+
+		// Computed - Sales Persons
+		enableSalesPersons,
+		salesPersonsMode,
+		isSingleSalesPerson,
+		isMultipleSalesPersons,
 
 		// Actions
 		loadSettings,

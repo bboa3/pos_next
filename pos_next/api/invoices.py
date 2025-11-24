@@ -590,6 +590,19 @@ def submit_invoice(invoice=None, data=None):
                 )
                 payment.account = account_info["account"]
 
+        # Handle sales team (multiple sales persons)
+        sales_team_data = invoice.get("sales_team") or data.get("sales_team")
+        if sales_team_data:
+            # Clear existing sales team entries
+            invoice_doc.sales_team = []
+
+            # Add new sales team entries
+            for member in sales_team_data:
+                invoice_doc.append("sales_team", {
+                    "sales_person": member.get("sales_person"),
+                    "allocated_percentage": member.get("allocated_percentage", 0),
+                })
+
         # Handle POS Coupon if coupon_code is provided
         coupon_code = invoice.get("coupon_code") or data.get("coupon_code")
         if coupon_code:

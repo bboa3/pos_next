@@ -17,6 +17,7 @@
   "allow_return",
   "allow_write_off_change",
   "allow_partial_payment",
+  "enable_sales_persons",
   "section_break_display",
   "default_card_view",
   "display_item_code",
@@ -147,6 +148,14 @@
    "fieldtype": "Check",
    "label": "Allow Partial Payment",
    "description": "Enable partial payment for invoices"
+  },
+  {
+   "default": "Disabled",
+   "fieldname": "enable_sales_persons",
+   "fieldtype": "Select",
+   "label": "Sales Persons Selection",
+   "options": "Disabled\nSingle\nMultiple",
+   "description": "Disabled: No sales person selection. Single: Select one sales person (100%). Multiple: Select multiple with allocation percentages."
   },
   {
    "collapsible": 1,
@@ -406,10 +415,11 @@
    "description": "Enable selling items even when stock reaches zero or below. Integrates with ERPNext negative stock settings."
   }
  ],
+ "autoname": "field:pos_profile",
  "index_web_pages_for_search": 1,
  "issingle": 0,
  "links": [],
- "modified": "2025-10-15 12:00:00.000000",
+ "modified": "2025-11-24 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "POS Next",
  "name": "POS Settings",

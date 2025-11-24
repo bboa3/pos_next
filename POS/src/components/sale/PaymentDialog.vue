@@ -147,6 +147,139 @@
 					</div>
 				</div>
 
+				<!-- Sales Persons Selection -->
+				<div v-if="settingsStore.enableSalesPersons" class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3">
+					<div class="flex items-center justify-between mb-2">
+						<div class="flex items-center space-x-2">
+							<div class="w-6 h-6 rounded-full bg-purple-200 flex items-center justify-center">
+								<svg class="w-4 h-4 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+								</svg>
+							</div>
+							<span class="text-xs font-bold text-purple-900">
+								Sales Person{{ settingsStore.isMultipleSalesPersons ? 's' : '' }}
+							</span>
+							<span v-if="selectedSalesPersons.length > 0" class="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-0.5 rounded">
+								{{ settingsStore.isSingleSalesPerson ? '1 selected' : `${selectedSalesPersons.length} selected` }}
+							</span>
+						</div>
+						<button
+							v-if="selectedSalesPersons.length > 0"
+							@click="clearSalesPersons"
+							class="text-xs text-purple-700 hover:text-purple-900 font-semibold px-2 py-1 bg-purple-100 hover:bg-purple-200 rounded transition-colors"
+						>
+							{{ settingsStore.isSingleSalesPerson ? 'Clear' : 'Clear All' }}
+						</button>
+					</div>
+
+					<!-- Search Input -->
+					<div class="relative mb-2">
+						<input
+							v-model="salesPersonSearch"
+							type="text"
+							placeholder="Search sales person..."
+							class="w-full px-3 py-2 pl-9 text-xs border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+						/>
+						<svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+						</svg>
+					</div>
+
+					<!-- Selected Sales Persons (Chips) -->
+					<div v-if="selectedSalesPersons.length > 0" class="mb-2 space-y-1.5">
+						<div class="text-[10px] font-semibold text-purple-700 uppercase tracking-wide mb-1">Selected:</div>
+						<div
+							v-for="person in selectedSalesPersons"
+							:key="person.sales_person"
+							class="flex items-center justify-between p-2 bg-purple-100 border border-purple-300 rounded-lg"
+						>
+							<div class="flex items-center space-x-2 flex-1">
+								<button
+									@click="removeSalesPerson(person.sales_person)"
+									class="text-purple-600 hover:text-purple-800 hover:bg-purple-200 rounded p-0.5 transition-colors"
+								>
+									<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+									</svg>
+								</button>
+								<span class="text-xs font-medium text-gray-900 flex-1">
+									{{ person.sales_person_name || person.sales_person }}
+								</span>
+							</div>
+							<!-- Only show allocation input for Multiple mode -->
+							<div v-if="settingsStore.isMultipleSalesPersons" class="flex items-center space-x-1">
+								<input
+									type="number"
+									:value="person.allocated_percentage"
+									@input="updateSalesPersonAllocation(person.sales_person, $event.target.value)"
+									placeholder="%"
+									min="0"
+									max="100"
+									step="1"
+									class="w-14 px-1.5 py-1 text-xs font-semibold text-right border border-purple-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500 bg-white"
+								/>
+								<span class="text-xs text-gray-600 font-medium">%</span>
+							</div>
+							<!-- Show 100% badge for Single mode -->
+							<div v-else class="text-xs font-semibold text-purple-700 bg-purple-200 px-2 py-1 rounded">
+								100%
+							</div>
+						</div>
+
+						<!-- Total Allocation Warning (only for Multiple mode) -->
+						<div v-if="settingsStore.isMultipleSalesPersons && totalAllocation !== 100" class="flex items-center space-x-2 p-2 bg-yellow-50 border border-yellow-300 rounded mt-2">
+							<svg class="w-4 h-4 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+							</svg>
+							<span class="text-xs font-medium text-yellow-800">
+								Total: {{ totalAllocation }}% (should be 100%)
+							</span>
+						</div>
+					</div>
+
+					<!-- Available Sales Persons Dropdown -->
+					<div v-if="filteredSalesPersons.length > 0 && salesPersonSearch" class="max-h-48 overflow-y-auto border border-purple-200 rounded-lg bg-white">
+						<div
+							v-for="person in filteredSalesPersons"
+							:key="person.name"
+							@click="addSalesPerson(person)"
+							class="flex items-center justify-between p-2 hover:bg-purple-50 cursor-pointer border-b border-purple-100 last:border-b-0 transition-colors"
+						>
+							<div class="flex items-center space-x-2">
+								<svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+								</svg>
+								<div>
+									<div class="text-xs font-medium text-gray-900">
+										{{ person.sales_person_name || person.name }}
+									</div>
+									<div v-if="person.commission_rate" class="text-[10px] text-gray-500">
+										Commission: {{ person.commission_rate }}%
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Empty State -->
+					<div v-else-if="!salesPersonSearch && selectedSalesPersons.length === 0 && !loadingSalesPersons" class="text-center py-3">
+						<svg class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+						</svg>
+						<div class="text-xs text-gray-500">Search to add sales persons</div>
+					</div>
+
+					<!-- Loading State -->
+					<div v-if="loadingSalesPersons" class="text-center py-3">
+						<div class="text-xs text-gray-500">Loading sales persons...</div>
+					</div>
+
+					<!-- No Results -->
+					<div v-if="salesPersonSearch && filteredSalesPersons.length === 0 && !loadingSalesPersons" class="text-center py-3">
+						<div class="text-xs text-gray-500">No sales persons found</div>
+					</div>
+				</div>
+
 				<!-- Additional Discount Section (Compact) -->
 				<div v-if="settingsStore.allowAdditionalDiscount" class="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-300 rounded-lg p-2">
 					<div class="flex items-center justify-between mb-1.5">
@@ -538,6 +671,107 @@ const customerBalanceResource = createResource({
 	},
 })
 
+// Sales Persons state
+const salesPersons = ref([])
+const selectedSalesPersons = ref([])
+const salesPersonSearch = ref('')
+const loadingSalesPersons = ref(false)
+
+const salesPersonsResource = createResource({
+	url: "pos_next.api.pos_profile.get_sales_persons",
+	makeParams() {
+		return {
+			pos_profile: props.posProfile,
+		}
+	},
+	auto: false,
+	onSuccess(data) {
+		console.log('[PaymentDialog] Sales persons loaded:', data)
+		salesPersons.value = data?.message || data || []
+		loadingSalesPersons.value = false
+	},
+	onError(error) {
+		console.error("[PaymentDialog] Error loading sales persons:", error)
+		salesPersons.value = []
+		loadingSalesPersons.value = false
+	},
+})
+
+// Computed: Filter sales persons based on search and exclude already selected
+const filteredSalesPersons = computed(() => {
+	if (!salesPersonSearch.value) {
+		return []
+	}
+
+	const searchLower = salesPersonSearch.value.toLowerCase()
+	const selectedIds = selectedSalesPersons.value.map(p => p.sales_person)
+
+	return salesPersons.value
+		.filter(person => {
+			// Exclude already selected
+			if (selectedIds.includes(person.name)) {
+				return false
+			}
+			// Filter by search term
+			const name = (person.sales_person_name || person.name || '').toLowerCase()
+			return name.includes(searchLower)
+		})
+		.slice(0, 10) // Limit to 10 results for performance
+})
+
+// Computed for total allocation percentage
+const totalAllocation = computed(() => {
+	return selectedSalesPersons.value.reduce((sum, person) => {
+		return sum + (person.allocated_percentage || 0)
+	}, 0)
+})
+
+// Helper functions for sales persons
+function addSalesPerson(person) {
+	// For Single mode, replace the existing selection
+	if (settingsStore.isSingleSalesPerson) {
+		selectedSalesPersons.value = [{
+			sales_person: person.name,
+			sales_person_name: person.sales_person_name || person.name,
+			allocated_percentage: 100, // Always 100% for single mode
+			commission_rate: person.commission_rate,
+		}]
+	} else {
+		// For Multiple mode, add to the list
+		// Calculate default allocation
+		const defaultAllocation = selectedSalesPersons.value.length === 0 ? 100 : 0
+
+		selectedSalesPersons.value.push({
+			sales_person: person.name,
+			sales_person_name: person.sales_person_name || person.name,
+			allocated_percentage: defaultAllocation,
+			commission_rate: person.commission_rate,
+		})
+	}
+
+	// Clear search after adding
+	salesPersonSearch.value = ''
+}
+
+function removeSalesPerson(personName) {
+	const index = selectedSalesPersons.value.findIndex(p => p.sales_person === personName)
+	if (index > -1) {
+		selectedSalesPersons.value.splice(index, 1)
+	}
+}
+
+function updateSalesPersonAllocation(personName, value) {
+	const person = selectedSalesPersons.value.find(p => p.sales_person === personName)
+	if (person) {
+		person.allocated_percentage = Number.parseFloat(value) || 0
+	}
+}
+
+function clearSalesPersons() {
+	selectedSalesPersons.value = []
+	salesPersonSearch.value = ''
+}
+
 // Load payment methods - from cache if offline, from server if online
 async function loadPaymentMethods() {
 	// Guard: Don't load if posProfile is not set
@@ -664,6 +898,8 @@ watch(show, (newVal) => {
 		lastSelectedMethod.value = null
 		customerCredit.value = []
 		customerBalance.value = { total_outstanding: 0, total_credit: 0, net_balance: 0 }
+		selectedSalesPersons.value = []
+		salesPersonSearch.value = ''
 
 		// Debug logging
 		console.log('[PaymentDialog] Dialog opened with props:', {
@@ -676,6 +912,11 @@ watch(show, (newVal) => {
 		// Load payment methods
 		if (props.posProfile) {
 			loadPaymentMethods()
+			// Load sales persons (only fetch once)
+			if (salesPersons.value.length === 0) {
+				loadingSalesPersons.value = true
+				salesPersonsResource.fetch()
+			}
 		}
 
 		// Load customer credit and balance if enabled and customer is selected
@@ -811,7 +1052,8 @@ function completePayment() {
 		totalPaid: totalPaid.value,
 		grandTotal: props.grandTotal,
 		allowPartialPayment: props.allowPartialPayment,
-		paymentEntries: paymentEntries.value
+		paymentEntries: paymentEntries.value,
+		salesPersons: selectedSalesPersons.value
 	})
 
 	if (!canComplete.value) {
@@ -827,6 +1069,7 @@ function completePayment() {
 		is_partial_payment: isPartial,
 		paid_amount: totalPaid.value,
 		outstanding_amount: isPartial ? remainingAmount.value : 0,
+		sales_team: selectedSalesPersons.value.length > 0 ? selectedSalesPersons.value : null,
 	}
 
 	console.log('[PaymentDialog] Emitting payment-completed:', paymentData)
