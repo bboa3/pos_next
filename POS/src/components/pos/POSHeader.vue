@@ -212,6 +212,11 @@
 
 					<div class="w-px h-4 sm:h-6 bg-gray-200 mx-0.5 sm:mx-2"></div>
 
+					<!-- Language Switcher -->
+					<LanguageSwitcher />
+
+					<div class="w-px h-4 sm:h-6 bg-gray-200 mx-0.5 sm:mx-2"></div>
+
 					<!-- User Menu -->
 					<UserMenu
 						:user-name="userName"
@@ -238,6 +243,7 @@
 import ActionButton from "@/components/common/ActionButton.vue"
 import StatusBadge from "@/components/common/StatusBadge.vue"
 import UserMenu from "@/components/common/UserMenu.vue"
+import LanguageSwitcher from "@/components/common/LanguageSwitcher.vue"
 import { ref } from "vue"
 import { version } from "../../../package.json"
 

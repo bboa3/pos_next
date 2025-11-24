@@ -28,6 +28,7 @@ declare module 'vue' {
     InvoiceManagement: typeof import('./src/components/invoices/InvoiceManagement.vue')['default']
     ItemSelectionDialog: typeof import('./src/components/sale/ItemSelectionDialog.vue')['default']
     ItemsSelector: typeof import('./src/components/sale/ItemsSelector.vue')['default']
+    LanguageSwitcher: typeof import('./src/components/common/LanguageSwitcher.vue')['default']
     LazyImage: typeof import('./src/components/common/LazyImage.vue')['default']
     LoadingSpinner: typeof import('./src/components/common/LoadingSpinner.vue')['default']
     ManagementSlider: typeof import('./src/components/pos/ManagementSlider.vue')['default']
