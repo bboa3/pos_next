@@ -5,7 +5,11 @@
 			class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
 			:class="{ 'flex-row-reverse': isRTL }"
 		>
-			<span class="text-xl">{{ localeConfig.flag }}</span>
+			<img
+				:src="localeConfig.flagUrlSvg"
+				:alt="localeConfig.name"
+				class="w-6 h-4 object-cover rounded-sm shadow-sm"
+			/>
 			<span>{{ localeConfig.nativeName }}</span>
 			<svg
 				class="w-4 h-4 transition-transform"
@@ -49,12 +53,12 @@
 						}"
 						role="menuitem"
 					>
-						<span
-							class="text-xl"
+						<img
+							:src="config.flagUrlSvg"
+							:alt="config.name"
+							class="w-6 h-4 object-cover rounded-sm shadow-sm"
 							:class="config.dir === 'rtl' ? 'ml-3' : 'mr-3'"
-						>
-							{{ config.flag }}
-						</span>
+						/>
 						<span
 							class="flex-1"
 							:class="config.dir === 'rtl' ? 'text-right' : 'text-left'"

@@ -1,5 +1,6 @@
 import { createResource } from "frappe-ui";
-import { App } from "vue";
+import { App, ref } from "vue";
+import { call } from "./apiWrapper";
 
 type Replace = { [key: string]: string };
 type TranslatedMessages = Replace;
@@ -8,12 +9,17 @@ declare global {
   interface Window {
     __: (message: string, replace?: Replace, context?: string | null) => string;
     translatedMessages?: TranslatedMessages;
+    $changeLanguage?: (locale: string) => Promise<void>;
   }
 }
+
+// Reactive translation version to trigger re-renders
+export const translationVersion = ref(0);
 
 export default function translationPlugin(app: App) {
   app.config.globalProperties.__ = translate;
   window.__ = translate;
+  window.$changeLanguage = changeLanguage;
   if (!window.translatedMessages) fetchTranslations();
 }
 
@@ -62,6 +68,25 @@ export function fetchTranslations() {
       console.log("translatedMessages updated ...", window.translatedMessages)
     },
   });
+}
+
+/**
+ * Dynamically change the language and fetch new translations
+ * This avoids a full page reload by fetching translations via API
+ */
+export async function changeLanguage(locale: string): Promise<void> {
+  try {
+    const messages = await call("frappe.translate.get_app_translations", {});
+
+    if (messages) {
+      window.translatedMessages = messages as TranslatedMessages;
+      // Increment version to trigger reactive updates
+      translationVersion.value++;
+    }
+  } catch (error) {
+    console.error("Failed to fetch translations:", error);
+    throw error;
+  }
 }
 
 export function __(

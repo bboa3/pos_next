@@ -1,5 +1,5 @@
 import { ref, computed, onMounted } from "vue"
-import { fetchTranslations } from "../utils/translation"
+import { translationVersion } from "../utils/translation"
 import { call } from "../utils/apiWrapper"
 
 // Reactive locale state (shared across all components)
@@ -7,18 +7,30 @@ const currentLocale = ref("en")
 const currentDir = ref("ltr")
 const PREFARED_LANGUAGE_KEY = "pos_next_language"
 
+// Get flag URL from flagcdn.com
+function getFlagUrl(countryCode) {
+	if (!countryCode) return null
+	return `https://flagcdn.com/h24/${countryCode.toLowerCase()}.png`
+}
+
+// Get flag SVG URL from flagcdn.com
+function getFlagUrlSvg(countryCode) {
+	if (!countryCode) return null
+	return `https://flagcdn.com/${countryCode.toLowerCase()}.svg`
+}
+
 // Supported languages configuration
 export const SUPPORTED_LOCALES = {
 	en: {
 		name: "English",
 		nativeName: "English",
-		flag: "🇺🇸",
+		countryCode: "us",
 		dir: "ltr",
 	},
 	ar: {
 		name: "Arabic",
 		nativeName: "العربية",
-		flag: "🇸🇦",
+		countryCode: "eg",
 		dir: "rtl",
 	}
 }
@@ -61,9 +73,14 @@ export function useLocale() {
 	const locale = computed(() => currentLocale.value)
 	const dir = computed(() => currentDir.value)
 	const isRTL = computed(() => currentDir.value === "rtl")
-	const localeConfig = computed(
-		() => SUPPORTED_LOCALES[locale.value] || SUPPORTED_LOCALES.en,
-	)
+	const localeConfig = computed(() => {
+		const config = SUPPORTED_LOCALES[locale.value] || SUPPORTED_LOCALES.en
+		return {
+			...config,
+			flagUrl: getFlagUrl(config.countryCode),
+			flagUrlSvg: getFlagUrlSvg(config.countryCode),
+		}
+	})
 
 	/**
 	 * Change application language
@@ -85,7 +102,7 @@ export function useLocale() {
 		// Update document attributes
 		document.documentElement.setAttribute("dir", config.dir)
 		document.documentElement.setAttribute("lang", newLocale)
-		console.log("document.documentElement.dir", document.documentElement.dir)
+
 		// Toggle RTL class for CSS
 		if (config.dir === "rtl") {
 			document.documentElement.classList.add("rtl")
@@ -96,27 +113,23 @@ export function useLocale() {
 		// Store preference in localStorage
 		localStorage.setItem(PREFARED_LANGUAGE_KEY, newLocale)
 
-		// Use the translation system's changeLanguage function
+		// Update Frappe user settings first (this changes the user's language in Frappe)
+		try {
+			await call("pos_next.api.localization.change_user_language", {
+				locale: newLocale,
+			})
+		} catch (error) {
+			console.error("Failed to save language preference to Frappe:", error)
+		}
+
+		// Fetch new translations dynamically (no page reload needed)
+		// The API returns translations based on the user's current Frappe language setting
 		if (typeof window !== "undefined" && window.$changeLanguage) {
 			try {
 				await window.$changeLanguage(newLocale)
 			} catch (error) {
-				console.error("Failed to change language via translation system:", error)
+				console.error("Failed to load translations:", error)
 			}
-		}
-
-		// Update Frappe user settings using custom API endpoint
-		try {
-			console.log("newLocale", newLocale)
-			await call("pos_next.api.localization.change_user_language", {
-				locale: newLocale,
-			})
-
-			// Reload the page to apply new translations
-			// This ensures all components re-render with the new language
-			window.location.reload()
-		} catch (error) {
-			console.error("Failed to save language preference to Frappe:", error)
 		}
 	}
 
@@ -149,13 +162,27 @@ export function useLocale() {
 		initLocale()
 	})
 
+	// Build supported locales with flag URLs
+	const supportedLocales = computed(() => {
+		const result = {}
+		for (const [code, config] of Object.entries(SUPPORTED_LOCALES)) {
+			result[code] = {
+				...config,
+				flagUrl: getFlagUrl(config.countryCode),
+				flagUrlSvg: getFlagUrlSvg(config.countryCode),
+			}
+		}
+		return result
+	})
+
 	return {
 		locale,
 		dir,
 		isRTL,
 		localeConfig,
-		supportedLocales: SUPPORTED_LOCALES,
+		supportedLocales,
 		changeLocale,
 		initLocale,
+		translationVersion, // Used to trigger re-renders when translations change
 	}
 }
