@@ -51,13 +51,15 @@ export function translate(
   return format(translatedMessage, replace);
 }
 
-function fetchTranslations() {
+export function fetchTranslations() {
   createResource({
     url: "frappe.translate.get_app_translations",
+    method: "GET",
     cache: "translations",
     auto: true,
     transform: (messages: TranslatedMessages) => {
       window.translatedMessages = messages;
+      console.log("translatedMessages updated ...", window.translatedMessages)
     },
   });
 }

@@ -1,4 +1,6 @@
 import { ref, computed, onMounted } from "vue"
+import { fetchTranslations } from "../utils/translation"
+import { call } from "../utils/apiWrapper"
 
 // Reactive locale state (shared across all components)
 const currentLocale = ref("en")
@@ -83,7 +85,7 @@ export function useLocale() {
 		// Update document attributes
 		document.documentElement.setAttribute("dir", config.dir)
 		document.documentElement.setAttribute("lang", newLocale)
-
+		console.log("document.documentElement.dir", document.documentElement.dir)
 		// Toggle RTL class for CSS
 		if (config.dir === "rtl") {
 			document.documentElement.classList.add("rtl")
@@ -103,22 +105,17 @@ export function useLocale() {
 			}
 		}
 
-		// Update Frappe user settings
-		if (typeof window !== "undefined" && window.frappe?.call) {
-			try {
-				await window.frappe.call({
-					method: "frappe.client.set_value",
-					args: {
-						doctype: "User",
-						name: window.frappe.session.user,
-						fieldname: "language",
-						value: newLocale.toLowerCase(),
-					},
-					freeze: false,
-				})
-			} catch (error) {
-				console.error("Failed to save language preference to Frappe:", error)
-			}
+		// Update Frappe user settings using custom API endpoint
+		try {
+			console.log("newLocale", newLocale)
+			await call("pos_next.api.localization.change_user_language", {
+				locale: newLocale,
+			})
+
+			// Fetch new translations for the selected language
+			fetchTranslations()
+		} catch (error) {
+			console.error("Failed to save language preference to Frappe:", error)
 		}
 	}
 
