@@ -7,7 +7,11 @@
 			:aria-label="__('Change language: {0}', [localeConfig.nativeName])"
 			:title="localeConfig.nativeName"
 		>
-			<span class="text-lg sm:text-xl">{{ localeConfig.flag }}</span>
+			<img
+				:src="localeConfig.flagUrlSvg"
+				:alt="localeConfig.name"
+				class="w-6 h-4 object-cover rounded-sm shadow-sm"
+			/>
 			<span class="hidden sm:inline">{{ localeConfig.nativeName }}</span>
 			<svg
 				class="w-3 h-3 sm:w-4 sm:h-4 transition-transform"
@@ -51,12 +55,12 @@
 						}"
 						role="menuitem"
 					>
-						<span
-							class="text-xl"
-							:class="config.dir === 'rtl' ? 'ms-3' : 'me-3'"
-						>
-							{{ config.flag }}
-						</span>
+						<img
+							:src="config.flagUrlSvg"
+							:alt="config.name"
+							class="w-6 h-4 object-cover rounded-sm shadow-sm"
+							:class="config.dir === 'rtl' ? 'ml-3' : 'mr-3'"
+						/>
 						<span
 							class="flex-1"
 							:class="config.dir === 'rtl' ? 'text-end' : 'text-start'"
