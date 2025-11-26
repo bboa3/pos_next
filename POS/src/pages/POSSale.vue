@@ -689,6 +689,7 @@ import InvoiceManagement from "@/components/invoices/InvoiceManagement.vue"
 import InvoiceDetailDialog from "@/components/invoices/InvoiceDetailDialog.vue"
 import { useRealtimeStock } from "@/composables/useRealtimeStock"
 import { usePOSEvents } from "@/composables/usePOSEvents"
+import { useLocale } from "@/composables/useLocale"
 import { session } from "@/data/session"
 import { useUserData } from "@/data/user"
 import { parseError } from "@/utils/errorHandler"
@@ -735,6 +736,9 @@ const log = logger.create('POSSale')
 
 // User data composable
 const { userName, userImage } = useUserData()
+
+// Locale composable for RTL support
+const { isRTL } = useLocale()
 
 // Component refs
 const itemsSelectorRef = ref(null)
@@ -1998,7 +2002,9 @@ function handleResize(event) {
 	resizeState.containerWidth = containerWidth
 
 	const deltaX = event.clientX - resizeState.startX
-	const rawWidth = resizeState.startWidth + deltaX
+	// In RTL, dragging right should decrease width, so invert deltaX
+	const adjustedDelta = isRTL.value ? -deltaX : deltaX
+	const rawWidth = resizeState.startWidth + adjustedDelta
 
 	uiStore.setLeftPanelWidth(rawWidth, containerWidth)
 }
