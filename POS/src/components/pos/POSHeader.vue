@@ -212,10 +212,12 @@
 						:aria-label="isRefreshing ? __('Refreshing items...') : __('Refresh items list')"
 					/>
 
-					<div class="w-px h-4 sm:h-6 bg-gray-200"></div>
+					<div class="w-px h-4 sm:h-6 bg-gray-200 hidden md:block"></div>
 
-					<!-- Language Switcher -->
-					<LanguageSwitcher />
+					<!-- Language Switcher - Hidden on mobile, shown in UserMenu instead -->
+					<div class="hidden md:block">
+						<LanguageSwitcher />
+					</div>
 
 					<div class="w-px h-4 sm:h-6 bg-gray-200"></div>
 
