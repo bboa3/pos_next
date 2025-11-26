@@ -149,16 +149,17 @@
 				<div class="relative z-50">
 					<button
 						@click="toggleSortDropdown"
+						data-sort-button
 						:class="[
 							'p-1.5 sm:p-2 rounded-lg transition-[background-color,box-shadow] duration-75 touch-manipulation border',
 							sortBy
 								? 'bg-blue-50 border-blue-400 text-blue-700 shadow-sm'
 								: 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50 active:bg-gray-100'
 						]"
-						:title="sortBy 
+						:title="sortBy
 							? (sortOrder === 'asc'
 								? __('Sorted by {0} A-Z', [getSortLabel(sortBy)])
-								: __('Sorted by {0} Z-A', [getSortLabel(sortBy)])) 
+								: __('Sorted by {0} Z-A', [getSortLabel(sortBy)]))
 							: __('Sort items')"
 						:aria-label="__('Sort items')"
 					>
@@ -1357,7 +1358,7 @@ function getSortIconState(field) {
 function handleClickOutside(event) {
 	if (showSortDropdown.value) {
 		const dropdown = event.target.closest('.relative')
-		if (!dropdown || !dropdown.querySelector('button[aria-label="Sort items"]')?.contains(event.target)) {
+		if (!dropdown || !dropdown.querySelector('button[data-sort-button]')?.contains(event.target)) {
 			showSortDropdown.value = false
 		}
 	}

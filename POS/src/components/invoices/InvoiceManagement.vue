@@ -150,7 +150,7 @@
 											<div class="text-2xl font-bold text-gray-900 mt-1">{{ formatCurrency(filteredUnpaidSummary.total_outstanding) }}</div>
 										</div>
 										<div class="text-end">
-											<div class="text-xs text-gray-600">{{ filteredUnpaidSummary.count }} invoices</div>
+											<div class="text-xs text-gray-600">{{ __('{0} invoices', [filteredUnpaidSummary.count]) }}</div>
 											<div class="text-sm text-gray-800 font-semibold mt-1">{{ __('{0} paid', [formatCurrency(filteredUnpaidSummary.total_paid)]) }}</div>
 										</div>
 									</div>
