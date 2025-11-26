@@ -11,14 +11,14 @@
 				<div class="w-full h-full max-w-[95vw] max-h-[95vh] bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col">
 					<!-- Header -->
 					<div class="flex items-center justify-between px-6 py-4 border-b">
-						<div class="flex items-center space-x-3">
+						<div class="flex items-center gap-3">
 							<FeatherIcon name="tag" class="w-5 h-5 text-gray-700" />
 							<div>
 								<h2 class="text-lg font-semibold text-gray-900">{{ __('Promotion & Coupon Management') }}</h2>
 								<p class="text-sm text-gray-600">{{ __('Manage promotional schemes and coupons') }}</p>
 							</div>
 						</div>
-						<div class="flex items-center space-x-2">
+						<div class="flex items-center gap-2">
 							<Button
 								variant="ghost"
 								@click="handleClose"
@@ -33,7 +33,7 @@
 
 					<!-- Tabs -->
 					<div class="border-b bg-white px-6">
-						<div class="flex space-x-1">
+						<div class="flex gap-1">
 							<button
 								@click="activeTab = 'promotions'"
 								:class="[
@@ -43,7 +43,7 @@
 										: 'text-gray-600 border-transparent hover:text-gray-900 hover:border-gray-300'
 								]"
 							>
-								<div class="flex items-center space-x-2">
+								<div class="flex items-center gap-2">
 									<FeatherIcon name="percent" class="w-4 h-4" />
 									<span>{{ __('Promotional Schemes') }}</span>
 								</div>
@@ -57,7 +57,7 @@
 										: 'text-gray-600 border-transparent hover:text-gray-900 hover:border-gray-300'
 								]"
 							>
-								<div class="flex items-center space-x-2">
+								<div class="flex items-center gap-2">
 									<FeatherIcon name="gift" class="w-4 h-4" />
 									<span>{{ __('Coupons') }}</span>
 								</div>
@@ -72,7 +72,7 @@
 						<!-- LEFT SIDE: Promotion List & Navigation -->
 						<div class="w-80 flex-shrink-0 border-r bg-gray-50 flex flex-col">
 							<!-- Search & Filter -->
-							<div class="p-4 bg-white border-b space-y-3">
+							<div class="p-4 bg-white border-b flex flex-col gap-3">
 								<FormControl
 									type="text"
 									v-model="searchQuery"
@@ -97,7 +97,7 @@
 							</div>
 
 							<!-- Create New Button -->
-							<div class="p-4 bg-white border-b space-y-2">
+							<div class="p-4 bg-white border-b flex flex-col gap-2">
 								<Button
 									v-if="permissions.create"
 									@click="handleCreateNew"
@@ -111,7 +111,7 @@
 								</Button>
 								<!-- Permission Warning -->
 								<div v-else class="px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
-									<div class="flex items-start space-x-2">
+									<div class="flex items-start gap-2">
 										<svg class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
 											<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
 										</svg>
@@ -152,13 +152,13 @@
 								</div>
 
 								<!-- Promotion Items -->
-								<div v-else class="p-2 space-y-1">
+								<div v-else class="p-2 flex flex-col gap-1">
 									<button
 										v-for="promotion in filteredPromotions"
 										:key="promotion.name"
 										@click="handleSelectPromotion(promotion)"
 										:class="[
-											'w-full text-left p-3 rounded-md transition-all',
+											'w-full text-start p-3 rounded-md transition-all',
 											selectedPromotion?.name === promotion.name
 												? 'bg-blue-50 ring-2 ring-blue-500 ring-inset'
 												: 'hover:bg-gray-100'
@@ -166,7 +166,7 @@
 									>
 										<div class="flex items-start justify-between mb-2">
 											<div class="flex-1 min-w-0">
-												<div class="flex items-center space-x-2">
+												<div class="flex items-center gap-2">
 													<p :class="[
 														'text-sm font-medium truncate',
 														selectedPromotion?.name === promotion.name ? 'text-blue-900' : 'text-gray-900'
@@ -245,7 +245,7 @@
 									<!-- Form Header -->
 									<div class="flex items-center justify-between mb-6 pb-4 border-b">
 										<div>
-											<div class="flex items-center space-x-3">
+											<div class="flex items-center gap-3">
 												<h3 class="text-xl font-semibold text-gray-900">
 													{{ isCreating ? __('Create New Promotion') : __('Edit Promotion') }}
 												</h3>
@@ -278,9 +278,9 @@
 												</span>
 											</p>
 										</div>
-										<div class="flex items-center space-x-2">
+										<div class="flex items-center gap-2">
 											<!-- Show info badge for read-only Pricing Rules -->
-											<div v-if="isPricingRule" class="flex items-center space-x-2 px-3 py-1 bg-blue-50 rounded-lg">
+											<div v-if="isPricingRule" class="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-lg">
 												<FeatherIcon name="info" class="w-4 h-4 text-blue-600" />
 												<span class="text-xs text-blue-700 font-medium">{{ __('Read-only: Edit in ERPNext') }}</span>
 											</div>
@@ -329,11 +329,11 @@
 									</div>
 
 									<!-- Form Content -->
-									<div class="space-y-6">
+									<div class="flex flex-col gap-6">
 										<!-- Basic Information Card -->
 										<Card>
 											<div class="p-5">
-												<div class="flex items-center space-x-2 mb-4">
+												<div class="flex items-center gap-2 mb-4">
 													<FeatherIcon name="info" class="w-4 h-4 text-blue-600" />
 													<h4 class="text-sm font-semibold text-gray-900">{{ __('Basic Information') }}</h4>
 												</div>
@@ -383,14 +383,14 @@
 										<!-- Item Selection Card -->
 										<Card v-if="form.apply_on !== 'Transaction'">
 											<div class="p-5">
-												<div class="flex items-center space-x-2 mb-4">
+												<div class="flex items-center gap-2 mb-4">
 													<FeatherIcon name="list" class="w-4 h-4 text-green-600" />
 													<h4 class="text-sm font-semibold text-gray-900">{{ __('Select {0}', [form.apply_on]) }}</h4>
 													<Badge variant="subtle" theme="red" size="sm">{{ __('Required') }}</Badge>
 												</div>
 
 												<!-- Item Code Search -->
-												<div v-if="form.apply_on === 'Item Code'" class="space-y-3">
+												<div v-if="form.apply_on === 'Item Code'" class="flex flex-col gap-3">
 													<div>
 														<FormControl
 															type="text"
@@ -412,7 +412,7 @@
 																v-for="item in searchResults"
 																:key="item.item_code"
 																@click="addItem(item)"
-																class="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors"
+																class="w-full text-start px-4 py-2 hover:bg-gray-50 transition-colors"
 															>
 																<p class="text-sm font-medium text-gray-900">{{ item.item_name }}</p>
 																<p class="text-xs text-gray-500">{{ item.item_code }}</p>
@@ -431,7 +431,7 @@
 															{{ item.item_code }}
 															<button
 																@click="removeItem(index)"
-																class="ml-1 hover:text-blue-900"
+																class="ms-1 hover:text-blue-900"
 															>
 																×
 															</button>
@@ -440,7 +440,7 @@
 												</div>
 
 												<!-- Item Group Selection -->
-												<div v-else-if="form.apply_on === 'Item Group'" class="space-y-3">
+												<div v-else-if="form.apply_on === 'Item Group'" class="flex flex-col gap-3">
 													<FormControl
 														type="select"
 														v-model="selectedItemGroup"
@@ -462,7 +462,7 @@
 															{{ item.item_group }}
 															<button
 																@click="removeItem(index)"
-																class="ml-1 hover:text-green-900"
+																class="ms-1 hover:text-green-900"
 															>
 																×
 															</button>
@@ -471,7 +471,7 @@
 												</div>
 
 												<!-- Brand Selection -->
-												<div v-else-if="form.apply_on === 'Brand'" class="space-y-3">
+												<div v-else-if="form.apply_on === 'Brand'" class="flex flex-col gap-3">
 													<FormControl
 														type="select"
 														v-model="selectedBrand"
@@ -493,7 +493,7 @@
 															{{ item.brand }}
 															<button
 																@click="removeItem(index)"
-																class="ml-1 hover:text-purple-900"
+																class="ms-1 hover:text-purple-900"
 															>
 																×
 															</button>
@@ -506,13 +506,13 @@
 										<!-- Discount Details Card -->
 										<Card>
 											<div class="p-5">
-												<div class="flex items-center space-x-2 mb-4">
+												<div class="flex items-center gap-2 mb-4">
 													<FeatherIcon name="percent" class="w-4 h-4 text-purple-600" />
 													<h4 class="text-sm font-semibold text-gray-900">{{ __('Discount Details') }}</h4>
 													<Badge variant="subtle" theme="red" size="sm">{{ __('Required') }}</Badge>
 												</div>
 
-												<div class="space-y-4">
+												<div class="flex flex-col gap-4">
 													<!-- Discount Type Selection -->
 													<div>
 														<label class="block text-sm font-medium text-gray-700 mb-3">{{ __('Discount Type') }}</label>
@@ -523,7 +523,7 @@
 																@click="form.discount_type = type.value"
 																:disabled="!isCreating"
 																:class="[
-																	'p-3 border rounded-lg transition-all flex items-center justify-center space-x-2',
+																	'p-3 border rounded-lg transition-all flex items-center justify-center gap-2',
 																	form.discount_type === type.value
 																		? 'border-blue-600 bg-blue-50 text-blue-900'
 																		: 'border-gray-300 hover:border-gray-400 text-gray-700',
@@ -549,7 +549,7 @@
 														/>
 
 														<!-- Free Item Search -->
-														<div v-if="form.discount_type === 'free_item'" class="space-y-2">
+														<div v-if="form.discount_type === 'free_item'" class="flex flex-col gap-2">
 															<label class="block text-sm font-medium text-gray-700">{{ __('Free Item') }}<span class="text-red-500"> *</span></label>
 
 															<!-- Search Input -->
@@ -572,7 +572,7 @@
 																		:key="item.item_code"
 																		@click="selectFreeItem(item)"
 																		type="button"
-																		class="w-full text-left px-4 py-2 hover:bg-gray-50 transition-colors"
+																		class="w-full text-start px-4 py-2 hover:bg-gray-50 transition-colors"
 																	>
 																		<p class="text-sm font-medium text-gray-900">{{ item.item_name }}</p>
 																		<p class="text-xs text-gray-500">{{ item.item_code }}</p>
@@ -581,13 +581,13 @@
 															</div>
 
 															<!-- Selected Free Item -->
-															<div v-if="form.free_item" class="flex items-center space-x-2">
+															<div v-if="form.free_item" class="flex items-center gap-2">
 																<Badge variant="subtle" theme="green" size="md">
 																	{{ form.free_item }}
 																	<button
 																		@click="form.free_item = ''"
 																		type="button"
-																		class="ml-2 hover:text-green-900"
+																		class="ms-2 hover:text-green-900"
 																	>
 																		×
 																	</button>
@@ -665,7 +665,7 @@
 						@click.self="cancelDelete"
 					>
 						<div class="bg-white rounded-lg shadow-2xl max-w-md w-full mx-4 p-6">
-							<div class="flex items-start space-x-4">
+							<div class="flex items-start gap-4">
 								<div class="flex-shrink-0">
 									<div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
 										<FeatherIcon name="alert-triangle" class="w-6 h-6 text-red-600" />
@@ -683,7 +683,7 @@
 									</p>
 								</div>
 							</div>
-							<div class="flex justify-end space-x-3 mt-6">
+							<div class="flex justify-end gap-3 mt-6">
 								<Button
 									@click="cancelDelete"
 									variant="ghost"

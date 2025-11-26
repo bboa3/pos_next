@@ -171,7 +171,7 @@
 					<div
 						v-if="showSortDropdown"
 						@click.stop
-						class="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]"
+						class="absolute end-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]"
 						style="box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);"
 					>
 						<div class="py-2">
@@ -291,7 +291,7 @@
 						<div
 							v-if="item.is_stock_item || item.is_bundle"
 							:class="[
-								'absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 rounded-md shadow-lg z-10',
+								'absolute -top-1.5 -end-1.5 sm:-top-2 sm:-end-2 rounded-md shadow-lg z-10',
 								'px-2 sm:px-2.5 py-1 sm:py-1',
 								'text-[10px] sm:text-xs font-bold',
 								'border-2 border-white',
@@ -387,7 +387,7 @@
 				<!-- Loading More Indicator for Grid View -->
 				<div v-if="loadingMore" class="flex justify-center items-center py-4">
 					<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-					<p class="ml-2 text-xs text-gray-500">{{ __('Loading more items...') }}</p>
+					<p class="ms-2 text-xs text-gray-500">{{ __('Loading more items...') }}</p>
 				</div>
 
 				<!-- End of Results Indicator - Only show on last page or when all items fit in one page -->
@@ -606,7 +606,7 @@
 							<td colspan="6" class="px-2 sm:px-3 py-4 text-center bg-white">
 								<div class="flex justify-center items-center">
 									<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-									<p class="ml-2 text-xs text-gray-500">{{ __('Loading more items...') }}</p>
+									<p class="ms-2 text-xs text-gray-500">{{ __('Loading more items...') }}</p>
 								</div>
 							</td>
 						</tr>

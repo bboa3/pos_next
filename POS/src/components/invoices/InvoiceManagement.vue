@@ -11,7 +11,7 @@
 				<div class="w-full h-full max-w-[95vw] max-h-[95vh] bg-white rounded-lg shadow-2xl overflow-hidden flex flex-col">
 					<!-- Header -->
 					<div class="flex items-center justify-between px-6 py-5 border-b bg-gradient-to-r from-indigo-50 to-purple-50">
-						<div class="flex items-center space-x-3">
+						<div class="flex items-center gap-3">
 							<div class="p-2 bg-indigo-100 rounded-lg">
 								<svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -24,7 +24,7 @@
 								</p>
 							</div>
 						</div>
-						<div class="flex items-center space-x-2">
+						<div class="flex items-center gap-2">
 							<Button
 								@click="refreshCurrentTab"
 								:loading="loading"
@@ -51,7 +51,7 @@
 
 					<!-- Tabs Navigation -->
 					<div class="border-b border-gray-200 bg-gray-50">
-						<nav class="flex space-x-2 px-6" :aria-label="__('Tabs')">
+						<nav class="flex gap-2 px-6" :aria-label="__('Tabs')">
 							<button
 								v-for="tab in tabs"
 								:key="tab.id"
@@ -63,7 +63,7 @@
 										: 'text-gray-600 border-transparent hover:text-gray-800 hover:border-gray-300'
 								]"
 							>
-								<div class="flex items-center space-x-2">
+								<div class="flex items-center gap-2">
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="tab.icon"/>
 									</svg>
@@ -71,7 +71,7 @@
 									<span
 										v-if="tab.badge && tab.badge() > 0"
 										:class="[
-											'ml-1 px-2 py-0.5 text-xs font-bold rounded-full',
+											'ms-1 px-2 py-0.5 text-xs font-bold rounded-full',
 											activeTab === tab.id ? getBadgeActiveClass(tab.id) : getBadgeInactiveClass(tab.id)
 										]"
 									>
@@ -93,9 +93,9 @@
 						<!-- Tab Content -->
 						<div class="p-6">
 							<!-- Unpaid Tab -->
-							<div v-if="activeTab === 'partial'" class="space-y-4">
+							<div v-if="activeTab === 'partial'" class="flex flex-col gap-4">
 								<!-- Filter Buttons -->
-								<div class="flex items-center space-x-2 mb-4 flex-wrap gap-2">
+								<div class="flex items-center gap-2 mb-4 flex-wrap gap-2">
 									<button
 										@click="unpaidFilter = 'all'"
 										:class="[
@@ -149,7 +149,7 @@
 											<div class="text-sm text-orange-600 font-medium">{{ __('Outstanding Payments') }}</div>
 											<div class="text-2xl font-bold text-gray-900 mt-1">{{ formatCurrency(filteredUnpaidSummary.total_outstanding) }}</div>
 										</div>
-										<div class="text-right">
+										<div class="text-end">
 											<div class="text-xs text-gray-600">{{ filteredUnpaidSummary.count }} invoices</div>
 											<div class="text-sm text-gray-800 font-semibold mt-1">{{ __('{0} paid', [formatCurrency(filteredUnpaidSummary.total_paid)]) }}</div>
 										</div>
@@ -166,7 +166,7 @@
 								</div>
 
 								<!-- Invoices List -->
-								<div v-else class="space-y-4">
+								<div v-else class="flex flex-col gap-4">
 									<div
 										v-for="invoice in filteredUnpaidInvoices"
 										:key="invoice.name"
@@ -176,7 +176,7 @@
 										<div class="p-4 border-b bg-gray-50">
 											<div class="flex items-start justify-between">
 												<div>
-													<div class="flex items-center space-x-2">
+													<div class="flex items-center gap-2">
 														<h3 class="text-lg font-bold text-gray-900">{{ invoice.name }}</h3>
 														<span
 															:class="[
@@ -187,15 +187,15 @@
 															{{ getStatusLabel(invoice.status) }}
 														</span>
 													</div>
-													<div class="flex items-center space-x-4 mt-1 text-sm text-gray-600">
+													<div class="flex items-center gap-4 mt-1 text-sm text-gray-600">
 														<div class="flex items-center">
-															<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+															<svg class="w-4 h-4 me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 																<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
 															</svg>
 															{{ invoice.customer_name || invoice.customer }}
 														</div>
 														<div class="flex items-center">
-															<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+															<svg class="w-4 h-4 me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 																<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
 															</svg>
 															{{ formatDate(invoice.posting_date) }} {{ formatTime(invoice.posting_time) }}
@@ -309,7 +309,7 @@
 											<div class="flex items-start justify-between mb-2">
 												<div class="flex-1">
 													<h3 class="text-base font-bold text-gray-900">{{ invoice.name }}</h3>
-													<div class="flex items-center space-x-2 mt-1">
+													<div class="flex items-center gap-2 mt-1">
 														<span
 															:class="[
 																'text-xs px-2.5 py-1 rounded-full font-semibold',
@@ -320,7 +320,7 @@
 														</span>
 													</div>
 												</div>
-												<div class="text-right ml-3">
+												<div class="text-end ms-3">
 													<div class="text-xs text-gray-500 mb-1">{{ __('Total') }}</div>
 													<div class="text-lg font-bold text-indigo-600">
 														{{ formatCurrency(invoice.grand_total) }}
@@ -330,10 +330,10 @@
 										</div>
 
 										<!-- Card Body -->
-										<div class="px-5 py-4 space-y-3">
+										<div class="px-5 py-4 flex flex-col gap-3">
 											<!-- Customer Info -->
 											<div class="flex items-start">
-												<svg class="w-5 h-5 text-gray-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<svg class="w-5 h-5 text-gray-400 me-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
 												</svg>
 												<div class="flex-1">
@@ -344,7 +344,7 @@
 
 											<!-- Date & Time -->
 											<div class="flex items-start">
-												<svg class="w-5 h-5 text-gray-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<svg class="w-5 h-5 text-gray-400 me-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
 												</svg>
 												<div class="flex-1">
@@ -367,10 +367,10 @@
 										</div>
 
 										<!-- Card Footer with Actions -->
-										<div class="px-5 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-end space-x-2">
+										<div class="px-5 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-end gap-2">
 											<button
 												@click="$emit('view-invoice', invoice)"
-												class="px-3 py-2 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors flex items-center space-x-1"
+												class="px-3 py-2 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-1"
 												:title="__('View Details')"
 											>
 												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -381,7 +381,7 @@
 											</button>
 											<button
 												@click="$emit('print-invoice', invoice)"
-												class="px-3 py-2 text-xs font-semibold text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors flex items-center space-x-1"
+												class="px-3 py-2 text-xs font-semibold text-green-600 bg-green-50 hover:bg-green-100 rounded-lg transition-colors flex items-center gap-1"
 												:title="__('Print')"
 											>
 												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -476,24 +476,24 @@
 									>
 										<div class="flex items-start justify-between">
 											<div class="flex-1">
-												<div class="flex items-center space-x-2 mb-1">
+												<div class="flex items-center gap-2 mb-1">
 													<h4 class="text-sm font-semibold text-gray-900">{{ invoice.name }}</h4>
 													<span class="text-xs px-2 py-0.5 rounded-full font-medium bg-red-100 text-red-800">
 														{{ __('Return') }}
 													</span>
 												</div>
-												<div class="flex items-center space-x-4 text-xs text-gray-600">
+												<div class="flex items-center gap-4 text-xs text-gray-600">
 													<span>{{ invoice.customer_name }}</span>
 													<span>{{ formatDate(invoice.posting_date) }}</span>
 													<span v-if="invoice.return_against">{{ __('Against: {0}', [invoice.return_against]) }}</span>
 												</div>
 											</div>
 
-											<div class="text-right ml-4">
+											<div class="text-end ms-4">
 												<p class="text-sm font-bold text-red-600">
 													-{{ formatCurrency(Math.abs(invoice.grand_total)) }}
 												</p>
-												<div class="flex items-center space-x-1 mt-2">
+												<div class="flex items-center gap-1 mt-2">
 													<button
 														@click="$emit('view-invoice', invoice)"
 														class="p-1.5 hover:bg-blue-50 rounded transition-colors"

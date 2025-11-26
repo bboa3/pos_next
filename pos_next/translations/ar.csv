@@ -227,6 +227,7 @@
 "Last","الأخير",""
 "per page","لكل صفحة",""
 "View","عرض",""
+"View Shift","عرض الوردية",""
 "View Details","عرض التفاصيل",""
 "Edit Details","تعديل التفاصيل",""
 "Copy","نسخ",""
@@ -315,3 +316,4 @@
 "Cache ready","ذاكرة التخزين المؤقت جاهزة",""
 "Access your point of sale system","الدخول لنقطة البيع",""
 "Your cart is empty","سلة التسوق فارغة",""
+"Cart Items","منتجات السلة",""

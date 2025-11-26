@@ -1,10 +1,10 @@
 <template>
 	<Dialog v-model="show" :options="{ title: __('Offline Invoices'), size: 'xl' }">
 		<template #body-content>
-			<div class="space-y-3 sm:space-y-4">
+			<div class="flex flex-col gap-3 sm:flex flex-col gap-4">
 				<!-- Header Info -->
 				<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 bg-orange-50 rounded-lg border border-orange-200">
-					<div class="flex items-center space-x-2 sm:space-x-3">
+					<div class="flex items-center gap-2 sm:gap-3">
 						<svg class="w-5 h-5 sm:w-6 sm:h-6 text-orange-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
 						</svg>
@@ -43,7 +43,7 @@
 				</div>
 
 				<!-- Invoices List -->
-				<div v-else class="space-y-2 sm:space-y-3 max-h-[60vh] sm:max-h-96 overflow-y-auto">
+				<div v-else class="flex flex-col gap-2 sm:flex flex-col gap-3 max-h-[60vh] sm:max-h-96 overflow-y-auto">
 					<div
 						v-for="invoice in invoices"
 						:key="invoice.id"
@@ -62,7 +62,7 @@
 										{{ __('{0} failed', [invoice.retry_count]) }}
 									</span>
 								</div>
-								<div class="mt-2 space-y-1 text-xs sm:text-sm text-gray-600">
+								<div class="mt-2 flex flex-col gap-1 text-xs sm:text-sm text-gray-600">
 									<div class="flex flex-wrap items-center gap-x-3 gap-y-1">
 										<span>{{ __('{0} items', [invoice.data.items?.length || 0]) }}</span>
 										<span class="font-semibold text-gray-900">
@@ -124,7 +124,7 @@
 	<!-- Details Dialog -->
 	<Dialog v-model="showDetails" :options="{ title: __('Invoice Details'), size: 'lg' }">
 		<template #body-content>
-			<div v-if="selectedInvoice" class="space-y-3 sm:space-y-4">
+			<div v-if="selectedInvoice" class="flex flex-col gap-3 sm:flex flex-col gap-4">
 				<div class="bg-gray-50 p-3 sm:p-4 rounded-lg">
 					<h4 class="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{{ __('Customer') }}</h4>
 					<p class="text-sm sm:text-base">{{ selectedInvoice.data.customer || __('Walk-in Customer') }}</p>
@@ -132,7 +132,7 @@
 
 				<div class="bg-gray-50 p-3 sm:p-4 rounded-lg">
 					<h4 class="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{{ __('Items') }}</h4>
-					<div class="space-y-2">
+					<div class="flex flex-col gap-2">
 						<div
 							v-for="(item, idx) in selectedInvoice.data.items"
 							:key="idx"
@@ -165,7 +165,7 @@
 
 				<div v-if="selectedInvoice.data.payments?.length > 0" class="bg-gray-50 p-3 sm:p-4 rounded-lg">
 					<h4 class="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{{ __('Payments') }}</h4>
-					<div class="space-y-1">
+					<div class="flex flex-col gap-1">
 						<div
 							v-for="(payment, idx) in selectedInvoice.data.payments"
 							:key="idx"
@@ -186,14 +186,14 @@
 	<!-- Delete Confirmation Dialog -->
 	<Dialog v-model="showDeleteConfirm" :options="{ title: __('Delete Offline Invoice'), size: 'md' }">
 		<template #body-content>
-			<div v-if="invoiceToDelete" class="space-y-3 sm:space-y-4">
-				<div class="flex items-start space-x-2 sm:space-x-3">
+			<div v-if="invoiceToDelete" class="flex flex-col gap-3 sm:flex flex-col gap-4">
+				<div class="flex items-start gap-2 sm:gap-3">
 					<svg class="w-5 h-5 sm:w-6 sm:h-6 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
 					</svg>
 					<div class="min-w-0 flex-1">
 						<p class="text-gray-900 font-medium mb-2 text-sm sm:text-base">{{ __('Are you sure you want to delete this offline invoice?') }}</p>
-						<div class="bg-gray-50 rounded-lg p-2.5 sm:p-3 space-y-1 text-xs sm:text-sm">
+						<div class="bg-gray-50 rounded-lg p-2.5 sm:p-3 flex flex-col gap-1 text-xs sm:text-sm">
 							<div class="flex justify-between gap-2">
 								<span class="text-gray-600">{{ __('Customer:') }}</span>
 								<span class="font-semibold truncate">{{ invoiceToDelete.data.customer || __('Walk-in Customer') }}</span>

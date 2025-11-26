@@ -4,9 +4,9 @@
 			<span class="sr-only">{{ __('Edit item quantity, UOM, warehouse, and discount') }}</span>
 		</template>
 		<template #body-content>
-			<div v-if="localItem" class="space-y-4">
+			<div v-if="localItem" class="flex flex-col gap-4">
 				<!-- Item Header -->
-				<div class="flex items-center space-x-3 pb-4 border-b border-gray-200">
+				<div class="flex items-center gap-3 pb-4 border-b border-gray-200">
 					<!-- Item Image -->
 					<div class="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
 						<img
@@ -44,7 +44,7 @@
 				<!-- Two Column Layout for Quantity, UOM, Rate, Warehouse -->
 				<div class="grid grid-cols-2 gap-4">
 					<!-- Left Column: Quantity and Rate -->
-					<div class="space-y-4">
+					<div class="flex flex-col gap-4">
 						<!-- Quantity Control -->
 						<div>
 							<label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Quantity') }}</label>
@@ -85,7 +85,7 @@
 						<div>
 							<label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Rate') }}</label>
 							<div class="relative h-10">
-								<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-sm font-medium">
+								<span class="absolute inset-y-0 start-0 ps-3 flex items-center text-gray-500 text-sm font-medium">
 									{{ currencySymbol }}
 								</span>
 								<input
@@ -94,14 +94,14 @@
 									min="0"
 									step="0.01"
 									readonly
-									class="w-full h-10 border border-gray-300 rounded-lg pl-16 pr-3 text-sm font-semibold bg-gray-50 cursor-not-allowed"
+									class="w-full h-10 border border-gray-300 rounded-lg ps-16 pe-3 text-sm font-semibold bg-gray-50 cursor-not-allowed"
 								/>
 							</div>
 						</div>
 					</div>
 
 					<!-- Right Column: UOM and Warehouse -->
-					<div class="space-y-4">
+					<div class="flex flex-col gap-4">
 						<!-- UOM Selector -->
 						<div>
 							<label class="block text-sm font-medium text-gray-700 mb-2">{{ __('UOM') }}</label>
@@ -172,10 +172,10 @@
 									min="0"
 									:max="discountType === 'percentage' ? 100 : undefined"
 									step="0.01"
-									class="w-full border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+									class="w-full border border-gray-300 rounded-lg px-3 py-2 pe-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									@input="calculateDiscount"
 								/>
-								<span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 text-sm">
+								<span class="absolute inset-y-0 end-0 pe-3 flex items-center text-gray-500 text-sm">
 									{{ discountType === 'percentage' ? '%' : '' }}
 								</span>
 							</div>
@@ -184,7 +184,7 @@
 				</div>
 
 				<!-- Totals -->
-				<div class="bg-gray-50 rounded-lg p-4 space-y-2">
+				<div class="bg-gray-50 rounded-lg p-4 flex flex-col gap-2">
 					<div class="flex items-center justify-between text-sm">
 						<span class="text-gray-600">{{ __('Subtotal:') }}</span>
 						<span class="font-semibold text-gray-900">{{ formatCurrency(calculatedSubtotal) }}</span>
@@ -202,7 +202,7 @@
 		</template>
 
 		<template #actions>
-			<div class="flex items-center justify-end space-x-2">
+			<div class="flex items-center justify-end gap-2">
 				<Button variant="subtle" @click="cancel">{{ __('Cancel') }}</Button>
 				<Button
 					variant="solid"

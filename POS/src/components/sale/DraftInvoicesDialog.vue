@@ -5,7 +5,7 @@
 		:options="{ title: __('Draft Invoices'), size: 'lg' }"
 	>
 		<template #body-content>
-			<div class="space-y-3">
+			<div class="flex flex-col gap-3">
 				<!-- Empty State -->
 				<div v-if="drafts.length === 0" class="text-center py-8">
 					<div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -18,7 +18,7 @@
 				</div>
 
 				<!-- Drafts List -->
-				<div v-else class="space-y-2 max-h-96 overflow-y-auto">
+				<div v-else class="flex flex-col gap-2 max-h-96 overflow-y-auto">
 					<div
 						v-for="draft in drafts"
 						:key="draft.draft_id"
@@ -110,7 +110,7 @@
 			</div>
 		</template>
 		<template #actions>
-			<div class="flex space-x-2 w-full">
+			<div class="flex gap-2 w-full">
 				<Button class="flex-1" variant="subtle" @click="showDeleteDialog = false">
 					{{ __('Cancel') }}
 				</Button>
@@ -134,7 +134,7 @@
 			</div>
 		</template>
 		<template #actions>
-			<div class="flex space-x-2 w-full">
+			<div class="flex gap-2 w-full">
 				<Button class="flex-1" variant="subtle" @click="showClearAllDialog = false">
 					{{ __('Cancel') }}
 				</Button>

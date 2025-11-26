@@ -2,13 +2,15 @@
 	<div ref="dropdownRef" class="relative">
 		<button
 			@click="toggleDropdown"
-			class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+			class="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
 			:class="{ 'flex-row-reverse': isRTL }"
+			:aria-label="__('Change language: {0}', [localeConfig.nativeName])"
+			:title="localeConfig.nativeName"
 		>
-			<span class="text-xl">{{ localeConfig.flag }}</span>
-			<span>{{ localeConfig.nativeName }}</span>
+			<span class="text-lg sm:text-xl">{{ localeConfig.flag }}</span>
+			<span class="hidden sm:inline">{{ localeConfig.nativeName }}</span>
 			<svg
-				class="w-4 h-4 transition-transform"
+				class="w-3 h-3 sm:w-4 sm:h-4 transition-transform"
 				:class="{ 'rotate-180': isOpen }"
 				fill="none"
 				stroke="currentColor"
@@ -34,7 +36,7 @@
 			<div
 				v-if="isOpen"
 				class="absolute z-50 mt-2 w-56 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5"
-				:class="isRTL ? 'left-0' : 'right-0'"
+				:class="isRTL ? 'start-0' : 'end-0'"
 			>
 				<div class="py-1" role="menu">
 					<button
@@ -51,13 +53,13 @@
 					>
 						<span
 							class="text-xl"
-							:class="config.dir === 'rtl' ? 'ml-3' : 'mr-3'"
+							:class="config.dir === 'rtl' ? 'ms-3' : 'me-3'"
 						>
 							{{ config.flag }}
 						</span>
 						<span
 							class="flex-1"
-							:class="config.dir === 'rtl' ? 'text-right' : 'text-left'"
+							:class="config.dir === 'rtl' ? 'text-end' : 'text-start'"
 						>
 							{{ config.nativeName }}
 						</span>

@@ -1,10 +1,10 @@
 <template>
 	<Dialog v-model="show" :options="{ title: __('Apply'), size: 'md' }">
 		<template #body-content>
-			<div class="space-y-4">
+			<div class="flex flex-col gap-4">
 				<!-- Info Banner -->
 				<div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
-					<div class="flex items-start space-x-2">
+					<div class="flex items-start gap-2">
 						<svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd"
 								d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
@@ -22,7 +22,7 @@
 					<label class="block text-sm font-medium text-gray-700 mb-2">
 						{{ __('Coupon Code') }}
 					</label>
-					<div class="flex space-x-2">
+					<div class="flex gap-2">
 						<Input v-model="couponCode" type="text" :placeholder="__('ENTER-CODE-HERE')" class="flex-1 uppercase"
 							@keyup.enter="applyCoupon" :disabled="applying" />
 						<Button @click="applyCoupon" :loading="applying" theme="blue" variant="solid" class="flex-shrink-0">
@@ -38,7 +38,7 @@
 				<!-- My Gift Cards -->
 				<div v-if="giftCards.length > 0 && !appliedDiscount">
 					<label class="block text-sm font-medium text-gray-700 mb-2">
-						<div class="flex items-center space-x-2">
+						<div class="flex items-center gap-2">
 							<svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
 								<path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
 								<path fill-rule="evenodd"
@@ -48,12 +48,12 @@
 							<span>{{ __('My Gift Cards ({0})', [giftCards.length]) }}</span>
 						</div>
 					</label>
-					<div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+					<div class="flex flex-col gap-2 max-h-60 overflow-y-auto pe-1">
 						<div v-for="card in giftCards" :key="card.coupon_code" @click="applyGiftCard(card)"
 							class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-3 cursor-pointer hover:shadow-md hover:border-purple-400 transition-all">
 							<div class="flex items-center justify-between">
 								<div class="flex-1">
-									<div class="flex items-center space-x-2">
+									<div class="flex items-center gap-2">
 										<div
 											class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
 											<svg class="w-4 h-4 text-purple-600" fill="currentColor"
@@ -84,7 +84,7 @@
 
 				<!-- Applied Coupon Preview -->
 				<div v-if="appliedDiscount" class="bg-green-50 border-2 border-green-500 rounded-lg p-4">
-					<div class="flex items-center space-x-2 mb-3">
+					<div class="flex items-center gap-2 mb-3">
 						<div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
 							<svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
 								<path fill-rule="evenodd"
@@ -112,7 +112,7 @@
 
 				<!-- Error Message -->
 				<div v-if="errorMessage" class="bg-red-50 border border-red-200 rounded-lg p-3">
-					<div class="flex items-start space-x-2">
+					<div class="flex items-start gap-2">
 						<svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd"
 								d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -134,7 +134,7 @@
 					</template>
 					{{ __('Remove') }}
 				</Button>
-				<div class="flex space-x-2 ml-auto">
+				<div class="flex gap-2 ms-auto">
 					<Button variant="subtle" @click="show = false">
 						{{ __('Close') }}
 					</Button>

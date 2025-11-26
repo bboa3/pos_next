@@ -3,14 +3,14 @@
 		<Transition name="toast-slide">
 			<div
 				v-if="showToast && toastNotification"
-				class="fixed top-4 right-4 z-[9999] max-w-md"
+				class="fixed top-4 end-4 z-[9999] max-w-md"
 			>
 				<div
 					:class="[
-						'rounded-lg shadow-xl p-4 flex items-start space-x-3',
-						toastNotification.type === 'success' ? 'bg-green-50 border-l-4 border-green-500' : '',
-						toastNotification.type === 'error' ? 'bg-red-50 border-l-4 border-red-500' : '',
-						toastNotification.type === 'warning' ? 'bg-orange-50 border-l-4 border-orange-500' : ''
+						'rounded-lg shadow-xl p-4 flex items-start gap-3',
+						toastNotification.type === 'success' ? 'bg-green-50 border-s-4 border-green-500' : '',
+						toastNotification.type === 'error' ? 'bg-red-50 border-s-4 border-red-500' : '',
+						toastNotification.type === 'warning' ? 'bg-orange-50 border-s-4 border-orange-500' : ''
 					]"
 				>
 					<div class="flex-shrink-0">

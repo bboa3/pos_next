@@ -1,5 +1,4 @@
 import { ref, computed, onMounted } from "vue"
-import { fetchTranslations } from "../utils/translation"
 import { call } from "../utils/apiWrapper"
 
 // Reactive locale state (shared across all components)

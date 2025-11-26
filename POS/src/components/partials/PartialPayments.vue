@@ -11,7 +11,7 @@
 				<div class="w-full max-w-6xl max-h-[90vh] bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col">
 					<!-- Header -->
 					<div class="flex items-center justify-between px-6 py-5 border-b bg-gradient-to-r from-orange-50 to-amber-50">
-						<div class="flex items-center space-x-3">
+						<div class="flex items-center gap-3">
 							<div class="p-2 bg-orange-100 rounded-lg">
 								<svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -24,7 +24,7 @@
 								</p>
 							</div>
 						</div>
-						<div class="flex items-center space-x-2">
+						<div class="flex items-center gap-2">
 							<!-- Summary Badge -->
 							<div v-if="summary.count > 0" class="px-4 py-2 bg-orange-100 rounded-lg border border-orange-200">
 								<div class="text-xs text-orange-600 font-medium">
@@ -75,7 +75,7 @@
 						</div>
 
 						<!-- Invoices List -->
-						<div v-else class="p-6 space-y-4">
+						<div v-else class="p-6 flex flex-col gap-4">
 							<div
 								v-for="invoice in invoices"
 								:key="invoice.name"
@@ -85,7 +85,7 @@
 								<div class="p-4 border-b bg-gray-50">
 									<div class="flex items-start justify-between">
 										<div>
-											<div class="flex items-center space-x-2">
+											<div class="flex items-center gap-2">
 												<h3 class="text-lg font-bold text-gray-900">{{ invoice.name }}</h3>
 												<span
 													:class="[
@@ -96,15 +96,15 @@
 													{{ getStatusLabel(invoice.status) }}
 												</span>
 											</div>
-											<div class="flex items-center space-x-4 mt-1 text-sm text-gray-600">
+											<div class="flex items-center gap-4 mt-1 text-sm text-gray-600">
 												<div class="flex items-center">
-													<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<svg class="w-4 h-4 me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
 													</svg>
 													{{ invoice.customer_name || invoice.customer }}
 												</div>
 												<div class="flex items-center">
-													<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<svg class="w-4 h-4 me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
 													</svg>
 													{{ formatDate(invoice.posting_date) }} {{ formatTime(invoice.posting_time) }}

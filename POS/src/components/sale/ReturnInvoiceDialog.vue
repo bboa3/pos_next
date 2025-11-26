@@ -4,7 +4,7 @@
         :options="{ title: __('Create Return Invoice'), size: '5xl' }"
     >
 		<template #body-content>
-			<div class="space-y-4">
+			<div class="flex flex-col gap-4">
 				<!-- Recent Invoices List -->
 				<div>
 					<label class="block text-sm font-medium text-gray-700 mb-3">
@@ -28,7 +28,7 @@
 								</div>
 
 								<!-- Invoice List -->
-								<div v-else class="max-h-96 overflow-y-auto space-y-2 pr-2">
+								<div v-else class="max-h-96 overflow-y-auto flex flex-col gap-2 pe-2">
 									<div
 										v-for="invoice in filteredInvoiceList"
 										:key="invoice.name"
@@ -46,7 +46,7 @@
 												<p class="text-xs text-gray-600 mt-1">{{ invoice.customer_name }}</p>
 												<p class="text-xs text-gray-500">{{ formatDate(invoice.posting_date) }}</p>
 											</div>
-											<div class="text-right flex-shrink-0">
+											<div class="text-end flex-shrink-0">
 												<p class="text-sm font-bold text-gray-900">{{ formatCurrency(invoice.grand_total) }}</p>
 											</div>
 										</div>
@@ -71,11 +71,11 @@
 		:options="{ title: __('Process Return'), size: '5xl' }"
 	>
 		<template #body-content>
-			<div class="space-y-4">
+			<div class="flex flex-col gap-4">
 				<!-- Invoice Details -->
 				<div v-if="originalInvoice" class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-5 border border-blue-100 shadow-sm">
 					<!-- Mobile Layout -->
-					<div class="sm:hidden space-y-3">
+					<div class="sm:hidden flex flex-col gap-3">
 						<div class="flex items-start gap-2">
 							<svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -89,7 +89,7 @@
 								</span>
 							</div>
 						</div>
-						<div class="space-y-2">
+						<div class="flex flex-col gap-2">
 							<div>
 								<p class="text-xs text-gray-500">{{ __('Customer') }}</p>
 								<p class="text-sm font-semibold text-gray-900">{{ originalInvoice.customer_name }}</p>
@@ -99,7 +99,7 @@
 									<p class="text-xs text-gray-500">{{ __('Date') }}</p>
 									<p class="text-sm font-semibold text-gray-900">{{ formatDate(originalInvoice.posting_date) }}</p>
 								</div>
-								<div class="text-right">
+								<div class="text-end">
 									<p class="text-xs text-gray-500 mb-1">{{ __('Total') }}</p>
 									<p class="text-xl font-bold text-gray-900">
 										{{ formatCurrency(originalInvoice.grand_total) }}
@@ -112,7 +112,7 @@
 					<!-- Desktop Layout -->
 					<div class="hidden sm:flex items-start justify-between">
 						<div class="flex-1">
-							<div class="flex items-center space-x-2">
+							<div class="flex items-center gap-2">
 								<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
 								</svg>
@@ -134,7 +134,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="text-right ml-4">
+						<div class="text-end ms-4">
 							<p class="text-xs text-gray-500 mb-1">{{ __('Total Amount') }}</p>
 							<p class="text-2xl font-bold text-gray-900">
 								{{ formatCurrency(originalInvoice.grand_total) }}
@@ -158,7 +158,7 @@
 										</Button>
 									</div>
 								</div>
-								<div class="space-y-2 max-h-96 overflow-y-auto pr-2">
+								<div class="flex flex-col gap-2 max-h-96 overflow-y-auto pe-2">
 									<div
 										v-for="(item, index) in returnItems"
 										:key="index"
@@ -171,7 +171,7 @@
 										]"
 									>
 										<!-- Desktop Layout -->
-										<div class="hidden sm:flex items-center space-x-4">
+										<div class="hidden sm:flex items-center gap-4">
 											<!-- Checkbox -->
 											<input
 												type="checkbox"
@@ -198,9 +198,9 @@
 											</div>
 
 											<!-- Quantity Controls -->
-											<div class="flex items-center space-x-3 bg-gray-50 rounded-lg px-3 py-2 border border-gray-200" @click.stop>
+											<div class="flex items-center gap-3 bg-gray-50 rounded-lg px-3 py-2 border border-gray-200" @click.stop>
 												<span class="text-xs font-medium text-gray-600">{{ __('Return Qty:') }}</span>
-												<div class="flex items-center space-x-2">
+												<div class="flex items-center gap-2">
 													<button
 														@click="decrementQty(item)"
 														:disabled="!item.selected || item.return_qty <= 1"
@@ -235,7 +235,7 @@
 											</div>
 
 											<!-- Rate & Amount -->
-											<div class="text-right min-w-[100px]">
+											<div class="text-end min-w-[100px]">
 												<p class="text-sm font-bold text-gray-900">
 													{{ formatCurrency(item.rate * item.return_qty) }}
 												</p>
@@ -244,7 +244,7 @@
 										</div>
 
 										<!-- Mobile Layout -->
-										<div class="sm:hidden space-y-3">
+										<div class="sm:hidden flex flex-col gap-3">
 											<!-- Item Header with Checkbox and Name -->
 											<div class="flex items-start gap-3">
 												<input
@@ -267,7 +267,7 @@
 											</div>
 
 											<!-- Quantity Controls -->
-											<div class="space-y-2" @click.stop>
+											<div class="flex flex-col gap-2" @click.stop>
 												<div class="flex items-center justify-between">
 													<span class="text-xs font-medium text-gray-600">{{ __('Return Qty:') }}</span>
 													<span class="text-xs text-gray-500">{{ __('of {0}', [item.qty], "item qty") }}</span>
@@ -304,7 +304,7 @@
 											<!-- Price -->
 											<div class="flex items-center justify-between px-1 pt-2 border-t border-gray-100">
 												<span class="text-xs text-gray-600">{{ __('Amount:') }}</span>
-												<div class="text-right">
+												<div class="text-end">
 													<p class="text-base font-bold text-gray-900">
 														{{ formatCurrency(item.rate * item.return_qty) }}
 													</p>
@@ -330,14 +330,14 @@
 									</Button>
 								</div>
 
-								<div class="space-y-2">
+								<div class="flex flex-col gap-2">
 									<div
 										v-for="(payment, index) in refundPayments"
 										:key="index"
 										class="bg-white border border-gray-200 rounded-lg p-3"
 									>
 										<!-- Mobile Layout -->
-										<div class="sm:hidden space-y-3">
+										<div class="sm:hidden flex flex-col gap-3">
 											<!-- Payment Method Row -->
 											<div class="flex items-center gap-3">
 												<div class="flex-shrink-0 text-3xl">
@@ -364,7 +364,7 @@
 											</div>
 
 											<!-- Amount Input Row -->
-											<div class="flex items-center gap-3 pl-1">
+											<div class="flex items-center gap-3 ps-1">
 												<label class="text-sm font-medium text-gray-600 w-20">{{ __('Amount:') }}</label>
 												<input
 													v-model.number="payment.amount"
@@ -373,7 +373,7 @@
 													min="0"
 													:max="returnTotal"
 													placeholder="0.00"
-													class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg text-lg text-right font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
+													class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg text-lg text-end font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
 												/>
 											</div>
 										</div>
@@ -405,7 +405,7 @@
 													min="0"
 													:max="returnTotal"
 													:placeholder="__('Amount')"
-													class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+													class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-end focus:outline-none focus:ring-2 focus:ring-blue-500"
 												/>
 											</div>
 											<button
@@ -444,13 +444,13 @@
 
 							<!-- Return Summary -->
 							<div v-if="selectedItems.length > 0" class="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4 sm:p-5 border border-red-200 shadow-sm">
-								<div class="flex items-center space-x-2 mb-3">
+								<div class="flex items-center gap-2 mb-3">
 									<svg class="w-5 h-5 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"/>
 									</svg>
 									<h3 class="text-sm font-bold text-gray-900">{{ __('Return Summary') }}</h3>
 								</div>
-								<div class="space-y-3">
+								<div class="flex flex-col gap-3">
 									<div class="flex justify-between items-center">
 										<span class="text-sm text-gray-600">{{ __('Items to Return:') }}</span>
 										<span class="px-2 py-1 bg-white rounded-lg text-sm font-bold text-gray-900 border border-red-200">
@@ -489,7 +489,7 @@
 					<p v-if="selectedItems.length > 0" class="text-xs text-gray-500 flex-shrink-0 order-2 sm:order-1">
 						{{ __('{0} item(s) selected', [selectedItems.length]) }}
 					</p>
-					<div class="flex gap-2 w-full sm:w-auto sm:ml-auto flex-shrink-0 order-1 sm:order-2">
+					<div class="flex gap-2 w-full sm:w-auto sm:ms-auto flex-shrink-0 order-1 sm:order-2">
 						<Button variant="subtle" @click="closeReturnModal" class="flex-1 sm:flex-initial">
 							<span class="text-sm">{{ __('Cancel') }}</span>
 						</Button>
@@ -515,7 +515,7 @@
 		:options="{ title: errorDialog.title, size: 'sm' }"
 	>
 		<template #body-content>
-			<div class="flex items-start space-x-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+			<div class="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
 				<svg class="h-5 w-5 flex-shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L4.34 16c-.77 1.333.192 3 1.732 3z" />
 				</svg>

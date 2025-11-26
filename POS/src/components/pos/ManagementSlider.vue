@@ -1,6 +1,6 @@
 <template>
 	<!-- Icon-Only Sidebar - Hidden on Mobile, Visible on Desktop -->
-	<div class="hidden lg:flex w-16 flex-shrink-0 bg-white border-r border-gray-200 flex-col items-center py-4 space-y-2">
+	<div class="hidden lg:flex w-16 flex-shrink-0 bg-white border-r border-gray-200 flex-col items-center py-4 flex flex-col gap-2">
 		<!-- Dashboard -->
 		<button
 			@click="handleMenuClick('dashboard')"
@@ -13,7 +13,7 @@
 			:title="__('Dashboard')"
 		>
 			<FeatherIcon name="layout" class="w-5 h-5" />
-			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+			<div class="absolute start-full ms-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
 				{{ __('Dashboard') }}
 			</div>
 		</button>
@@ -30,7 +30,7 @@
 			:title="__('Promotions')"
 		>
 			<FeatherIcon name="tag" class="w-5 h-5" />
-			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+			<div class="absolute start-full ms-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
 				{{ __('Promotions') }}
 			</div>
 		</button>
@@ -47,7 +47,7 @@
 			:title="__('Products')"
 		>
 			<FeatherIcon name="package" class="w-5 h-5" />
-			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+			<div class="absolute start-full ms-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
 				{{ __('Products') }}
 			</div>
 		</button>
@@ -64,7 +64,7 @@
 			:title="__('Reports')"
 		>
 			<FeatherIcon name="bar-chart-2" class="w-5 h-5" />
-			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+			<div class="absolute start-full ms-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
 				{{ __('Reports') }}
 			</div>
 		</button>
@@ -81,7 +81,7 @@
 			:title="__('Invoice Management')"
 		>
 			<FeatherIcon name="file-text" class="w-5 h-5" />
-			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+			<div class="absolute start-full ms-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
 				{{ __('Invoice Management') }}
 			</div>
 		</button>
@@ -101,7 +101,7 @@
 			:title="__('Settings')"
 		>
 			<FeatherIcon name="settings" class="w-5 h-5" />
-			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+			<div class="absolute start-full ms-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
 				{{ __('Settings') }}
 			</div>
 		</button>

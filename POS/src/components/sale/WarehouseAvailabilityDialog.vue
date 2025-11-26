@@ -16,7 +16,7 @@
 				>
 					<!-- Header -->
 					<div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-						<div class="flex items-center space-x-3">
+						<div class="flex items-center gap-3">
 							<div class="p-2 bg-blue-100 rounded-lg">
 								<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -65,7 +65,7 @@
 						</div>
 
 						<!-- Warehouses List -->
-						<div v-else-if="warehouses && warehouses.length > 0" class="space-y-3">
+						<div v-else-if="warehouses && warehouses.length > 0" class="flex flex-col gap-3">
 							<div
 								v-for="warehouse in warehouses"
 								:key="warehouse.warehouse"
@@ -76,7 +76,7 @@
 										<h3 class="font-medium text-gray-900">{{ warehouse.warehouse_name }}</h3>
 										<p class="text-sm text-gray-500 mt-0.5">{{ warehouse.company }}</p>
 									</div>
-									<div class="text-right">
+									<div class="text-end">
 										<div class="text-lg font-bold text-green-600">
 											{{ Math.floor(warehouse.available_qty) }} {{ uom }}
 										</div>
@@ -115,10 +115,10 @@
 						<div class="flex items-center justify-between">
 							<div class="text-sm text-gray-600">
 								<span class="font-medium">{{ __('Total Available:') }}</span>
-								<span class="ml-2 text-gray-900 font-semibold">
+								<span class="ms-2 text-gray-900 font-semibold">
 									{{ totalAvailable }} {{ uom }}
 								</span>
-								<span v-if="warehouses && warehouses.length > 0" class="ml-2 text-gray-500">
+								<span v-if="warehouses && warehouses.length > 0" class="ms-2 text-gray-500">
 									{{ warehouses.length === 1
 										? __('across 1 warehouse')
 										: __('across {0} warehouses', [warehouses.length])

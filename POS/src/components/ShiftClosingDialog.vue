@@ -1,14 +1,14 @@
 <template>
   <Dialog v-model="open" :options="{ title: __('Close POS Shift'), size: '4xl' }">
     <template #body-content>
-      <div class="space-y-3 md:space-y-6">
+      <div class="flex flex-col gap-3 md:flex flex-col gap-6">
         <div v-if="closingDataResource.loading" class="text-center py-8 md:py-12">
           <div class="inline-block animate-spin rounded-full h-12 w-12 md:h-16 md:w-16 border-b-4 border-blue-600"></div>
           <p class="mt-3 md:mt-4 text-base md:text-lg font-medium text-gray-600">{{ __('Loading shift data...') }}</p>
           <p class="text-xs md:text-sm text-gray-500">{{ __('Calculating totals and reconciliation...') }}</p>
         </div>
 
-        <div v-else-if="closingData" class="space-y-3 md:space-y-6">
+        <div v-else-if="closingData" class="flex flex-col gap-3 md:flex flex-col gap-6">
           <!-- Shift Summary Header (hidden in entry mode when hideExpectedAmount is enabled) -->
           <div v-if="shouldShowSummary" class="bg-white border border-gray-200 rounded-lg p-3 md:p-6 shadow-sm">
             <div class="flex flex-col sm:flex-row justify-between items-start gap-3 mb-3 md:mb-6">
@@ -16,7 +16,7 @@
                 <h3 class="text-sm md:text-base font-medium text-gray-900">{{ closingData.pos_profile }}</h3>
                 <p class="text-xs md:text-sm text-gray-500 mt-1">{{ formatDateTime(closingData.period_start_date) }}</p>
               </div>
-              <div class="text-left sm:text-right">
+              <div class="text-start sm:text-end">
                 <div class="text-xs text-gray-500 uppercase">{{ __('Duration') }}</div>
                 <div class="text-base md:text-lg font-semibold text-gray-900">{{ getShiftDuration() }}</div>
               </div>
@@ -79,7 +79,7 @@
               :aria-expanded="showInvoiceDetails"
               class="w-full px-3 py-3 md:px-6 md:py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
             >
-              <div class="text-left">
+              <div class="text-start">
                 <h3 class="text-sm md:text-lg font-medium text-gray-900">{{ __('Invoice Details') }}</h3>
                 <p class="text-xs md:text-sm text-gray-500">{{ __('{0} transactions • {1}', [
                   invoiceCount,
@@ -128,10 +128,10 @@
                 <table class="min-w-full divide-y divide-gray-200">
                   <thead class="bg-gray-50">
                     <tr>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Invoice') }}</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Customer') }}</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('Time') }}</th>
-                      <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ __('Amount') }}</th>
+                      <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">{{ __('Invoice') }}</th>
+                      <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">{{ __('Customer') }}</th>
+                      <th class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">{{ __('Time') }}</th>
+                      <th class="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase">{{ __('Amount') }}</th>
                     </tr>
                   </thead>
                   <tbody class="bg-white divide-y divide-gray-200">
@@ -147,7 +147,7 @@
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {{ formatTime(invoice.posting_date) }}
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-right">
+                      <td class="px-6 py-4 whitespace-nowrap text-end">
                         <span class="text-sm font-semibold text-gray-900">
                           {{ formatCurrency(invoice.grand_total) }}
                         </span>
@@ -156,10 +156,10 @@
                   </tbody>
                   <tfoot class="bg-gray-50">
                     <tr>
-                      <td colspan="3" class="px-6 py-4 text-right text-sm font-semibold text-gray-700">
+                      <td colspan="3" class="px-6 py-4 text-end text-sm font-semibold text-gray-700">
                         {{ __('Total:') }}
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-right">
+                      <td class="px-6 py-4 whitespace-nowrap text-end">
                         <span class="text-base font-bold text-gray-900">
                           {{ formatCurrency(closingData.grand_total) }}
                         </span>
@@ -189,7 +189,7 @@
                     {{ reconciliationMessage }}
                   </p>
                 </div>
-                <div v-if="shouldShowSummary && getTotalDifference !== 0" class="text-left sm:text-right">
+                <div v-if="shouldShowSummary && getTotalDifference !== 0" class="text-start sm:text-end">
                   <div class="text-xs text-gray-500 uppercase">{{ __('Total Variance') }}</div>
                   <div :class="[
                     'text-lg md:text-xl font-bold',
@@ -203,7 +203,7 @@
 
             <div class="p-3 md:p-6">
               <!-- ENTRY MODE: Simple blind input list (when hideExpectedAmount is enabled and not showing report) -->
-              <div v-if="isInEntryMode" class="space-y-3 md:space-y-4">
+              <div v-if="isInEntryMode" class="flex flex-col gap-3 md:flex flex-col gap-4">
                 <div
                   v-for="(payment, idx) in closingData.payment_reconciliation"
                   :key="idx"
@@ -240,7 +240,7 @@
               </div>
 
               <!-- REVIEW MODE: Full payment method cards (when not in entry mode) -->
-              <div v-else class="space-y-4 md:space-y-5">
+              <div v-else class="flex flex-col gap-4 md:flex flex-col gap-5">
                 <div
                   v-for="(payment, idx) in closingData.payment_reconciliation"
                   :key="idx"
@@ -361,11 +361,11 @@
                   <p class="text-xs md:text-sm text-gray-600">{{ __('Total Expected') }}</p>
                   <p class="text-base md:text-xl font-semibold text-gray-900">{{ formatCurrency(getTotalExpected) }}</p>
                 </div>
-                <div class="text-center md:text-right">
+                <div class="text-center md:text-end">
                   <p class="text-xs md:text-sm text-gray-600">{{ __('Total Actual') }}</p>
                   <p class="text-base md:text-xl font-semibold text-gray-900">{{ formatCurrency(getTotalActual) }}</p>
                 </div>
-                <div class="text-right">
+                <div class="text-end">
                   <p class="text-xs md:text-sm text-gray-600">{{ __('Net Variance') }}</p>
                   <p :class="[
                     'text-base md:text-xl font-bold',
@@ -385,13 +385,13 @@
               <h3 class="text-sm md:text-lg font-medium text-gray-900">{{ __('Tax Summary') }}</h3>
             </div>
             <div class="p-3 md:p-6">
-              <div class="space-y-2 md:space-y-3">
+              <div class="flex flex-col gap-2 md:flex flex-col gap-3">
                 <div v-for="(tax, idx) in closingData.taxes" :key="idx" class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                   <div>
                     <p class="text-xs md:text-sm font-medium text-gray-900">{{ tax.account_head }}</p>
                     <p class="text-xs text-gray-500">{{ formatQuantity(tax.rate) }}%</p>
                   </div>
-                  <div class="text-right">
+                  <div class="text-end">
                     <p class="text-sm md:text-base font-semibold text-gray-900">{{ formatCurrency(tax.amount) }}</p>
                   </div>
                 </div>
@@ -455,12 +455,12 @@
 
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 order-1 sm:order-2">
           <!-- Validation Warning (only in entry mode) -->
-          <div v-if="!canSubmit && closingData && !showSuccessReport" class="text-xs md:text-sm text-yellow-600 font-medium text-center sm:text-right">
+          <div v-if="!canSubmit && closingData && !showSuccessReport" class="text-xs md:text-sm text-yellow-600 font-medium text-center sm:text-end">
             {{ __('Please enter all closing amounts') }}
           </div>
 
           <!-- Success message (shown in report view) -->
-          <div v-if="showSuccessReport" class="text-xs md:text-sm text-green-600 font-medium text-center sm:text-right">
+          <div v-if="showSuccessReport" class="text-xs md:text-sm text-green-600 font-medium text-center sm:text-end">
             {{ __('✓ Shift closed successfully') }}
           </div>
 

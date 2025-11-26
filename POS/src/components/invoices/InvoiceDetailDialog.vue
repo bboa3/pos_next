@@ -9,12 +9,12 @@
 				<p class="mt-3 text-sm text-gray-500">{{ __('Loading invoice details...') }}</p>
 			</div>
 
-			<div v-else-if="invoiceData" class="space-y-6">
+			<div v-else-if="invoiceData" class="flex flex-col gap-6">
 				<!-- Invoice Header -->
 				<div class="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-5 border border-indigo-100">
 					<div class="flex items-start justify-between">
 						<div class="flex-1">
-							<div class="flex items-center space-x-3 mb-2">
+							<div class="flex items-center gap-3 mb-2">
 								<h3 class="text-xl font-bold text-gray-900">{{ invoiceData.name }}</h3>
 								<span
 									v-if="invoiceData.is_return"
@@ -35,19 +35,19 @@
 							<div class="grid grid-cols-2 gap-3 text-sm">
 								<div>
 									<span class="text-gray-600">{{ __('Customer:') }}</span>
-									<span class="ml-2 font-semibold text-gray-900">{{ invoiceData.customer_name || invoiceData.customer }}</span>
+									<span class="ms-2 font-semibold text-gray-900">{{ invoiceData.customer_name || invoiceData.customer }}</span>
 								</div>
 								<div>
 									<span class="text-gray-600">{{ __('Date:') }}</span>
-									<span class="ml-2 font-medium text-gray-900">{{ formatDate(invoiceData.posting_date) }} {{ formatTime(invoiceData.posting_time) }}</span>
+									<span class="ms-2 font-medium text-gray-900">{{ formatDate(invoiceData.posting_date) }} {{ formatTime(invoiceData.posting_time) }}</span>
 								</div>
 								<div v-if="invoiceData.return_against">
 									<span class="text-gray-600">{{ __('Return Against:') }}</span>
-									<span class="ml-2 font-medium text-gray-900">{{ invoiceData.return_against }}</span>
+									<span class="ms-2 font-medium text-gray-900">{{ invoiceData.return_against }}</span>
 								</div>
 							</div>
 						</div>
-						<div class="text-right ml-4">
+						<div class="text-end ms-4">
 							<div class="text-xs text-gray-500 mb-1">{{ __('Grand Total') }}</div>
 							<div class="text-2xl font-bold text-indigo-600">
 								{{ formatCurrency(invoiceData.grand_total) }}
@@ -59,7 +59,7 @@
 				<!-- Items Section -->
 				<div>
 					<h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-						<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
 						</svg>
 						{{ __('Items') }}
@@ -68,11 +68,11 @@
 						<table class="min-w-full divide-y divide-gray-200">
 							<thead class="bg-gray-50">
 								<tr>
-									<th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ __('Item') }}</th>
-									<th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ __('Qty') }}</th>
-									<th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ __('Rate') }}</th>
-									<th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ __('Discount') }}</th>
-									<th class="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ __('Amount') }}</th>
+									<th class="px-4 py-3 text-start text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ __('Item') }}</th>
+									<th class="px-4 py-3 text-end text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ __('Qty') }}</th>
+									<th class="px-4 py-3 text-end text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ __('Rate') }}</th>
+									<th class="px-4 py-3 text-end text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ __('Discount') }}</th>
+									<th class="px-4 py-3 text-end text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ __('Amount') }}</th>
 								</tr>
 							</thead>
 							<tbody class="bg-white divide-y divide-gray-200">
@@ -81,12 +81,12 @@
 										<div class="text-sm font-medium text-gray-900">{{ item.item_name }}</div>
 										<div class="text-xs text-gray-500">{{ item.item_code }}</div>
 									</td>
-									<td class="px-4 py-3 text-right text-sm text-gray-900">{{ item.qty }}</td>
-									<td class="px-4 py-3 text-right text-sm text-gray-900">{{ formatCurrency(item.rate) }}</td>
-									<td class="px-4 py-3 text-right text-sm text-gray-600">
+									<td class="px-4 py-3 text-end text-sm text-gray-900">{{ item.qty }}</td>
+									<td class="px-4 py-3 text-end text-sm text-gray-900">{{ formatCurrency(item.rate) }}</td>
+									<td class="px-4 py-3 text-end text-sm text-gray-600">
 										{{ item.discount_percentage ? `${item.discount_percentage}%` : '-' }}
 									</td>
-									<td class="px-4 py-3 text-right text-sm font-semibold text-gray-900">{{ formatCurrency(item.amount) }}</td>
+									<td class="px-4 py-3 text-end text-sm font-semibold text-gray-900">{{ formatCurrency(item.amount) }}</td>
 								</tr>
 							</tbody>
 						</table>
@@ -98,12 +98,12 @@
 					<!-- Payment Info -->
 					<div v-if="invoiceData.payments && invoiceData.payments.length > 0">
 						<h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-							<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
 							</svg>
 							{{ __('Payments') }}
 						</h4>
-						<div class="space-y-2">
+						<div class="flex flex-col gap-2">
 							<div
 								v-for="(payment, idx) in invoiceData.payments"
 								:key="idx"
@@ -121,7 +121,7 @@
 					<!-- Summary -->
 					<div>
 						<h4 class="text-sm font-semibold text-gray-700 mb-3">{{ __('Summary') }}</h4>
-						<div class="space-y-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
+						<div class="flex flex-col gap-2 bg-gray-50 p-4 rounded-lg border border-gray-200">
 							<div class="flex justify-between text-sm">
 								<span class="text-gray-600">{{ __('Net Total:') }}</span>
 								<span class="font-medium text-gray-900">{{ formatCurrency(invoiceData.net_total || invoiceData.total) }}</span>

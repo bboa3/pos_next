@@ -4,7 +4,7 @@
 		<!-- LEFT SIDE: Coupon List & Navigation -->
 		<div class="w-80 flex-shrink-0 border-r bg-gray-50 flex flex-col">
 			<!-- Search & Filter -->
-			<div class="p-4 bg-white border-b space-y-3">
+			<div class="p-4 bg-white border-b flex flex-col gap-3">
 				<FormControl
 					type="text"
 					v-model="searchQuery"
@@ -41,7 +41,7 @@
 			</div>
 
 			<!-- Create New Button -->
-			<div class="p-4 bg-white border-b space-y-2">
+			<div class="p-4 bg-white border-b flex flex-col gap-2">
 				<Button
 					v-if="permissions.create"
 					@click="handleCreateNew"
@@ -85,13 +85,13 @@
 				</div>
 
 				<!-- Coupon Items -->
-				<div v-else class="p-2 space-y-1">
+				<div v-else class="p-2 flex flex-col gap-1">
 					<button
 						v-for="coupon in filteredCoupons"
 						:key="coupon.name"
 						@click="handleSelectCoupon(coupon)"
 						:class="[
-							'w-full text-left p-3 rounded-md transition-all',
+							'w-full text-start p-3 rounded-md transition-all',
 							selectedCoupon?.name === coupon.name
 								? 'bg-blue-50 ring-2 ring-blue-500 ring-inset'
 								: 'hover:bg-gray-100'
@@ -99,7 +99,7 @@
 					>
 						<div class="flex items-start justify-between mb-2">
 							<div class="flex-1 min-w-0">
-								<div class="flex items-center space-x-2">
+								<div class="flex items-center gap-2">
 									<p :class="[
 										'text-sm font-medium truncate',
 										selectedCoupon?.name === coupon.name ? 'text-blue-900' : 'text-gray-900'
@@ -172,7 +172,7 @@
 					<!-- Form Header -->
 					<div class="flex items-center justify-between mb-6 pb-4 border-b">
 						<div>
-							<div class="flex items-center space-x-3">
+							<div class="flex items-center gap-3">
 								<h3 class="text-xl font-semibold text-gray-900">
 									{{ isCreating ? __('Create New Coupon') : __('Coupon Details') }}
 								</h3>
@@ -189,7 +189,7 @@
 								{{ isCreating ? __('Fill in the details to create a new coupon') : __('View and update coupon information') }}
 							</p>
 						</div>
-						<div class="flex items-center space-x-2">
+						<div class="flex items-center gap-2">
 							<Button
 								v-if="!isCreating && permissions.write"
 								@click="handleToggle"
@@ -234,11 +234,11 @@
 					</div>
 
 					<!-- Form Content -->
-					<div class="space-y-6">
+					<div class="flex flex-col gap-6">
 						<!-- Basic Information Card -->
 						<Card>
 							<div class="p-5">
-								<div class="flex items-center space-x-2 mb-4">
+								<div class="flex items-center gap-2 mb-4">
 									<FeatherIcon name="info" class="w-4 h-4 text-blue-600" />
 									<h4 class="text-sm font-semibold text-gray-900">{{ __('Basic Information') }}</h4>
 								</div>
@@ -334,7 +334,7 @@
 						<!-- Discount Configuration Card -->
 						<Card>
 							<div class="p-5">
-								<div class="flex items-center space-x-2 mb-4">
+								<div class="flex items-center gap-2 mb-4">
 									<FeatherIcon name="percent" class="w-4 h-4 text-purple-600" />
 									<h4 class="text-sm font-semibold text-gray-900">{{ __('Discount Configuration') }}</h4>
 								</div>
@@ -407,10 +407,10 @@
 										<span v-else>
 											{{ __('{0} off {1}', [formatCurrency(couponDetails.discount_amount), couponDetails.apply_on]) }}
 										</span>
-										<span v-if="couponDetails.min_amount" class="ml-2">
+										<span v-if="couponDetails.min_amount" class="ms-2">
 											{{ __('(Min: {0})', [formatCurrency(couponDetails.min_amount)]) }}
 										</span>
-										<span v-if="couponDetails.max_amount" class="ml-2">
+										<span v-if="couponDetails.max_amount" class="ms-2">
 											{{ __('(Max Discount: {0})', [formatCurrency(couponDetails.max_amount)]) }}
 										</span>
 									</p>
@@ -421,7 +421,7 @@
 						<!-- Validity & Usage Card -->
 						<Card>
 							<div class="p-5">
-								<div class="flex items-center space-x-2 mb-4">
+								<div class="flex items-center gap-2 mb-4">
 									<FeatherIcon name="calendar" class="w-4 h-4 text-green-600" />
 									<h4 class="text-sm font-semibold text-gray-900">{{ __('Validity & Usage') }}</h4>
 								</div>
@@ -451,7 +451,7 @@
 									</div>
 								</div>
 								<div class="mt-4">
-									<label class="flex items-center space-x-2">
+									<label class="flex items-center gap-2">
 										<input
 											type="checkbox"
 											v-model="form.one_use"
@@ -466,7 +466,7 @@
 						<!-- Coupon Status & Info (View Only) -->
 						<Card v-if="!isCreating">
 							<div class="p-5">
-								<div class="flex items-center space-x-2 mb-4">
+								<div class="flex items-center gap-2 mb-4">
 									<FeatherIcon name="activity" class="w-4 h-4 text-orange-600" />
 									<h4 class="text-sm font-semibold text-gray-900">{{ __('Coupon Status & Info') }}</h4>
 								</div>
@@ -510,7 +510,7 @@
 			@click.self="showDeleteConfirm = false"
 		>
 			<div class="bg-white rounded-lg shadow-2xl max-w-md w-full mx-4 p-6">
-				<div class="flex items-start space-x-4">
+				<div class="flex items-start gap-4">
 					<div class="flex-shrink-0">
 						<div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
 							<FeatherIcon name="alert-triangle" class="w-6 h-6 text-red-600" />
@@ -528,7 +528,7 @@
 						</p>
 					</div>
 				</div>
-				<div class="flex justify-end space-x-3 mt-6">
+				<div class="flex justify-end gap-3 mt-6">
 					<Button
 						@click="showDeleteConfirm = false"
 						variant="ghost"

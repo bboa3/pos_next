@@ -10,7 +10,7 @@
 	>
 		<div
 			v-if="showBadge"
-			class="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 shadow-md z-[250]"
+			class="lg:hidden fixed top-0 start-0 end-0 bg-white border-b border-gray-200 shadow-md z-[250]"
 			role="dialog"
 			aria-labelledby="install-banner-title"
 		>
@@ -26,7 +26,7 @@
 					</div>
 
 					<!-- Text Content -->
-					<div class="flex-1 min-w-0 mr-2">
+					<div class="flex-1 min-w-0 me-2">
 						<h3 id="install-banner-title" class="text-xs font-semibold mb-0.5 leading-tight" style="color: #111827;">
 							{{ __('Install POSNext') }}
 						</h3>

@@ -4,10 +4,10 @@
 		:options="{ title: item?.has_batch_no ? __('Select Batch Numbers') : __('Select Serial Numbers'), size: 'lg' }"
 	>
 		<template #body-content>
-			<div class="space-y-4">
+			<div class="flex flex-col gap-4">
 				<!-- Item Info -->
 				<div v-if="item" class="bg-blue-50 rounded-lg p-3">
-					<div class="flex items-center space-x-3">
+					<div class="flex items-center gap-3">
 						<div class="w-12 h-12 bg-gray-100 rounded-md flex-shrink-0 flex items-center justify-center overflow-hidden">
 							<img
 								v-if="item.image"
@@ -24,7 +24,7 @@
 							<h3 class="text-sm font-semibold text-gray-900">{{ item.item_name }}</h3>
 							<p class="text-xs text-gray-600">{{ item.item_code }}</p>
 						</div>
-						<div class="text-right">
+						<div class="text-end">
 							<p class="text-sm font-bold text-gray-900">Qty: {{ quantity }}</p>
 						</div>
 					</div>
@@ -35,7 +35,7 @@
 					<label class="block text-sm font-medium text-gray-700 mb-2">
 						{{ __('Select Batch Number') }}
 					</label>
-					<div class="space-y-2 max-h-80 overflow-y-auto">
+					<div class="flex flex-col gap-2 max-h-80 overflow-y-auto">
 						<div
 							v-for="batch in availableBatches"
 							:key="batch.batch_no"
@@ -50,7 +50,7 @@
 							<div class="flex items-start justify-between">
 								<div class="flex-1">
 									<h4 class="text-sm font-semibold text-gray-900">{{ batch.batch_no }}</h4>
-									<div class="flex items-center space-x-3 mt-1">
+									<div class="flex items-center gap-3 mt-1">
 										<span class="text-xs text-gray-600">
 											{{ __('Qty: {0}', [batch.qty]) }}
 										</span>
@@ -74,7 +74,7 @@
 					<label class="block text-sm font-medium text-gray-700 mb-2">
 						{{ __('Select Serial Numbers ({0}/{1})', [selectedSerials.length, quantity]) }}
 					</label>
-					<div class="space-y-2 max-h-80 overflow-y-auto">
+					<div class="flex flex-col gap-2 max-h-80 overflow-y-auto">
 						<div
 							v-for="serial in availableSerials"
 							:key="serial.serial_no"
@@ -118,7 +118,7 @@
 			</div>
 		</template>
 		<template #actions>
-			<div class="flex space-x-2">
+			<div class="flex gap-2">
 				<Button variant="subtle" @click="show = false">
 					{{ __('Cancel') }}
 				</Button>

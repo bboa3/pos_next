@@ -3,7 +3,7 @@
 		<template #body-content>
 			<div class="py-4">
 				<div v-if="item" class="mb-4">
-					<div class="flex items-center space-x-3 mb-3">
+					<div class="flex items-center gap-3 mb-3">
 						<div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center overflow-hidden flex-shrink-0">
 							<img v-if="item.image" :src="item.image" loading="lazy" :alt="item.item_name" class="w-full h-full object-cover" />
 							<svg v-else class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,11 +21,11 @@
 				<!-- Loading State -->
 				<div v-if="loading" class="flex items-center justify-center py-8">
 					<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-					<p class="ml-3 text-sm text-gray-500">{{ __('Loading options...') }}</p>
+					<p class="ms-3 text-sm text-gray-500">{{ __('Loading options...') }}</p>
 				</div>
 
 				<!-- Variant Options with Attribute Selection -->
-				<div v-else-if="mode === 'variant' && options.length > 0" class="space-y-4">
+				<div v-else-if="mode === 'variant' && options.length > 0" class="flex flex-col gap-4">
 					<!-- Display item image and info - show variant image when selected, otherwise template image -->
 					<div class="flex items-center justify-center mb-4">
 						<img
@@ -38,7 +38,7 @@
 					</div>
 
 					<!-- Group variants by attributes -->
-					<div v-for="(values, attrName) in variantAttributesMap" :key="attrName" class="space-y-2">
+					<div v-for="(values, attrName) in variantAttributesMap" :key="attrName" class="flex flex-col gap-2">
 						<label class="text-sm font-semibold text-gray-900">{{ attrName }}</label>
 						<div class="flex flex-wrap gap-2">
 							<button
@@ -64,7 +64,7 @@
 								<p class="text-sm font-semibold text-gray-900">{{ matchedVariant.label }}</p>
 								<p class="text-xs text-gray-500">{{ matchedVariant.description }}</p>
 							</div>
-							<div class="text-right">
+							<div class="text-end">
 								<p class="text-sm font-bold text-blue-600">{{ formatCurrency(matchedVariant.rate || 0) }}</p>
 								<p class="text-xs" :class="(matchedVariant.stock ?? matchedVariant.data?.actual_qty ?? 0) > 0 ? 'text-green-600' : 'text-red-600'">
 									 {{ __('Stock: {0}', [(matchedVariant.stock ?? matchedVariant.data?.actual_qty ?? 0)]) }}
@@ -80,13 +80,13 @@
 				</div>
 
 				<!-- UOM Options (List format) -->
-				<div v-else-if="mode === 'uom' && options.length > 0" class="space-y-2 max-h-96 overflow-y-auto">
+				<div v-else-if="mode === 'uom' && options.length > 0" class="flex flex-col gap-2 max-h-96 overflow-y-auto">
 					<button
 						v-for="(option, index) in options"
 						:key="index"
 						@click="selectOption(option)"
 						:class="[
-							'w-full text-left p-3 rounded-lg border-2 transition-all',
+							'w-full text-start p-3 rounded-lg border-2 transition-all',
 							selectedOption === option
 								? 'border-blue-500 bg-blue-50'
 								: 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
@@ -97,7 +97,7 @@
 								<p class="text-sm font-semibold text-gray-900">{{ option.label }}</p>
 								<p class="text-xs text-gray-500">{{ option.description }}</p>
 							</div>
-							<div class="text-right ml-3">
+							<div class="text-end ms-3">
 								<p class="text-sm font-bold text-blue-600">
 									{{ formatCurrency(option.rate || 0) }}
 								</p>
@@ -130,7 +130,7 @@
 					</p>
 					<div v-if="mode === 'variant'" class="mt-4">
 						<p class="text-xs text-gray-600 mb-2">{{ __('To create variants:') }}</p>
-						<ol class="text-xs text-gray-600 text-left max-w-xs mx-auto space-y-1">
+						<ol class="text-xs text-gray-600 text-start max-w-xs mx-auto flex flex-col gap-1">
 							<TranslatedHTML 
 								:tag="'li'"
 								:inner="__('1. Go to &lt;strong&gt;Item Master&lt;strong&gt; → &lt;strong&gt;{0}&lt;strong&gt;', [item?.item_code])"
@@ -151,7 +151,7 @@
 		</template>
 
 		<template #actions>
-			<div class="flex space-x-2 w-full">
+			<div class="flex gap-2 w-full">
 				<Button class="flex-1" variant="subtle" @click="cancel">
 					{{ __('Cancel') }}
 				</Button>

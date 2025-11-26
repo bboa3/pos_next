@@ -1,9 +1,9 @@
 <template>
   <Dialog v-model="open" :options="{ title: __('Open POS Shift'), size: 'xl' }">
     <template #body-content>
-      <div class="space-y-6">
+      <div class="flex flex-col gap-6">
         <!-- Step 1: Select POS Profile -->
-        <div v-if="step === 1" class="space-y-4">
+        <div v-if="step === 1" class="flex flex-col gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
               {{ __('Select POS Profile') }}
@@ -45,7 +45,7 @@
         </div>
 
         <!-- Step 2: Enter Opening Balances -->
-        <div v-if="step === 2" class="space-y-4">
+        <div v-if="step === 2" class="flex flex-col gap-4">
           <div class="mb-4">
             <div class="flex items-center justify-between">
               <div>
@@ -65,7 +65,7 @@
               <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
             </div>
 
-            <div v-else-if="paymentMethods.length > 0" class="space-y-3">
+            <div v-else-if="paymentMethods.length > 0" class="flex flex-col gap-3">
               <div
                 v-for="method in paymentMethods"
                 :key="method.name"
@@ -103,7 +103,7 @@
         </div>
 
         <!-- Step 3: Resume or Open New -->
-        <div v-if="step === 3" class="space-y-4">
+        <div v-if="step === 3" class="flex flex-col gap-4">
           <div class="text-center">
             <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
               <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,7 +128,7 @@
               </div>
             </div>
 
-            <div class="flex space-x-3 justify-center">
+            <div class="flex gap-3 justify-center">
               <Button variant="solid" theme="blue" @click="resumeShift">
                 {{ __('Resume Shift') }}
               </Button>
@@ -153,7 +153,7 @@
         </Button>
         <div v-else></div>
 
-        <div class="flex space-x-2">
+        <div class="flex gap-2">
           <Button variant="subtle" @click="closeDialog('cancelled')" :disabled="createShiftResource.loading">
             {{ __('Cancel') }}
           </Button>

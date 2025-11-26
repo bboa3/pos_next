@@ -59,12 +59,12 @@
 				</div>
 
 				<!-- Right Side: Controls -->
-				<div class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+				<div class="flex items-center gap-0.5 sm:gap-1 md:gap-2 flex-shrink-0">
 					<!-- WiFi/Offline Status -->
 					<button
 						@click="$emit('sync-click')"
 						:class="[
-							'p-2 sm:p-2 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors relative group touch-manipulation',
+							'p-1.5 sm:p-2 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors relative group touch-manipulation',
 							isSyncing ? 'animate-pulse' : ''
 						]"
 						:title="isOffline ? __('Offline ({0} pending)', [pendingInvoicesCount]) : __('Online - Click to sync')"
@@ -72,7 +72,7 @@
 					>
 						<svg
 							v-if="!isOffline"
-							class="w-5 h-5 text-green-600"
+							class="w-4 h-4 sm:w-5 sm:h-5 text-green-600"
 							fill="currentColor"
 							viewBox="0 0 24 24"
 						>
@@ -80,7 +80,7 @@
 						</svg>
 						<svg
 							v-else
-							class="w-5 h-5 text-orange-600"
+							class="w-4 h-4 sm:w-5 sm:h-5 text-orange-600"
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"
@@ -89,7 +89,7 @@
 						</svg>
 						<span
 							v-if="pendingInvoicesCount > 0"
-							class="absolute -top-1 -right-1 bg-orange-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md"
+							class="absolute -top-1 -end-1 bg-orange-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md"
 						>
 							{{ pendingInvoicesCount }}
 						</span>
@@ -100,11 +100,11 @@
 						<button
 							@click="showCacheTooltip = !showCacheTooltip"
 							@blur="handleBlur"
-							class="p-2 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors relative touch-manipulation"
+							class="p-1.5 sm:p-2 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors relative touch-manipulation"
 							:aria-label="getCacheAriaLabel()"
 						>
 							<svg
-								class="w-5 h-5 transition-colors"
+								class="w-4 h-4 sm:w-5 sm:h-5 transition-colors"
 								:class="getCacheIconColor()"
 								fill="currentColor"
 								viewBox="0 0 24 24"
@@ -113,7 +113,7 @@
 							</svg>
 							<svg
 								v-if="cacheSyncing || isRefreshing"
-								class="w-5 h-5 absolute top-2 left-2 animate-spin opacity-70"
+								class="w-4 h-4 sm:w-5 sm:h-5 absolute top-2 start-2 animate-spin opacity-70"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -128,11 +128,11 @@
 						<div
 							v-if="showCacheTooltip"
 							@mousedown.prevent
-							class="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-[999] w-[90vw] max-w-[240px] sm:max-w-[260px]"
+							class="absolute top-full start-1/2 -translate-x-1/2 mt-2 z-[999] w-[90vw] max-w-[240px] sm:max-w-[260px]"
 						>
 							<div class="bg-gray-900 text-white text-xs rounded-lg shadow-xl py-2 px-2.5 sm:px-3">
 								<!-- Arrow -->
-								<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-px">
+								<div class="absolute bottom-full start-1/2 -translate-x-1/2 mb-px">
 									<div class="border-[5px] sm:border-4 border-transparent border-b-gray-900"></div>
 								</div>
 
@@ -145,7 +145,7 @@
 								</div>
 
 								<!-- Stats -->
-								<div class="space-y-1 sm:space-y-1.5 text-[10px] sm:text-xs">
+								<div class="flex flex-col gap-1 sm:flex flex-col gap-1.5 text-[10px] sm:text-xs">
 									<div class="flex items-center justify-between">
 										<span class="text-gray-400">{{ __('Items:') }}</span>
 										<span class="font-semibold">{{ cacheStats?.items || 0 }}</span>

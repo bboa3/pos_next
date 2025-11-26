@@ -4,9 +4,9 @@
 		:options="{ title: __('Invoice History'), size: 'xl' }"
 	>
 		<template #body-content>
-			<div class="space-y-4">
+			<div class="flex flex-col gap-4">
 				<!-- Filters -->
-				<div class="flex items-center space-x-3">
+				<div class="flex items-center gap-3">
 					<div class="flex-1">
 						<Input
 							v-model="searchTerm"
@@ -39,7 +39,7 @@
 					<p class="mt-2 text-sm text-gray-500">{{ __('No invoices found') }}</p>
 				</div>
 
-				<div v-else class="space-y-2 max-h-96 overflow-y-auto">
+				<div v-else class="flex flex-col gap-2 max-h-96 overflow-y-auto">
 					<div
 						v-for="invoice in filteredInvoices"
 						:key="invoice.name"
@@ -47,7 +47,7 @@
 					>
 						<div class="flex items-start justify-between">
 							<div class="flex-1">
-								<div class="flex items-center space-x-2 mb-1">
+								<div class="flex items-center gap-2 mb-1">
 									<h4 class="text-sm font-semibold text-gray-900">
 										{{ invoice.name }}
 									</h4>
@@ -73,18 +73,18 @@
 										{{ invoice.status }}
 									</span>
 								</div>
-								<div class="flex items-center space-x-4 text-xs text-gray-600">
+								<div class="flex items-center gap-4 text-xs text-gray-600">
 									<span>{{ invoice.customer_name }}</span>
 									<span>{{ formatDateTime(invoice.posting_date, invoice.posting_time) }}</span>
 									<span v-if="invoice.items_count">{{ __('{0} item(s)', [invoice.items_count]) }}</span>
 								</div>
 							</div>
 
-							<div class="text-right ml-4">
+							<div class="text-end ms-4">
 								<p class="text-sm font-bold text-gray-900">
 									{{ formatCurrency(invoice.grand_total) }}
 								</p>
-								<div class="flex items-center space-x-1 mt-2">
+								<div class="flex items-center gap-1 mt-2">
 									<button
 										@click="viewInvoice(invoice)"
 										class="p-1.5 hover:bg-blue-50 rounded transition-colors"

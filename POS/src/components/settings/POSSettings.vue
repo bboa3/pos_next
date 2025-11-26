@@ -11,7 +11,7 @@
 				<div class="w-full max-w-5xl max-h-[90vh] bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col">
 					<!-- Header -->
 					<div class="flex items-center justify-between px-6 py-5 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
-						<div class="flex items-center space-x-3">
+						<div class="flex items-center gap-3">
 							<div class="p-2 bg-blue-100 rounded-lg">
 								<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -21,14 +21,14 @@
 							<div>
 								<h2 class="text-xl font-bold text-gray-900">{{ __('POS Settings') }}</h2>
 								<p class="text-sm text-gray-600 flex items-center mt-0.5">
-									<svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
 									</svg>
 									{{ settings.pos_profile || posProfile }}
 								</p>
 							</div>
 						</div>
-						<div class="flex items-center space-x-2">
+						<div class="flex items-center gap-2">
 							<Button
 								@click="loadSettings"
 								:loading="loading"
@@ -75,12 +75,12 @@
 						</div>
 
 						<!-- Settings Form -->
-						<div v-else-if="settings.pos_profile || posProfile" class="p-6 space-y-6">
+						<div v-else-if="settings.pos_profile || posProfile" class="p-6 flex flex-col gap-6">
 							<!-- Stock Settings Section - Prominent -->
 							<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
 								<div :class="stockSectionClasses.header">
 									<div class="flex items-center justify-between">
-										<div class="flex items-center space-x-3">
+										<div class="flex items-center gap-3">
 											<div :class="stockSectionClasses.iconContainer">
 												<svg :class="stockSectionClasses.icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.warehouse"/>
@@ -99,17 +99,17 @@
 										</div>
 									</div>
 								</div>
-								<div class="p-6 space-y-6">
+								<div class="p-6 flex flex-col gap-6">
 									<!-- Warehouse Selection -->
 									<div :class="warehouseSubsectionClasses.container">
-										<div class="flex items-center space-x-2 mb-4">
+										<div class="flex items-center gap-2 mb-4">
 											<svg :class="warehouseSubsectionClasses.icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.location"/>
 											</svg>
 											<h4 class="text-sm font-semibold text-gray-900">{{ __('Warehouse Selection') }}</h4>
 										</div>
 										<div v-if="warehouseOptions.length === 0" class="flex items-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-											<svg class="w-5 h-5 text-yellow-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<svg class="w-5 h-5 text-yellow-600 me-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.warning"/>
 											</svg>
 											<p class="text-sm text-yellow-800 font-medium">{{ __('Loading warehouses...') }}</p>
@@ -125,20 +125,20 @@
 
 									<!-- Stock Policy Settings -->
 									<div :class="stockPolicySubsectionClasses.container">
-										<div class="flex items-center space-x-2 mb-4">
+										<div class="flex items-center gap-2 mb-4">
 											<svg :class="stockPolicySubsectionClasses.icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.clipboard"/>
 											</svg>
 											<h4 class="text-sm font-semibold text-gray-900">{{ __('Stock Validation Policy') }}</h4>
 										</div>
-										<div class="space-y-3">
+										<div class="flex flex-col gap-3">
 											<CheckboxField
 												v-model="settings.allow_negative_stock"
 												:label="__('Allow Negative Stock')"
 												:description="__('Enable selling items even when stock reaches zero or below. Integrates with ERPNext stock settings.')"
 											/>
 											<div class="mt-3 p-3 bg-blue-100 rounded-md">
-												<div class="flex items-start space-x-2">
+												<div class="flex items-start gap-2">
 													<svg class="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.info"/>
 													</svg>
@@ -154,22 +154,22 @@
 
 									<!-- Background Stock Sync Settings -->
 									<div :class="stockSyncSubsectionClasses.container">
-										<div class="flex items-center space-x-2 mb-4">
+										<div class="flex items-center gap-2 mb-4">
 											<svg :class="stockSyncSubsectionClasses.icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
 											</svg>
 											<h4 class="text-sm font-semibold text-gray-900">{{ __('Background Stock Sync') }}</h4>
-											<div v-if="stockSyncStatus.enabled" class="ml-auto flex items-center px-2.5 py-1 bg-green-100 border border-green-300 rounded-full">
-												<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
+											<div v-if="stockSyncStatus.enabled" class="ms-auto flex items-center px-2.5 py-1 bg-green-100 border border-green-300 rounded-full">
+												<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse me-2"></div>
 												<span class="text-xs font-medium text-green-800">{{ __('Active') }}</span>
 											</div>
-											<div v-else class="ml-auto flex items-center px-2.5 py-1 bg-gray-100 border border-gray-300 rounded-full">
-												<div class="w-2 h-2 bg-gray-400 rounded-full mr-2"></div>
+											<div v-else class="ms-auto flex items-center px-2.5 py-1 bg-gray-100 border border-gray-300 rounded-full">
+												<div class="w-2 h-2 bg-gray-400 rounded-full me-2"></div>
 												<span class="text-xs font-medium text-gray-600">{{ __('Inactive') }}</span>
 											</div>
 										</div>
 
-										<div class="space-y-4">
+										<div class="flex flex-col gap-4">
 											<!-- Enable Sync Toggle -->
 											<CheckboxField
 												v-model="stockSyncEnabled"
@@ -178,7 +178,7 @@
 											/>
 
 											<!-- Sync Interval -->
-											<div v-if="stockSyncEnabled" class="pl-6 space-y-3 border-l-2 border-blue-200">
+											<div v-if="stockSyncEnabled" class="ps-6 flex flex-col gap-3 border-s-2 border-blue-200">
 												<NumberField
 													v-model="stockSyncIntervalSeconds"
 													:label="__('Sync Interval (seconds)')"
@@ -190,11 +190,11 @@
 
 												<!-- Sync Status Info -->
 												<div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-													<div class="flex items-start space-x-2">
+													<div class="flex items-start gap-2">
 														<svg class="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.info"/>
 														</svg>
-														<div class="text-xs text-blue-800 space-y-1">
+														<div class="text-xs text-blue-800 flex flex-col gap-1">
 															<TranslatedHTML 
 																:tag="'p'"
 																:inner="stockSyncStatus.enabled 
@@ -223,7 +223,7 @@
 
 												<!-- Network Usage Info -->
 												<div class="p-3 bg-gray-50 border border-gray-200 rounded-lg">
-													<div class="flex items-start space-x-2">
+													<div class="flex items-start gap-2">
 														<svg class="w-4 h-4 text-gray-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
 														</svg>
@@ -244,7 +244,7 @@
 							<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
 								<div :class="salesSectionClasses.header">
 									<div class="flex items-center justify-between">
-										<div class="flex items-center space-x-3">
+										<div class="flex items-center gap-3">
 											<div :class="salesSectionClasses.iconContainer">
 												<svg :class="salesSectionClasses.icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.shoppingCart"/>
@@ -263,16 +263,16 @@
 										</div>
 									</div>
 								</div>
-								<div class="p-6 space-y-6">
+								<div class="p-6 flex flex-col gap-6">
 									<!-- Pricing & Discounts -->
 									<div :class="pricingSubsectionClasses.container">
-										<div class="flex items-center space-x-2 mb-4">
+										<div class="flex items-center gap-2 mb-4">
 											<svg :class="pricingSubsectionClasses.icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.tag"/>
 											</svg>
 											<h4 class="text-sm font-semibold text-gray-900">{{ __('Pricing & Discounts') }}</h4>
 										</div>
-										<div class="space-y-3">
+										<div class="flex flex-col gap-3">
 											<CheckboxField
 												v-model="settings.tax_inclusive"
 												:label="__('Tax Inclusive')"
@@ -310,13 +310,13 @@
 
 									<!-- Sales Operations -->
 									<div :class="operationsSubsectionClasses.container">
-										<div class="flex items-center space-x-2 mb-4">
+										<div class="flex items-center gap-2 mb-4">
 											<svg :class="operationsSubsectionClasses.icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="icons.checkCircle"/>
 											</svg>
 											<h4 class="text-sm font-semibold text-gray-900">{{ __('Sales Operations') }}</h4>
 										</div>
-										<div class="space-y-3">
+										<div class="flex flex-col gap-3">
 											<CheckboxField
 												v-model="settings.allow_credit_sale"
 												:label="__('Allow Credit Sale')"
