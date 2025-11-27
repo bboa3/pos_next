@@ -47,17 +47,17 @@ export const usePOSSyncStore = defineStore("posSync", () => {
 		try {
 			await deletePending(invoiceId)
 			await loadPendingInvoices()
-			showSuccess("Offline invoice deleted successfully")
+			showSuccess(__("Offline invoice deleted successfully"))
 		} catch (error) {
 			console.error("Error deleting offline invoice:", error)
-			showError(error.message || "Failed to delete offline invoice")
+			showError(error.message || __("Failed to delete offline invoice"))
 			throw error
 		}
 	}
 
 	async function syncAllPending() {
 		if (isOffline.value) {
-			showWarning("Cannot sync while offline")
+			showWarning(__("Cannot sync while offline"))
 			return { success: 0, failed: 0, errors: [] }
 		}
 
@@ -65,7 +65,7 @@ export const usePOSSyncStore = defineStore("posSync", () => {
 			const result = await syncPending()
 
 			if (result.success > 0) {
-				showSuccess(`${result.success} invoice(s) synced successfully`)
+				showSuccess(__('{0} invoice(s) synced successfully', [result.success]))
 				await loadPendingInvoices()
 			}
 
@@ -114,7 +114,7 @@ export const usePOSSyncStore = defineStore("posSync", () => {
 				// to prevent duplicate fetches and improve performance.
 				// Only cache customers here (payment methods already loaded above).
 
-				showSuccess("Loading customers for offline use...")
+				showSuccess(__("Loading customers for offline use..."))
 
 				// Fetch customers (items handled by itemStore, payment methods already loaded above)
 				const customersData = await cacheCustomersFromServer(currentProfile.name)
@@ -122,18 +122,18 @@ export const usePOSSyncStore = defineStore("posSync", () => {
 				// Cache customers using composable
 				await cacheData([], customersData.customers || [])
 
-				showSuccess("Data is ready for offline use")
+				showSuccess(__("Data is ready for offline use"))
 			}
 		} catch (error) {
 			console.error("Error pre-loading data:", error)
-			showWarning("Some data may not be available offline")
+			showWarning(__("Some data may not be available offline"))
 		}
 	}
 
 	async function checkOfflineCacheAvailability() {
 		const cacheReady = await checkCacheReady()
 		if (!cacheReady && isOffline.value) {
-			showWarning("POS is offline without cached data. Please connect to sync.")
+			showWarning(__("POS is offline without cached data. Please connect to sync."))
 		}
 		return cacheReady
 	}

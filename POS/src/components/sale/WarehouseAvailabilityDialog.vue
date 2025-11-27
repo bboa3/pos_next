@@ -16,21 +16,21 @@
 				>
 					<!-- Header -->
 					<div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-						<div class="flex items-center space-x-3">
+						<div class="flex items-center gap-3">
 							<div class="p-2 bg-blue-100 rounded-lg">
 								<svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
 								</svg>
 							</div>
 							<div>
-								<h2 class="text-lg font-semibold text-gray-900">Warehouse Availability</h2>
+								<h2 class="text-lg font-semibold text-gray-900">{{ __('Warehouse Availability') }}</h2>
 								<p class="text-sm text-gray-500">{{ itemName }}</p>
 							</div>
 						</div>
 						<button
 							@click="$emit('close')"
 							class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-							aria-label="Close dialog"
+							:aria-label="__('Close dialog')"
 						>
 							<svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -44,7 +44,7 @@
 						<div v-if="loading" class="flex items-center justify-center py-12">
 							<div class="text-center">
 								<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-								<p class="mt-4 text-sm text-gray-500">Checking warehouse availability...</p>
+								<p class="mt-4 text-sm text-gray-500">{{ __('Checking warehouse availability...') }}</p>
 							</div>
 						</div>
 
@@ -59,13 +59,13 @@
 									@click="loadAvailability"
 									class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
 								>
-									Try Again
+									{{ __('Try Again') }}
 								</button>
 							</div>
 						</div>
 
 						<!-- Warehouses List -->
-						<div v-else-if="warehouses && warehouses.length > 0" class="space-y-3">
+						<div v-else-if="warehouses && warehouses.length > 0" class="flex flex-col gap-3">
 							<div
 								v-for="warehouse in warehouses"
 								:key="warehouse.warehouse"
@@ -76,7 +76,7 @@
 										<h3 class="font-medium text-gray-900">{{ warehouse.warehouse_name }}</h3>
 										<p class="text-sm text-gray-500 mt-0.5">{{ warehouse.company }}</p>
 									</div>
-									<div class="text-right">
+									<div class="text-end">
 										<div class="text-lg font-bold text-green-600">
 											{{ Math.floor(warehouse.available_qty) }} {{ uom }}
 										</div>
@@ -84,14 +84,14 @@
 											<span v-if="warehouse.reserved_qty > 0" class="text-orange-600">
 												{{ Math.floor(warehouse.reserved_qty) }} reserved
 											</span>
-											<span v-else>Available</span>
+											<span v-else>{{ __('Available') }}</span>
 										</div>
 									</div>
 								</div>
 								<!-- Actual vs Available -->
 								<div v-if="warehouse.actual_qty !== warehouse.available_qty" class="mt-2 pt-2 border-t border-gray-200">
 									<div class="flex items-center justify-between text-xs text-gray-600">
-										<span>Actual Stock:</span>
+										<span>{{ __('Actual Stock:') }}</span>
 										<span class="font-medium">{{ Math.floor(warehouse.actual_qty) }} {{ uom }}</span>
 									</div>
 								</div>
@@ -104,8 +104,8 @@
 								<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
 								</svg>
-								<p class="mt-4 text-sm text-gray-700 font-medium">No stock available</p>
-								<p class="mt-1 text-sm text-gray-500">This item is out of stock in all warehouses</p>
+								<p class="mt-4 text-sm text-gray-700 font-medium">{{ __('No stock available') }}</p>
+								<p class="mt-1 text-sm text-gray-500">{{ __('This item is out of stock in all warehouses') }}</p>
 							</div>
 						</div>
 					</div>
@@ -114,19 +114,22 @@
 					<div class="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
 						<div class="flex items-center justify-between">
 							<div class="text-sm text-gray-600">
-								<span class="font-medium">Total Available:</span>
-								<span class="ml-2 text-gray-900 font-semibold">
+								<span class="font-medium">{{ __('Total Available:') }}</span>
+								<span class="ms-2 text-gray-900 font-semibold">
 									{{ totalAvailable }} {{ uom }}
 								</span>
-								<span v-if="warehouses && warehouses.length > 0" class="ml-2 text-gray-500">
-									across {{ warehouses.length }} {{ warehouses.length === 1 ? 'warehouse' : 'warehouses' }}
+								<span v-if="warehouses && warehouses.length > 0" class="ms-2 text-gray-500">
+									{{ warehouses.length === 1
+										? __('across 1 warehouse')
+										: __('across {0} warehouses', [warehouses.length])
+									}}
 								</span>
 							</div>
 							<button
 								@click="$emit('close')"
 								class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
 							>
-								Close
+								{{ __('Close') }}
 							</button>
 						</div>
 					</div>

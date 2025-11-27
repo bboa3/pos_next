@@ -15,7 +15,7 @@
 		</svg>
 		<span
 			v-if="badge"
-			class="absolute -top-1 -right-1 bg-orange-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center"
+			class="absolute -top-1 -end-1 bg-orange-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center"
 		>
 			{{ badge }}
 		</span>
@@ -74,16 +74,16 @@ const props = defineProps({
 defineEmits(["click"])
 
 const buttonClasses = computed(() => {
-	const base = "p-2 hover:bg-gray-50 rounded-lg transition-colors group"
+	const base = "p-1.5 sm:p-2 hover:bg-gray-50 rounded-lg transition-colors group touch-manipulation"
 	const animation = props.animate ? "animate-pulse" : ""
 	return `${base} ${animation}`.trim()
 })
 
 const iconClasses = computed(() => {
 	const sizes = {
-		sm: "w-4 h-4",
-		md: "w-5 h-5",
-		lg: "w-6 h-6",
+		sm: "w-3.5 h-3.5 sm:w-4 sm:h-4",
+		md: "w-4 h-4 sm:w-5 sm:h-5",
+		lg: "w-5 h-5 sm:w-6 sm:h-6",
 	}
 
 	const variants = {

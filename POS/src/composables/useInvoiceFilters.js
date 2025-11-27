@@ -255,21 +255,21 @@ export function useInvoiceFilters(invoices) {
  * Exported for use in filter UI components
  */
 export const DATE_PRESETS = [
-	{ label: "Today", value: "today", action: "setToday" },
-	{ label: "Yesterday", value: "yesterday", action: "setYesterday" },
-	{ label: "This Week", value: "week", action: "setThisWeek" },
-	{ label: "This Month", value: "month", action: "setThisMonth" },
-	{ label: "Last 7 Days", value: "last7", action: "setLast7Days" },
-	{ label: "Last 30 Days", value: "last30", action: "setLast30Days" },
+	{ label: __("Today"), value: "today", action: "setToday" },
+	{ label: __("Yesterday"), value: "yesterday", action: "setYesterday" },
+	{ label: __("This Week"), value: "week", action: "setThisWeek" },
+	{ label: __("This Month"), value: "month", action: "setThisMonth" },
+	{ label: __("Last 7 Days"), value: "last7", action: "setLast7Days" },
+	{ label: __("Last 30 Days"), value: "last30", action: "setLast30Days" },
 ]
 
 /**
  * Payment status options
  */
 export const PAYMENT_STATUS_OPTIONS = [
-	{ label: "All Status", value: "" },
-	{ label: "Paid", value: "Paid" },
-	{ label: "Unpaid", value: "Unpaid" },
-	{ label: "Partly Paid", value: "Partly Paid" },
-	{ label: "Overdue", value: "Overdue" },
+	{ label: __("All Status"), value: "" },
+	{ label: __("Paid"), value: "Paid" },
+	{ label: __("Unpaid"), value: "Unpaid" },
+	{ label: __("Partly Paid"), value: "Partly Paid" },
+	{ label: __("Overdue"), value: "Overdue" },
 ]

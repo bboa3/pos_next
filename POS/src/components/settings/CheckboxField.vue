@@ -1,5 +1,5 @@
 <template>
-	<div class="flex items-start space-x-2.5 p-2 rounded hover:bg-gray-50 transition-colors">
+	<div class="flex items-start gap-2.5 p-2 rounded hover:bg-gray-50 transition-colors">
 		<div class="flex items-center h-5">
 			<input
 				:id="fieldId"

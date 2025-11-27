@@ -1,12 +1,12 @@
 <template>
-  <Dialog v-model="open" :options="{ title: 'Open POS Shift', size: 'xl' }">
+  <Dialog v-model="open" :options="{ title: __('Open POS Shift'), size: 'xl' }">
     <template #body-content>
-      <div class="space-y-6">
+      <div class="flex flex-col gap-6">
         <!-- Step 1: Select POS Profile -->
-        <div v-if="step === 1" class="space-y-4">
+        <div v-if="step === 1" class="flex flex-col gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
-              Select POS Profile
+              {{ __('Select POS Profile') }}
             </label>
             <div v-if="profilesResource.loading" class="text-center py-4">
               <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -35,7 +35,7 @@
               </div>
             </div>
             <div v-else class="text-center py-8 text-gray-500">
-              <p>No POS Profiles available. Please contact your administrator.</p>
+              <p>{{ __('No POS Profiles available. Please contact your administrator.') }}</p>
             </div>
           </div>
 
@@ -45,27 +45,27 @@
         </div>
 
         <!-- Step 2: Enter Opening Balances -->
-        <div v-if="step === 2" class="space-y-4">
+        <div v-if="step === 2" class="flex flex-col gap-4">
           <div class="mb-4">
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="font-medium text-gray-900">{{ selectedProfile?.name }}</h3>
                 <p class="text-sm text-gray-500">{{ selectedProfile?.company }}</p>
               </div>
-              <Button variant="subtle" @click="step = 1">Change Profile</Button>
+              <Button variant="subtle" @click="step = 1">{{ __('Change Profile') }}</Button>
             </div>
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-3">
-              Opening Balance (Optional)
+              {{ __('Opening Balance (Optional)') }}
             </label>
 
             <div v-if="dialogDataResource.loading" class="text-center py-4">
               <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
             </div>
 
-            <div v-else-if="paymentMethods.length > 0" class="space-y-3">
+            <div v-else-if="paymentMethods.length > 0" class="flex flex-col gap-3">
               <div
                 v-for="method in paymentMethods"
                 :key="method.name"
@@ -89,7 +89,7 @@
             </div>
 
             <div v-else class="text-center py-4 text-gray-500">
-              <p class="text-sm">No payment methods configured for this POS Profile</p>
+              <p class="text-sm">{{ __('No payment methods configured for this POS Profile') }}</p>
             </div>
           </div>
 
@@ -103,28 +103,35 @@
         </div>
 
         <!-- Step 3: Resume or Open New -->
-        <div v-if="step === 3" class="space-y-4">
+        <div v-if="step === 3" class="flex flex-col gap-4">
           <div class="text-center">
             <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
               <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-2">Existing Shift Found</h3>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('Existing Shift Found') }}</h3>
             <p class="text-sm text-gray-500 mb-6">
-              You have an open shift. Would you like to resume it or close it and open a new one?
+              {{ __('You have an open shift. Would you like to resume it or close it and open a new one?') }}
             </p>
 
             <div v-if="existingShift" class="bg-gray-50 rounded-lg p-4 mb-6">
               <div class="text-sm text-gray-600">
-                <p><strong>POS Profile:</strong> {{ existingShift.pos_profile?.name }}</p>
-                <p><strong>Opened:</strong> {{ formatDateTime(existingShift.pos_opening_shift?.period_start_date) }}</p>
+                  <TranslatedHTML
+                    :tag="'p'"
+                    :inner="__('&lt;strong&gt;POS Profile:&lt;/strong&gt; {0}', [existingShift.pos_profile?.name])"
+                  />
+                  <div class="h-2"></div>
+                  <TranslatedHTML
+                    :tag="'p'"
+                    :inner="__('&lt;strong&gt;Opened:&lt;/strong&gt; {0}', [formatDateTime(existingShift.pos_opening_shift?.period_start_date)])"
+                  />
               </div>
             </div>
 
-            <div class="flex space-x-3 justify-center">
+            <div class="flex gap-3 justify-center">
               <Button variant="solid" theme="blue" @click="resumeShift">
-                Resume Shift
+                {{ __('Resume Shift') }}
               </Button>
               <Button
                 variant="subtle"
@@ -132,7 +139,7 @@
                 @click="closeAndOpenNew"
                 :disabled="closingExistingShift"
               >
-                Close & Open New
+                {{ __('Close & Open New') }}
               </Button>
             </div>
           </div>
@@ -143,13 +150,13 @@
     <template #actions>
       <div class="flex justify-between w-full">
         <Button v-if="step > 1 && step !== 3" variant="subtle" @click="step--">
-          Back
+          {{ __('Back') }}
         </Button>
         <div v-else></div>
 
-        <div class="flex space-x-2">
+        <div class="flex gap-2">
           <Button variant="subtle" @click="closeDialog('cancelled')" :disabled="createShiftResource.loading">
-            Cancel
+            {{ __('Cancel') }}
           </Button>
           <Button
             v-if="step === 1"
@@ -158,7 +165,7 @@
             @click="nextStep"
             :disabled="!selectedProfile"
           >
-            Next
+            {{ __('Next') }}
           </Button>
           <Button
             v-if="step === 2"
@@ -167,7 +174,7 @@
             @click="openShift"
             :loading="createShiftResource.loading"
           >
-            Open Shift
+            {{ __('Open Shift') }}
           </Button>
         </div>
       </div>
@@ -189,6 +196,7 @@ import { computed, ref, watch } from "vue"
 import { useShift } from "../composables/useShift"
 import { useFormatters } from "../composables/useFormatters"
 import ShiftClosingDialog from "./ShiftClosingDialog.vue"
+import TranslatedHTML from "./common/TranslatedHTML.vue"
 
 const props = defineProps({
 	modelValue: Boolean,

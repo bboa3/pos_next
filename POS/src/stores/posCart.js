@@ -130,7 +130,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 	function applyDiscountToCart(discount) {
 		applyDiscount(discount)
 		appliedCoupon.value = discount
-		showSuccess(`${discount.name} applied successfully`)
+		showSuccess(__('{0} applied successfully', [discount.name]))
 	}
 
 	function removeDiscountFromCart() {
@@ -138,7 +138,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		appliedOffers.value = []
 		removeDiscount()
 		appliedCoupon.value = null
-		showSuccess("Discount has been removed from cart")
+		showSuccess(__("Discount has been removed from cart"))
 	}
 
 	function buildInvoiceDataForOffers(currentProfile) {
@@ -302,7 +302,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		}
 
 		if (!posProfile.value || invoiceItems.value.length === 0) {
-			showWarning("Add items to the cart before applying an offer.")
+			showWarning(__("Add items to the cart before applying an offer."))
 			offersDialogRef?.resetApplyingState()
 			return false
 		}
@@ -349,7 +349,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 					}
 				}
 
-				showWarning("Your cart doesn't meet the requirements for this offer.")
+				showWarning(__("Your cart doesn't meet the requirements for this offer."))
 				offersDialogRef?.resetApplyingState()
 				return false
 			}
@@ -376,12 +376,12 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			})
 			appliedOffers.value = updatedEntries
 
-			showSuccess(`${offer.title || offer.name} applied successfully`)
+			showSuccess(__('{0} applied successfully', [(offer.title || offer.name)]))
 
 			return true
 		} catch (error) {
 			console.error("Error applying offer:", error)
-			showError("Failed to apply offer. Please try again.")
+			showError(__("Failed to apply offer. Please try again."))
 			offersDialogRef?.resetApplyingState()
 			return false
 		}
@@ -401,7 +401,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			appliedOffers.value = []
 			processFreeItems([]) // Remove all free items
 			removeDiscount()
-			showSuccess("Offer has been removed from cart")
+			showSuccess(__("Offer has been removed from cart"))
 			offersDialogRef?.resetApplyingState()
 			return true
 		}
@@ -416,7 +416,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			appliedOffers.value = []
 			processFreeItems([]) // Remove all free items
 			removeDiscount()
-			showSuccess("Offer has been removed from cart")
+			showSuccess(__("Offer has been removed from cart"))
 			offersDialogRef?.resetApplyingState()
 			return true
 		}
@@ -441,12 +441,12 @@ export const usePOSCartStore = defineStore("posCart", () => {
 				remainingCodes.includes(entry.code),
 			)
 
-			showSuccess("Offer has been removed from cart")
+			showSuccess(__("Offer has been removed from cart"))
 			offersDialogRef?.resetApplyingState()
 			return true
 		} catch (error) {
 			console.error("Error removing offer:", error)
-			showError("Failed to update cart after removing offer.")
+			showError(__("Failed to update cart after removing offer."))
 			offersDialogRef?.resetApplyingState()
 			return false
 		}
@@ -592,10 +592,10 @@ export const usePOSCartStore = defineStore("posCart", () => {
 
 			recalculateItem(cartItem)
 
-			showSuccess(`Unit changed to ${newUom}`)
+			showSuccess(__('Unit changed to {0}', [newUom]))
 		} catch (error) {
 			console.error("Error changing UOM:", error)
-			showError("Failed to update UOM. Please try again.")
+			showError(__("Failed to update UOM. Please try again."))
 		}
 	}
 
@@ -665,12 +665,12 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			// Rebuild cache after item update to ensure totals are accurate
 			rebuildIncrementalCache()
 
-			showSuccess(`${cartItem.item_name} updated successfully`)
+			showSuccess(__('{0} updated successfully', [cartItem.item_name]))
 
 			return true
 		} catch (error) {
 			console.error("Error updating item details:", error)
-			showError(parseError(error) || "Failed to update item. Please try again.")
+			showError(parseError(error) || __("Failed to update item. Please try again."))
 			return false
 		}
 	}

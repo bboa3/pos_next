@@ -263,7 +263,7 @@ export const useItemSearchStore = defineStore("itemSearch", () => {
 		},
 		auto: false,
 		onSuccess(data) {
-			itemGroups.value = data?.message || data || []
+			itemGroups.value = (data?.message || data || [])
 		},
 		onError(error) {
 			log.error("Error fetching item groups", error)

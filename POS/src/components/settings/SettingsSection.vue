@@ -5,7 +5,7 @@
 			@click="isCollapsed = !isCollapsed"
 			class="w-full px-5 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
 		>
-			<div class="flex items-center space-x-2.5">
+			<div class="flex items-center gap-2.5">
 				<div class="p-1.5 bg-blue-50 rounded">
 					<component :is="getIcon(icon)" class="w-4 h-4 text-blue-600" />
 				</div>
@@ -21,7 +21,7 @@
 			</svg>
 		</button>
 		<div v-else class="px-5 py-3 border-b border-gray-100">
-			<div class="flex items-center space-x-2.5">
+			<div class="flex items-center gap-2.5">
 				<div class="p-1.5 bg-blue-50 rounded">
 					<component :is="getIcon(icon)" class="w-4 h-4 text-blue-600" />
 				</div>

@@ -5,7 +5,7 @@
                         <!-- Inline Customer Search/Selection -->
                         <div ref="customerSearchContainer" class="relative">
                                 <div v-if="customer" class="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
-                                        <div class="flex items-center space-x-3 min-w-0 flex-1">
+                                        <div class="flex items-center gap-3 min-w-0 flex-1">
                                                 <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
                                                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -26,7 +26,7 @@
 							type="button"
 							@click="$emit('create-customer', '')"
 							class="flex items-center justify-center w-10 h-10 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-xl text-white transition-colors shadow-sm hover:shadow touch-manipulation flex-shrink-0"
-							title="Create new customer"
+							:title="__('Create new customer')"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
@@ -37,7 +37,7 @@
 							type="button"
 							@click="clearCustomer"
 							class="flex items-center justify-center w-10 h-10 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl flex-shrink-0 transition-colors touch-manipulation"
-							title="Remove customer"
+							:title="__('Remove customer')"
 						>
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -50,7 +50,7 @@
 						<!-- Search Input -->
 						<div class="relative flex-1">
 							<!-- Search Icon Prefix -->
-							<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+							<div class="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none">
 								<svg v-if="customersLoaded" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
 								</svg>
@@ -64,11 +64,11 @@
 								:value="customerSearch"
 								@input="handleSearchInput"
 								type="text"
-								placeholder="Search or add customer..."
-								class="w-full h-11 pl-11 pr-4 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-shadow"
+								:placeholder="__('Search or add customer...')"
+								class="w-full h-11 ps-11 pe-4 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-shadow"
 								:disabled="!customersLoaded"
 								@keydown="handleKeydown"
-								aria-label="Search customer in cart"
+								:aria-label="__('Search customer in cart')"
 							/>
 						</div>
 
@@ -77,8 +77,8 @@
 							type="button"
 							@click="createNewCustomer"
 							class="flex items-center justify-center w-11 h-11 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-xl text-white transition-colors shadow-sm hover:shadow touch-manipulation flex-shrink-0"
-							title="Create new customer"
-							aria-label="Create new customer"
+							:title="__('Create new customer')"
+							:aria-label="__('Create new customer')"
 						>
 							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
@@ -99,7 +99,7 @@
 								:key="cust.name"
 								@click="selectCustomer(cust)"
 								:class="[
-									'w-full text-left px-3 py-2.5 flex items-center space-x-2 border-b border-gray-100 last:border-0 transition-colors duration-75',
+									'w-full text-start px-3 py-2.5 flex items-center gap-2 border-b border-gray-100 last:border-0 transition-colors duration-75',
 									index === selectedIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
 								]"
 							>
@@ -116,7 +116,7 @@
 						<!-- No Results + Create New Option -->
 						<div v-else-if="customerSearch.trim().length >= 2">
 							<div class="px-3 py-2 text-center text-xs font-medium text-gray-700 border-b border-gray-100">
-								No results for "{{ customerSearch }}"
+								{{ __('No results for "{0}"', [customerSearch]) }}
 							</div>
 						</div>
 
@@ -125,7 +125,7 @@
 							type="button"
 							v-if="customerSearch.trim().length >= 2"
 							@click="createNewCustomer"
-							class="w-full text-left px-3 py-2.5 hover:bg-green-50 flex items-center space-x-2 transition-colors border-t border-gray-200"
+							class="w-full text-start px-3 py-2.5 hover:bg-green-50 flex items-center gap-2 transition-colors border-t border-gray-200"
 						>
 							<div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
 								<svg class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +133,7 @@
 								</svg>
 							</div>
 							<div class="flex-1">
-								<p class="text-xs font-medium text-green-700">Create New Customer</p>
+								<p class="text-xs font-medium text-green-700">{{  __('Create New Customer') }}</p>
 								<p class="text-[10px] text-green-600">"{{ customerSearch }}"</p>
 							</div>
 						</button>
@@ -145,17 +145,17 @@
                 <!-- Action Buttons Section -->
                 <div v-if="items.length > 0" class="px-3 py-3 border-b border-gray-200 bg-white">
                         <div class="flex items-center justify-between mb-2.5">
-                                <h2 class="text-sm font-bold text-gray-900">Cart Items</h2>
+                                <h2 class="text-sm font-bold text-gray-900">{{ __('Cart Items') }}</h2>
                                 <button
                                         @click="$emit('clear-cart')"
                                         class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors touch-manipulation"
                                         type="button"
-                                        title="Clear all items"
+                                        :title="__('Clear all items')"
                                 >
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V5a2 2 0 00-2-2h-2a2 2 0 00-2 2v2M4 7h16"/>
                                         </svg>
-                                        <span>Clear</span>
+                                        <span>{{ __('Clear') }}</span>
                                 </button>
                         </div>
 
@@ -166,13 +166,13 @@
                                         type="button"
                                         @click="$emit('show-offers')"
                                         class="relative flex-1 flex items-center justify-between px-3 py-2.5 rounded-xl bg-white border border-gray-200 hover:border-green-400 hover:bg-green-50 hover:shadow-sm transition-all min-w-0 touch-manipulation"
-                                        :aria-label="'View all available offers'"
+                                        :aria-label="__('View all available offers')"
                                 >
                                         <div class="flex items-center gap-2 min-w-0 flex-1">
                                                 <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                                 </svg>
-                                                <span class="text-xs font-semibold text-gray-700 truncate">Offers</span>
+                                                <span class="text-xs font-semibold text-gray-700 truncate">{{ __('Offers') }}</span>
                                         </div>
                                         <span
                                                 v-if="appliedOfferCount > 0 || offersStore.autoEligibleCount > 0"
@@ -187,13 +187,13 @@
                                         type="button"
                                         @click="$emit('apply-coupon')"
                                         class="relative flex-1 flex items-center justify-between px-3 py-2.5 rounded-xl bg-white border border-gray-200 hover:border-purple-400 hover:bg-purple-50 hover:shadow-sm transition-all min-w-0 touch-manipulation"
-                                        :aria-label="'Apply coupon code'"
+                                        :aria-label="__('Apply coupon code')"
                                 >
                                         <div class="flex items-center gap-2 min-w-0 flex-1">
                                                 <svg class="w-4 h-4 text-purple-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                                         <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd"/>
                                                 </svg>
-                                                <span class="text-xs font-semibold text-gray-700 truncate">Coupon</span>
+                                                <span class="text-xs font-semibold text-gray-700 truncate">{{ __('Coupon') }}</span>
                                         </div>
                                         <span v-if="availableGiftCards.length > 0" class="bg-purple-600 text-white text-xs font-bold rounded-full px-2 py-0.5 flex-shrink-0 min-w-[20px] text-center">
                                                 {{ availableGiftCards.length }}
@@ -221,9 +221,9 @@
 						/>
 					</svg>
 				</div>
-				<p class="text-xs sm:text-sm font-semibold text-gray-900 mb-1">Your cart is empty</p>
+				<p class="text-xs sm:text-sm font-semibold text-gray-900 mb-1">{{ __('Your cart is empty') }}</p>
 				<p class="text-[10px] sm:text-xs text-gray-500 mb-5 sm:mb-6">
-					Select items to start or choose a quick action
+					{{ __('Select items to start or choose a quick action') }}
 				</p>
 
 				<!-- Quick Actions Grid -->
@@ -233,7 +233,7 @@
 						type="button"
 						@click="$emit('view-shift')"
 						class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100 transition-colors shadow-sm hover:shadow touch-manipulation group"
-						title="View current shift details"
+						:title="__('View current shift details')"
 					>
 						<div class="w-9 h-9 sm:w-10 sm:h-10 bg-blue-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-blue-100 transition-colors">
 							<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -241,7 +241,7 @@
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
 							</svg>
 						</div>
-						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">View Shift</span>
+						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{ __('View Shift') }}</span>
 					</button>
 
 					<!-- Draft Invoices -->
@@ -249,14 +249,14 @@
 						type="button"
 						@click="$emit('show-drafts')"
 						class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 active:bg-purple-100 transition-colors shadow-sm hover:shadow touch-manipulation group"
-						title="View draft invoices"
+						:title="__('View draft invoices')"
 					>
 						<div class="w-9 h-9 sm:w-10 sm:h-10 bg-purple-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-purple-100 transition-colors">
 							<svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
 							</svg>
 						</div>
-						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">Draft Invoices</span>
+						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{ __('Draft Invoices') }}</span>
 					</button>
 
 					<!-- Invoice History -->
@@ -264,14 +264,14 @@
 						type="button"
 						@click="$emit('show-history')"
 						class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100 transition-colors shadow-sm hover:shadow touch-manipulation group"
-						title="View invoice history"
+						:title="__('View invoice history')"
 					>
 						<div class="w-9 h-9 sm:w-10 sm:h-10 bg-gray-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-gray-100 transition-colors">
 							<svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
 							</svg>
 						</div>
-						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">Invoice History</span>
+						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{ __('Invoice History') }}</span>
 					</button>
 
 					<!-- Return Invoice -->
@@ -279,14 +279,14 @@
 						type="button"
 						@click="$emit('show-return')"
 						class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:border-red-300 hover:bg-red-50 active:bg-red-100 transition-colors shadow-sm hover:shadow touch-manipulation group"
-						title="Process return invoice"
+						:title="__('Process return invoice')"
 					>
 						<div class="w-9 h-9 sm:w-10 sm:h-10 bg-red-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-red-100 transition-colors">
 							<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
 							</svg>
 						</div>
-						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">Return Invoice</span>
+						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{ __('Return Invoice') }}</span>
 					</button>
 
 					<!-- Close Shift -->
@@ -294,14 +294,14 @@
 						type="button"
 						@click="$emit('close-shift')"
 						class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:border-orange-300 hover:bg-orange-50 active:bg-orange-100 transition-colors shadow-sm hover:shadow touch-manipulation group"
-						title="Close current shift"
+						:title="__('Close current shift')"
 					>
 						<div class="w-9 h-9 sm:w-10 sm:h-10 bg-orange-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-orange-100 transition-colors">
 							<svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
 							</svg>
 						</div>
-						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">Close Shift</span>
+						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{ __('Close Shift') }}</span>
 					</button>
 
 					<!-- Create Customer -->
@@ -309,19 +309,19 @@
 						type="button"
 						@click="$emit('create-customer', '')"
 						class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 transition-colors shadow-sm hover:shadow touch-manipulation group"
-						title="Create new customer"
+						:title="__('Create new customer')"
 					>
 						<div class="w-9 h-9 sm:w-10 sm:h-10 bg-green-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-green-100 transition-colors">
 							<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
 							</svg>
 						</div>
-						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">Create Customer</span>
+						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{ __('Create Customer') }}</span>
 					</button>
 				</div>
 			</div>
 
-			<div v-else class="space-y-1 sm:space-y-2">
+			<div v-else class="flex flex-col gap-1 sm:flex flex-col gap-2">
 				<div
 					v-for="(item, index) in items"
 					:key="index"
@@ -369,20 +369,20 @@
 									<span
 										v-if="item.free_qty && item.free_qty > 0"
 										class="inline-flex items-center px-1.5 py-0.5 bg-green-600 text-white rounded-full text-[9px] font-bold flex-shrink-0"
-										:title="`${item.free_qty} free item(s) included`"
+										:title="__('{0} free item(s) included', [item.free_qty])"
 									>
-										<svg class="w-2.5 h-2.5 mr-0.5" fill="currentColor" viewBox="0 0 20 20">
+										<svg class="w-2.5 h-2.5 me-0.5" fill="currentColor" viewBox="0 0 20 20">
 											<path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
 										</svg>
-										+{{ item.free_qty }} FREE
+										{{ __('+{0} FREE',  [item.free_qty]) }}
 									</span>
 								</div>
 								<button
 									type="button"
 									@click.stop="$emit('remove-item', item.item_code)"
 									class="text-gray-400 hover:text-red-600 active:text-red-700 transition-colors flex-shrink-0 p-0.5 -m-0.5 touch-manipulation active:scale-90"
-									:aria-label="'Remove ' + item.item_name"
-									title="Remove item"
+									:aria-label="__('Remove {0}', [item.item_name])"
+									:title="__('Remove item')"
 								>
 									<svg class="h-4 w-4 sm:h-4.5 sm:w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -398,7 +398,7 @@
 									</span>
 									<span class="text-[10px] text-gray-500">/</span>
 									<span class="inline-flex items-center px-1.5 py-0.5 bg-gray-100 text-gray-700 rounded text-[10px] sm:text-xs font-semibold">
-										{{ item.uom || item.stock_uom || 'Nos' }}
+										{{ item.uom || item.stock_uom || __('Nos', null, 'UOM') }}
 									</span>
 								</div>
 
@@ -407,10 +407,10 @@
 									v-if="item.discount_amount && item.discount_amount > 0"
 									class="inline-flex items-center px-1.5 py-0.5 bg-gradient-to-r from-red-50 to-orange-50 text-red-700 rounded-full text-[9px] font-bold border border-red-200"
 								>
-									<svg class="w-2 h-2 mr-0.5" fill="currentColor" viewBox="0 0 20 20">
+									<svg class="w-2 h-2 me-0.5" fill="currentColor" viewBox="0 0 20 20">
 										<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
 									</svg>
-									{{ Number(item.discount_percentage).toFixed(2) }}% OFF
+									{{ __('{0}% OFF', [Number(item.discount_percentage).toFixed(2)]) }}
 								</div>
 							</div>
 
@@ -422,9 +422,9 @@
 										<button
 											type="button"
 											@click="decrementQuantity(item)"
-											class="w-7 h-7 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 active:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors touch-manipulation border-r-2 border-gray-200"
-											:aria-label="'Decrease quantity'"
-											title="Decrease quantity"
+											class="w-7 h-7 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 active:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors touch-manipulation border-e-2 border-gray-200"
+											:aria-label="__('Decrease quantity')"
+											:title="__('Decrease quantity')"
 										>
 											<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/>
@@ -440,14 +440,14 @@
 											step="any"
 											inputmode="decimal"
 											class="w-16 sm:w-20 text-center bg-white border-0 text-sm sm:text-base font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-											:aria-label="'Quantity'"
+											:aria-label="__('Quantity')"
 										/>
 										<button
 											type="button"
 											@click="incrementQuantity(item)"
-											class="w-7 h-7 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 active:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors touch-manipulation border-l-2 border-gray-200"
-											:aria-label="'Increase quantity'"
-											title="Increase quantity"
+											class="w-7 h-7 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 active:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors touch-manipulation border-s-2 border-gray-200"
+											:aria-label="__('Increase quantity')"
+											:title="__('Increase quantity')"
 										>
 											<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/>
@@ -463,20 +463,20 @@
 											@click="toggleUomDropdown(item.item_code)"
 											:disabled="!item.item_uoms || item.item_uoms.length === 0"
 											:class="[
-												'h-7 sm:h-8 text-[10px] sm:text-xs font-bold rounded-lg pl-2.5 pr-7 transition-all touch-manipulation shadow-sm flex items-center justify-center min-w-[60px]',
+												'h-7 sm:h-8 text-[10px] sm:text-xs font-bold rounded-lg ps-2.5 pe-7 transition-all touch-manipulation shadow-sm flex items-center justify-center min-w-[60px]',
 												item.item_uoms && item.item_uoms.length > 0
 													? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white border-2 border-blue-400 hover:from-blue-600 hover:to-blue-700 hover:border-blue-500 hover:shadow-md active:scale-95 cursor-pointer'
 													: 'bg-gray-100 text-gray-500 border-2 border-gray-200 cursor-not-allowed opacity-60'
 											]"
-											:title="item.item_uoms && item.item_uoms.length > 0 ? 'Click to change unit' : 'Only one unit available'"
+											:title="item.item_uoms && item.item_uoms.length > 0 ? __('Click to change unit') : __('Only one unit available')"
 										>
-											{{ item.uom || item.stock_uom || 'Nos' }}
+											{{ item.uom || item.stock_uom || __('Nos', null, 'UOM') }}
 										</button>
 
 										<!-- Dropdown Arrow Icon -->
 										<svg
 											:class="[
-												'absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none transition-transform',
+												'absolute end-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none transition-transform',
 												openUomDropdown === item.item_code ? 'rotate-180' : '',
 												item.item_uoms && item.item_uoms.length > 0 ? 'text-white' : 'text-gray-400'
 											]"
@@ -490,21 +490,21 @@
 										<!-- Dropdown Menu -->
 										<div
 											v-if="openUomDropdown === item.item_code && item.item_uoms && item.item_uoms.length > 0"
-											class="absolute top-full left-0 mt-1 bg-white border-2 border-blue-300 rounded-lg shadow-xl z-50 min-w-full overflow-hidden"
+											class="absolute top-full start-0 mt-1 bg-white border-2 border-blue-300 rounded-lg shadow-xl z-50 min-w-full overflow-hidden"
 										>
 											<!-- Stock UOM Option -->
 											<button
 												type="button"
 												@click="selectUom(item, item.stock_uom)"
 												:class="[
-													'w-full text-left px-3 py-2 text-[10px] sm:text-xs font-semibold transition-colors border-b border-gray-100',
+													'w-full text-start px-3 py-2 text-[10px] sm:text-xs font-semibold transition-colors border-b border-gray-100',
 													(item.uom || item.stock_uom) === item.stock_uom
 														? 'bg-blue-50 text-blue-700'
 														: 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
 												]"
 											>
 												<div class="flex items-center justify-between">
-													<span>{{ item.stock_uom || 'Nos' }}</span>
+													<span>{{ item.stock_uom || __('Nos', null, 'UOM') }}</span>
 													<svg
 														v-if="(item.uom || item.stock_uom) === item.stock_uom"
 														class="w-4 h-4 text-blue-600"
@@ -523,7 +523,7 @@
 												type="button"
 												@click="selectUom(item, uomData.uom)"
 												:class="[
-													'w-full text-left px-3 py-2 text-[10px] sm:text-xs font-semibold transition-colors border-b border-gray-100 last:border-0',
+													'w-full text-start px-3 py-2 text-[10px] sm:text-xs font-semibold transition-colors border-b border-gray-100 last:border-0',
 													(item.uom || item.stock_uom) === uomData.uom
 														? 'bg-blue-50 text-blue-700'
 														: 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
@@ -546,8 +546,8 @@
 								</div>
 
 								<!-- Item Total Price -->
-								<div class="text-right">
-									<div class="text-[9px] text-gray-500 leading-none mb-0.5">Total</div>
+								<div class="text-end">
+									<div class="text-[9px] text-gray-500 leading-none mb-0.5">{{ __('Total') }}</div>
 									<div class="text-xs sm:text-sm font-bold text-blue-600 leading-none">
 										{{ formatCurrency(item.amount || item.rate * item.quantity) }}
 									</div>
@@ -564,11 +564,11 @@
 			<!-- Summary Details -->
 			<div v-if="items.length > 0" class="mb-2.5">
 				<div class="flex items-center justify-between text-[10px] text-gray-600 mb-1">
-					<span>Total Quantity</span>
+					<span>{{ __('Total Quantity') }}</span>
 					<span class="font-medium text-gray-900">{{ formatQuantity(totalQuantity) }}</span>
 				</div>
 				<div class="flex items-center justify-between text-[10px] text-gray-600 mb-2">
-					<span>Subtotal</span>
+					<span>{{ __('Subtotal') }}</span>
 					<span class="font-medium text-gray-900">{{ formatCurrency(subtotal) }}</span>
 				</div>
 			</div>
@@ -577,21 +577,21 @@
 			<div v-if="items.length > 0" class="mb-2.5">
 				<!-- Discount Display - Highlighted -->
 				<div v-if="discountAmount > 0" class="flex items-center justify-between mb-1 bg-red-50 rounded px-1.5 py-1 -mx-0.5">
-					<div class="flex items-center space-x-1">
+					<div class="flex items-center gap-1">
 						<svg class="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
 						</svg>
-						<span class="text-[10px] font-semibold text-red-700">Discount</span>
+						<span class="text-[10px] font-semibold text-red-700">{{ __('Discount') }}</span>
 					</div>
 					<span class="text-xs font-bold text-red-600">{{ formatCurrency(discountAmount) }}</span>
 				</div>
 
 				<div class="flex items-center justify-between text-[10px] text-gray-600 mb-2">
-					<div class="flex items-center space-x-1">
+					<div class="flex items-center gap-1">
 						<svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
 						</svg>
-						<span>Tax</span>
+						<span>{{ __('Tax') }}</span>
 					</div>
 					<span class="font-medium text-gray-900">{{ formatCurrency(taxAmount) }}</span>
 				</div>
@@ -600,7 +600,7 @@
 			<!-- Grand Total -->
 			<div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-2.5 mb-2.5">
 				<div class="flex items-center justify-between">
-					<span class="text-sm font-bold text-gray-900">Grand Total</span>
+					<span class="text-sm font-bold text-gray-900">{{ __('Grand Total') }}</span>
 					<span class="text-lg font-bold text-blue-600">
 						{{ formatCurrency(grandTotal) }}
 					</span>
@@ -620,12 +620,12 @@
 							? 'bg-gray-300 cursor-not-allowed'
 							: 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-lg hover:shadow-xl active:scale-[0.98]'
 					]"
-					:aria-label="'Proceed to payment'"
+					:aria-label="__('Proceed to payment')"
 				>
-					<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<svg class="w-5 h-5 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
 					</svg>
-					<span>Checkout</span>
+					<span>{{ __('Checkout') }}</span>
 				</button>
 
 				<!-- Hold Order Button (Secondary - 50% width) -->
@@ -634,12 +634,12 @@
 					v-if="items.length > 0"
 					@click="$emit('save-draft')"
 					class="flex-1 py-3 px-3 rounded-xl font-semibold text-sm text-orange-700 bg-orange-50 hover:bg-orange-100 active:bg-orange-200 transition-all touch-manipulation active:scale-[0.98] flex items-center justify-center"
-					:aria-label="'Hold order as draft'"
+					:aria-label="__('Hold order as draft')"
 				>
-					<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<svg class="w-5 h-5 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
 					</svg>
-					<span>Hold</span>
+					<span>{{ __('Hold', null, 'order') }}</span>
 				</button>
 			</div>
 		</div>

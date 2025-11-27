@@ -1,13 +1,13 @@
 <template>
 	<Dialog
 		v-model="show"
-		:options="{ title: `Select ${item?.has_batch_no ? 'Batch' : 'Serial'} Numbers`, size: 'lg' }"
+		:options="{ title: item?.has_batch_no ? __('Select Batch Numbers') : __('Select Serial Numbers'), size: 'lg' }"
 	>
 		<template #body-content>
-			<div class="space-y-4">
+			<div class="flex flex-col gap-4">
 				<!-- Item Info -->
 				<div v-if="item" class="bg-blue-50 rounded-lg p-3">
-					<div class="flex items-center space-x-3">
+					<div class="flex items-center gap-3">
 						<div class="w-12 h-12 bg-gray-100 rounded-md flex-shrink-0 flex items-center justify-center overflow-hidden">
 							<img
 								v-if="item.image"
@@ -24,7 +24,7 @@
 							<h3 class="text-sm font-semibold text-gray-900">{{ item.item_name }}</h3>
 							<p class="text-xs text-gray-600">{{ item.item_code }}</p>
 						</div>
-						<div class="text-right">
+						<div class="text-end">
 							<p class="text-sm font-bold text-gray-900">Qty: {{ quantity }}</p>
 						</div>
 					</div>
@@ -33,9 +33,9 @@
 				<!-- Batch Selection -->
 				<div v-if="item?.has_batch_no">
 					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Select Batch Number
+						{{ __('Select Batch Number') }}
 					</label>
-					<div class="space-y-2 max-h-80 overflow-y-auto">
+					<div class="flex flex-col gap-2 max-h-80 overflow-y-auto">
 						<div
 							v-for="batch in availableBatches"
 							:key="batch.batch_no"
@@ -50,12 +50,12 @@
 							<div class="flex items-start justify-between">
 								<div class="flex-1">
 									<h4 class="text-sm font-semibold text-gray-900">{{ batch.batch_no }}</h4>
-									<div class="flex items-center space-x-3 mt-1">
+									<div class="flex items-center gap-3 mt-1">
 										<span class="text-xs text-gray-600">
-											Qty: {{ batch.qty }}
+											{{ __('Qty: {0}', [batch.qty]) }}
 										</span>
 										<span v-if="batch.expiry_date" class="text-xs text-gray-600">
-											Exp: {{ formatDate(batch.expiry_date) }}
+											{{ __('Exp: {0}', [formatDate(batch.expiry_date)]) }}
 										</span>
 									</div>
 								</div>
@@ -72,9 +72,9 @@
 				<!-- Serial Number Selection -->
 				<div v-if="item?.has_serial_no">
 					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Select Serial Numbers ({{ selectedSerials.length }}/{{ quantity }})
+						{{ __('Select Serial Numbers ({0}/{1})', [selectedSerials.length, quantity]) }}
 					</label>
-					<div class="space-y-2 max-h-80 overflow-y-auto">
+					<div class="flex flex-col gap-2 max-h-80 overflow-y-auto">
 						<div
 							v-for="serial in availableSerials"
 							:key="serial.serial_no"
@@ -90,7 +90,7 @@
 								<div class="flex-1">
 									<h4 class="text-sm font-semibold text-gray-900">{{ serial.serial_no }}</h4>
 									<p v-if="serial.warehouse" class="text-xs text-gray-600 mt-1">
-										Warehouse: {{ serial.warehouse }}
+										{{ __('Warehouse: {0}', [serial.warehouse]) }}
 									</p>
 								</div>
 								<div v-if="isSerialSelected(serial.serial_no)" class="flex-shrink-0">
@@ -105,12 +105,12 @@
 					<!-- Manual Serial Entry -->
 					<div class="mt-3 p-3 bg-gray-50 rounded-lg">
 						<label class="block text-xs font-medium text-gray-700 mb-2">
-							Or enter serial numbers manually (one per line)
+							{{ __('Or enter serial numbers manually (one per line)') }}
 						</label>
 						<textarea
 							v-model="manualSerials"
 							rows="3"
-							placeholder="Enter serial numbers..."
+							:placeholder="__('Enter serial numbers...')"
 							class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 						></textarea>
 					</div>
@@ -118,16 +118,16 @@
 			</div>
 		</template>
 		<template #actions>
-			<div class="flex space-x-2">
+			<div class="flex gap-2">
 				<Button variant="subtle" @click="show = false">
-					Cancel
+					{{ __('Cancel') }}
 				</Button>
 				<Button
 					variant="solid"
 					@click="handleConfirm"
 					:disabled="!isValid"
 				>
-					Confirm
+					{{ __('Confirm') }}
 				</Button>
 			</div>
 		</template>

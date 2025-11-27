@@ -1,6 +1,6 @@
 <template>
 	<!-- Icon-Only Sidebar - Hidden on Mobile, Visible on Desktop -->
-	<div class="hidden lg:flex w-16 flex-shrink-0 bg-white border-r border-gray-200 flex-col items-center py-4 space-y-2">
+	<div class="hidden lg:flex w-16 flex-shrink-0 bg-white border-r border-gray-200 flex-col items-center py-4 flex flex-col gap-2">
 		<!-- Dashboard -->
 		<button
 			@click="handleMenuClick('dashboard')"
@@ -10,11 +10,11 @@
 					? 'bg-blue-100 text-blue-600'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
 			]"
-			:title="'Dashboard'"
+			:title="__('Dashboard')"
 		>
 			<FeatherIcon name="layout" class="w-5 h-5" />
-			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-				Dashboard
+			<div class="absolute start-full ms-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+				{{ __('Dashboard') }}
 			</div>
 		</button>
 
@@ -27,11 +27,11 @@
 					? 'bg-green-100 text-green-600'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
 			]"
-			:title="'Promotions'"
+			:title="__('Promotions')"
 		>
 			<FeatherIcon name="tag" class="w-5 h-5" />
-			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-				Promotions
+			<div class="absolute start-full ms-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+				{{ __('Promotions') }}
 			</div>
 		</button>
 
@@ -44,11 +44,11 @@
 					? 'bg-purple-100 text-purple-600'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
 			]"
-			:title="'Products'"
+			:title="__('Products')"
 		>
 			<FeatherIcon name="package" class="w-5 h-5" />
-			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-				Products
+			<div class="absolute start-full ms-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+				{{ __('Products') }}
 			</div>
 		</button>
 
@@ -61,11 +61,11 @@
 					? 'bg-orange-100 text-orange-600'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
 			]"
-			:title="'Reports'"
+			:title="__('Reports')"
 		>
 			<FeatherIcon name="bar-chart-2" class="w-5 h-5" />
-			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-				Reports
+			<div class="absolute start-full ms-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+				{{ __('Reports') }}
 			</div>
 		</button>
 
@@ -78,11 +78,11 @@
 					? 'bg-indigo-100 text-indigo-600'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
 			]"
-			:title="'Invoice Management'"
+			:title="__('Invoice Management')"
 		>
 			<FeatherIcon name="file-text" class="w-5 h-5" />
-			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-				Invoice Management
+			<div class="absolute start-full ms-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+				{{ __('Invoice Management') }}
 			</div>
 		</button>
 
@@ -98,11 +98,11 @@
 					? 'bg-gray-100 text-gray-900'
 					: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
 			]"
-			:title="'Settings'"
+			:title="__('Settings')"
 		>
 			<FeatherIcon name="settings" class="w-5 h-5" />
-			<div class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-				Settings
+			<div class="absolute start-full ms-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+				{{ __('Settings') }}
 			</div>
 		</button>
 	</div>

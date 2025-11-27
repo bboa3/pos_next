@@ -30,7 +30,7 @@
 			</div>
 
 			<!-- ISD Code -->
-			<span class="text-sm font-medium text-gray-700 min-w-[3rem] text-left">
+			<span class="text-sm font-medium text-gray-700 min-w-[3rem] text-start">
 				{{ selectedCountry?.isd || "+1" }}
 			</span>
 
@@ -57,7 +57,7 @@
 		>
 			<div
 				v-if="isOpen"
-				class="absolute left-0 z-50 mt-1 w-80 max-h-80 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
+				class="absolute start-0 z-50 mt-1 w-80 max-h-80 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
 				:style="{ top: dropdownPosition }"
 			>
 				<!-- Search Input -->
@@ -67,13 +67,13 @@
 							ref="searchInputRef"
 							v-model="searchQuery"
 							type="text"
-							placeholder="Search countries..."
-							class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							:placeholder="__('Search countries...')"
+							class="w-full ps-9 pe-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 							@keydown.escape="closeDropdown"
 							@keydown.enter.prevent="selectFirstFiltered"
 						/>
 						<svg
-							class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+							class="absolute start-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"
@@ -95,7 +95,7 @@
 					</div>
 
 					<div v-else-if="filteredCountries.length === 0" class="px-4 py-8 text-center text-sm text-gray-500">
-						No countries found
+						{{ __('No countries found') }}
 					</div>
 
 					<button
@@ -103,7 +103,7 @@
 						:key="country.code"
 						type="button"
 						@click="selectCountry(country)"
-						class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-left"
+						class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors text-start"
 						:class="{
 							'bg-blue-50 hover:bg-blue-100': selectedCountry?.code === country.code,
 						}"

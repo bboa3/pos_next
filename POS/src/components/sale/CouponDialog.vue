@@ -1,18 +1,18 @@
 <template>
-	<Dialog v-model="show" :options="{ title: 'Apply', size: 'md' }">
+	<Dialog v-model="show" :options="{ title: __('Apply'), size: 'md' }">
 		<template #body-content>
-			<div class="space-y-4">
+			<div class="flex flex-col gap-4">
 				<!-- Info Banner -->
 				<div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
-					<div class="flex items-start space-x-2">
+					<div class="flex items-start gap-2">
 						<svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd"
 								d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
 								clip-rule="evenodd" />
 						</svg>
 						<div class="flex-1">
-							<p class="text-xs font-medium text-blue-900">Have a coupon code?</p>
-							<p class="text-xs text-blue-700 mt-0.5">Enter your promotional or gift card code below</p>
+							<p class="text-xs font-medium text-blue-900">{{ __('Have a coupon code?') }}</p>
+							<p class="text-xs text-blue-700 mt-0.5">{{ __('Enter your promotional or gift card code below') }}</p>
 						</div>
 					</div>
 				</div>
@@ -20,10 +20,10 @@
 				<!-- Coupon Code Input -->
 				<div v-if="!appliedDiscount">
 					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Coupon Code
+						{{ __('Coupon Code') }}
 					</label>
-					<div class="flex space-x-2">
-						<Input v-model="couponCode" type="text" placeholder="ENTER-CODE-HERE" class="flex-1 uppercase"
+					<div class="flex gap-2">
+						<Input v-model="couponCode" type="text" :placeholder="__('ENTER-CODE-HERE')" class="flex-1 uppercase"
 							@keyup.enter="applyCoupon" :disabled="applying" />
 						<Button @click="applyCoupon" :loading="applying" theme="blue" variant="solid" class="flex-shrink-0">
 							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,28 +32,28 @@
 							</svg>
 						</Button>
 					</div>
-					<p class="text-xs text-gray-500 mt-1">Code is case-insensitive</p>
+					<p class="text-xs text-gray-500 mt-1">{{ __('Code is case-insensitive') }}</p>
 				</div>
 
 				<!-- My Gift Cards -->
 				<div v-if="giftCards.length > 0 && !appliedDiscount">
 					<label class="block text-sm font-medium text-gray-700 mb-2">
-						<div class="flex items-center space-x-2">
+						<div class="flex items-center gap-2">
 							<svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
 								<path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
 								<path fill-rule="evenodd"
 									d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"
 									clip-rule="evenodd" />
 							</svg>
-							<span>My Gift Cards ({{ giftCards.length }})</span>
+							<span>{{ __('My Gift Cards ({0})', [giftCards.length]) }}</span>
 						</div>
 					</label>
-					<div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+					<div class="flex flex-col gap-2 max-h-60 overflow-y-auto pe-1">
 						<div v-for="card in giftCards" :key="card.coupon_code" @click="applyGiftCard(card)"
 							class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-3 cursor-pointer hover:shadow-md hover:border-purple-400 transition-all">
 							<div class="flex items-center justify-between">
 								<div class="flex-1">
-									<div class="flex items-center space-x-2">
+									<div class="flex items-center gap-2">
 										<div
 											class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
 											<svg class="w-4 h-4 text-purple-600" fill="currentColor"
@@ -84,7 +84,7 @@
 
 				<!-- Applied Coupon Preview -->
 				<div v-if="appliedDiscount" class="bg-green-50 border-2 border-green-500 rounded-lg p-4">
-					<div class="flex items-center space-x-2 mb-3">
+					<div class="flex items-center gap-2 mb-3">
 						<div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
 							<svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
 								<path fill-rule="evenodd"
@@ -93,16 +93,16 @@
 							</svg>
 						</div>
 						<h4 class="text-sm font-bold text-green-900">
-							Coupon Applied Successfully!
+							{{ __('Coupon Applied Successfully!') }}
 						</h4>
 					</div>
 					<div class="bg-white rounded-lg p-3">
 						<div class="flex justify-between items-center mb-2">
-							<span class="text-xs text-gray-600">Coupon Code</span>
+							<span class="text-xs text-gray-600">{{ __('Coupon Code') }}</span>
 							<span class="text-sm font-bold text-gray-900">{{ appliedDiscount.code }}</span>
 						</div>
 						<div class="flex justify-between items-center">
-							<span class="text-xs text-gray-600">Discount Amount</span>
+							<span class="text-xs text-gray-600">{{ __('Discount Amount') }}</span>
 							<span class="text-lg font-bold text-green-600">
 								-{{ formatCurrency(appliedDiscount.amount) }}
 							</span>
@@ -112,7 +112,7 @@
 
 				<!-- Error Message -->
 				<div v-if="errorMessage" class="bg-red-50 border border-red-200 rounded-lg p-3">
-					<div class="flex items-start space-x-2">
+					<div class="flex items-start gap-2">
 						<svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd"
 								d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -132,11 +132,11 @@
 								d="M6 18L18 6M6 6l12 12" />
 						</svg>
 					</template>
-					Remove
+					{{ __('Remove') }}
 				</Button>
-				<div class="flex space-x-2 ml-auto">
+				<div class="flex gap-2 ms-auto">
 					<Button variant="subtle" @click="show = false">
-						Close
+						{{ __('Close') }}
 					</Button>
 				</div>
 			</div>
@@ -160,7 +160,7 @@ const props = defineProps({
 	subtotal: {
 		type: Number,
 		required: true,
-		note: "Cart subtotal BEFORE tax - used for discount calculations",
+		note: __("Cart subtotal BEFORE tax - used for discount calculations"),
 	},
 	items: Array,
 	posProfile: String,
@@ -259,7 +259,7 @@ function applyGiftCard(card) {
 
 async function applyCoupon() {
 	if (!couponCode.value.trim()) {
-		errorMessage.value = "Please enter a coupon code"
+		errorMessage.value = __("Please enter a coupon code")
 		return
 	}
 
@@ -276,7 +276,7 @@ async function applyCoupon() {
 
 		if (!validationData || !validationData.valid) {
 			errorMessage.value =
-				validationData?.message || "The coupon code you entered is not valid"
+				validationData?.message || __("The coupon code you entered is not valid")
 			showError(errorMessage.value)
 			return
 		}
@@ -285,7 +285,7 @@ async function applyCoupon() {
 
 		// Check minimum amount (on subtotal before tax)
 		if (coupon.min_amount && props.subtotal < coupon.min_amount) {
-			errorMessage.value = `This coupon requires a minimum purchase of ${formatCurrency(coupon.min_amount)}`
+			errorMessage.value = __('This coupon requires a minimum purchase of ', [formatCurrency(coupon.min_amount)])
 			showWarning(errorMessage.value)
 			return
 		}
@@ -319,12 +319,12 @@ async function applyCoupon() {
 
 		emit("discount-applied", appliedDiscount.value)
 
-		showSuccess(`${couponCode.value.toUpperCase()} applied successfully`)
+		showSuccess(__('{0} applied successfully', [couponCode.value.toUpperCase()]))
 
 		errorMessage.value = ""
 	} catch (error) {
 		console.error("Error applying coupon:", error)
-		errorMessage.value = "Failed to apply coupon. Please try again."
+		errorMessage.value = __("Failed to apply coupon. Please try again.")
 		showError(errorMessage.value)
 	} finally {
 		applying.value = false
@@ -334,7 +334,7 @@ async function applyCoupon() {
 function removeDiscount() {
 	appliedDiscount.value = null
 	emit("discount-removed")
-	showSuccess("Discount has been removed")
+	showSuccess(__("Discount has been removed"))
 }
 
 function formatCurrency(amount) {

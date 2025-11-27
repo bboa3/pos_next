@@ -2,10 +2,10 @@
 	<!-- Main Dialog -->
 	<Dialog
 		v-model="show"
-		:options="{ title: 'Draft Invoices', size: 'lg' }"
+		:options="{ title: __('Draft Invoices'), size: 'lg' }"
 	>
 		<template #body-content>
-			<div class="space-y-3">
+			<div class="flex flex-col gap-3">
 				<!-- Empty State -->
 				<div v-if="drafts.length === 0" class="text-center py-8">
 					<div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -13,12 +13,12 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
 						</svg>
 					</div>
-					<p class="text-sm font-medium text-gray-900">No draft invoices</p>
-					<p class="text-xs text-gray-500 mt-1">Save invoices as drafts to continue later</p>
+					<p class="text-sm font-medium text-gray-900">{{ __('No draft invoices') }}</p>
+					<p class="text-xs text-gray-500 mt-1">{{ __('Save invoices as drafts to continue later') }}</p>
 				</div>
 
 				<!-- Drafts List -->
-				<div v-else class="space-y-2 max-h-96 overflow-y-auto">
+				<div v-else class="flex flex-col gap-2 max-h-96 overflow-y-auto">
 					<div
 						v-for="draft in drafts"
 						:key="draft.draft_id"
@@ -31,7 +31,7 @@
 									{{ draft.draft_id }}
 								</h4>
 								<p v-if="draft.customer" class="text-xs text-gray-500 mt-0.5">
-									Customer: {{ draft.customer?.customer_name || draft.customer?.name || draft.customer }}
+									{{ __('Customer: {0}', [(draft.customer?.customer_name || draft.customer?.name || draft.customer)]) }}
 								</p>
 								<p class="text-xs text-gray-400 mt-0.5">
 									{{ formatDateTime(draft.created_at) }}
@@ -40,7 +40,7 @@
 							<button
 								@click.stop="handleDeleteDraft(draft.draft_id)"
 								class="text-gray-400 hover:text-red-600 transition-colors p-1"
-								title="Delete draft"
+								:title="__('Delete draft')"
 							>
 								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -51,7 +51,7 @@
 						<!-- Items Preview -->
 						<div class="flex items-center justify-between text-xs">
 							<span class="text-gray-600">
-								{{ draft.items?.length || 0 }} item(s)
+								{{ __('{0} item(s)', [draft.items?.length || 0]) }}
 							</span>
 							<span class="font-bold text-blue-600">
 								{{ formatCurrency(calculateTotal(draft.items)) }}
@@ -72,7 +72,7 @@
 									v-if="draft.items.length > 3"
 									class="text-[10px] text-gray-500 px-1.5 py-0.5"
 								>
-									+{{ draft.items.length - 3 }} more
+									{{ __('+{0} more', [draft.items.length - 3]) }}
 								</span>
 							</div>
 						</div>
@@ -88,10 +88,10 @@
 					theme="red"
 					@click="showClearAllDialog = true"
 				>
-					Clear All
+					{{ __('Clear All') }}
 				</Button>
 				<Button variant="subtle" @click="show = false">
-					Close
+					{{ __('Close') }}
 				</Button>
 			</div>
 		</template>
@@ -100,22 +100,22 @@
 	<!-- Delete Single Draft Confirmation -->
 	<Dialog
 		v-model="showDeleteDialog"
-		:options="{ title: 'Delete Draft?', size: 'xs' }"
+		:options="{ title: __('Delete Draft?'), size: 'xs' }"
 	>
 		<template #body-content>
 			<div class="py-3">
 				<p class="text-sm text-gray-600">
-					Permanently delete this draft invoice?
+					{{ __('Permanently delete this draft invoice?') }}
 				</p>
 			</div>
 		</template>
 		<template #actions>
-			<div class="flex space-x-2 w-full">
+			<div class="flex gap-2 w-full">
 				<Button class="flex-1" variant="subtle" @click="showDeleteDialog = false">
-					Cancel
+					{{ __('Cancel') }}
 				</Button>
 				<Button class="flex-1" variant="solid" theme="red" @click="confirmDeleteDraft">
-					Delete
+					{{ __('Delete') }}
 				</Button>
 			</div>
 		</template>
@@ -124,22 +124,22 @@
 	<!-- Clear All Drafts Confirmation -->
 	<Dialog
 		v-model="showClearAllDialog"
-		:options="{ title: 'Clear All Drafts?', size: 'xs' }"
+		:options="{ title: __('Clear All Drafts?'), size: 'xs' }"
 	>
 		<template #body-content>
 			<div class="py-3">
 				<p class="text-sm text-gray-600">
-					Permanently delete all {{ drafts.length }} draft invoices?
+					{{ __('Permanently delete all {0} draft invoices?', [drafts.length]) }}
 				</p>
 			</div>
 		</template>
 		<template #actions>
-			<div class="flex space-x-2 w-full">
+			<div class="flex gap-2 w-full">
 				<Button class="flex-1" variant="subtle" @click="showClearAllDialog = false">
-					Cancel
+					{{ __('Cancel') }}
 				</Button>
 				<Button class="flex-1" variant="solid" theme="red" @click="confirmClearAll">
-					Clear All
+					{{ __('Clear All') }}
 				</Button>
 			</div>
 		</template>
@@ -194,7 +194,7 @@ async function loadDrafts() {
 		drafts.value = await getAllDrafts()
 	} catch (error) {
 		console.error("Error loading drafts:", error)
-		showError("Failed to load draft invoices")
+		showError(__("Failed to load draft invoices"))
 	}
 }
 
@@ -213,10 +213,10 @@ async function confirmDeleteDraft() {
 		// Notify parent to update count
 		emit("drafts-updated")
 
-		showSuccess("Draft invoice deleted")
+		showSuccess(__("Draft invoice deleted"))
 	} catch (error) {
 		console.error("Error deleting draft:", error)
-		showError("Failed to delete draft")
+		showError(__("Failed to delete draft"))
 	}
 }
 
@@ -229,10 +229,10 @@ async function confirmClearAll() {
 		// Notify parent to update count
 		emit("drafts-updated")
 
-		showSuccess("All draft invoices deleted")
+		showSuccess(__("All draft invoices deleted"))
 	} catch (error) {
 		console.error("Error clearing drafts:", error)
-		showError("Failed to clear drafts")
+		showError(__("Failed to clear drafts"))
 	}
 }
 

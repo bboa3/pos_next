@@ -2,11 +2,11 @@
 	<div class="flex flex-col h-full bg-gray-50">
 		<!-- Item Groups Filter Tabs -->
 		<div class="px-1.5 sm:px-3 pt-1.5 sm:pt-3 pb-1.5 sm:pb-2 bg-white border-b border-gray-200">
-			<div class="flex items-center space-x-1 sm:space-x-2 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory">
+			<div class="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory">
 				<button
 					@click="itemStore.setSelectedItemGroup(null)"
 					:class="[
-						'flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-medium whitespace-nowrap transition-[background-color,border-color] duration-75 touch-manipulation snap-start flex-shrink-0',
+						'flex items-center px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-medium whitespace-nowrap transition-[background-color,border-color] duration-75 touch-manipulation snap-start flex-shrink-0',
 						!selectedItemGroup
 							? 'bg-blue-50 text-blue-600 border-2 border-blue-500 shadow-sm'
 							: 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 active:bg-gray-100',
@@ -15,38 +15,38 @@
 					<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
 					</svg>
-					<span>All Items</span>
+					<span>{{ __('All Items') }}</span>
 				</button>
 				<button
 					v-for="group in itemGroups"
 					:key="group.item_group"
 					@click="itemStore.setSelectedItemGroup(group.item_group)"
 					:class="[
-						'flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-medium whitespace-nowrap transition-[background-color,border-color] duration-75 touch-manipulation snap-start flex-shrink-0',
+						'flex items-center px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-medium whitespace-nowrap transition-[background-color,border-color] duration-75 touch-manipulation snap-start flex-shrink-0',
 						selectedItemGroup === group.item_group
 							? 'bg-blue-50 text-blue-600 border-2 border-blue-500 shadow-sm'
 							: 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 active:bg-gray-100',
 					]"
 				>
-					<span>{{ group.item_group }}</span>
+					<span>{{ __(group.item_group) }}</span>
 				</button>
 			</div>
 		</div>
 
 		<!-- Cache Sync Indicator -->
 		<div v-if="cacheSyncing" class="px-1.5 sm:px-3 py-1 bg-blue-50 border-b border-blue-200">
-			<div class="flex items-center justify-center space-x-2 text-[10px] sm:text-xs text-blue-700">
+			<div class="flex items-center justify-center gap-2 text-[10px] sm:text-xs text-blue-700">
 				<div class="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
-				<span>Syncing catalog in background... {{ cacheStats.items }} items cached</span>
+				<span>{{ __('Syncing catalog in background... {0} items cached', [cacheStats.items]) }}</span>
 			</div>
 		</div>
 
 		<!-- Search Bar with Barcode Scanner and View Controls -->
 		<div class="px-1.5 sm:px-3 py-1.5 sm:py-2 bg-white border-b border-gray-200">
-			<div class="flex items-center space-x-1 sm:space-x-2">
+			<div class="flex items-center gap-1 sm:gap-2">
 				<div class="flex-1 relative min-w-0">
 					<!-- Search Icon -->
-					<div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
+					<div class="absolute inset-y-0 start-0 ps-2 sm:ps-3 flex items-center pointer-events-none">
 						<svg
 							class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400"
 							fill="none"
@@ -72,17 +72,17 @@
 						type="text"
 						:placeholder="searchPlaceholder"
 						:class="[
-							'w-full text-[11px] sm:text-sm border rounded-lg px-2 sm:px-3 py-2 pl-7 sm:pl-10 pr-16 sm:pr-24 focus:outline-none transition-all',
+							'w-full text-[11px] sm:text-sm border rounded-lg px-2 sm:px-3 py-2 ps-7 sm:ps-10 pe-16 sm:pe-24 focus:outline-none transition-all',
 							autoAddEnabled
 								? 'border-blue-400 bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
 								: scannerEnabled
 								? 'border-green-400 bg-green-50 focus:ring-2 focus:ring-green-500 focus:border-transparent'
 								: 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
 						]"
-						aria-label="Search items"
+						:aria-label="__('Search items')"
 					/>
 					<!-- Barcode Scan Icon and Auto-Add Toggle -->
-					<div class="absolute inset-y-0 right-0 pr-1 sm:pr-2 flex items-center gap-0.5">
+					<div class="absolute inset-y-0 end-0 pe-1 sm:pe-2 flex items-center gap-0.5">
 						<button
 							@click="toggleBarcodeScanner"
 							:class="[
@@ -91,8 +91,8 @@
 									? 'bg-green-100 hover:bg-green-200 active:bg-green-300 text-green-700'
 									: 'hover:bg-gray-100 active:bg-gray-200 text-gray-600'
 							]"
-							:title="scannerEnabled ? 'Barcode Scanner: ON (Click to disable)' : 'Barcode Scanner: OFF (Click to enable)'"
-							:aria-label="scannerEnabled ? 'Disable barcode scanner' : 'Enable barcode scanner'"
+							:title="scannerEnabled ? __('Barcode Scanner: ON (Click to disable)') : __('Barcode Scanner: OFF (Click to enable)')"
+							:aria-label="scannerEnabled ? __('Disable barcode scanner') : __('Enable barcode scanner')"
 						>
 							<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
@@ -106,25 +106,25 @@
 									? 'bg-blue-100 hover:bg-blue-200 active:bg-blue-300 text-blue-700'
 									: 'hover:bg-gray-100 active:bg-gray-200 text-gray-600'
 							]"
-							:title="autoAddEnabled ? 'Auto-Add: ON - Press Enter to add items to cart' : 'Auto-Add: OFF - Click to enable automatic cart addition on Enter'"
-							:aria-label="autoAddEnabled ? 'Disable auto-add' : 'Enable auto-add'"
+							:title="autoAddEnabled ? __('Auto-Add: ON - Press Enter to add items to cart') : __('Auto-Add: OFF - Click to enable automatic cart addition on Enter')"
+							:aria-label="autoAddEnabled ? __('Disable auto-add') : __('Enable auto-add')"
 						>
 							<svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
 							</svg>
-							<span class="hidden xs:inline">Auto</span>
+							<span class="hidden xs:inline">{{ __('Auto') }}</span>
 						</button>
 					</div>
 				</div>
-				<div class="flex items-center space-x-0.5 bg-gray-100 rounded-lg p-0.5 flex-shrink-0">
+				<div class="flex items-center gap-0.5 bg-gray-100 rounded-lg p-0.5 flex-shrink-0">
 					<button
 						@click="setViewMode('grid')"
 						:class="[
 							'p-1.5 sm:p-2 rounded transition-[background-color,box-shadow] duration-75 touch-manipulation',
 							viewMode === 'grid' ? 'bg-white shadow-sm' : 'hover:bg-gray-200 active:bg-gray-300'
 						]"
-						title="Grid View"
-						:aria-label="'Switch to grid view'"
+						:title="__('Grid View')"
+						:aria-label="__('Switch to grid view')"
 					>
 						<svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
@@ -136,8 +136,8 @@
 							'p-1.5 sm:p-2 rounded transition-[background-color,box-shadow] duration-75 touch-manipulation',
 							viewMode === 'list' ? 'bg-white shadow-sm' : 'hover:bg-gray-200 active:bg-gray-300'
 						]"
-						title="List View"
-						:aria-label="'Switch to list view'"
+						:title="__('List View')"
+						:aria-label="__('Switch to list view')"
 					>
 						<svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -149,14 +149,19 @@
 				<div class="relative z-50">
 					<button
 						@click="toggleSortDropdown"
+						data-sort-button
 						:class="[
 							'p-1.5 sm:p-2 rounded-lg transition-[background-color,box-shadow] duration-75 touch-manipulation border',
 							sortBy
 								? 'bg-blue-50 border-blue-400 text-blue-700 shadow-sm'
 								: 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50 active:bg-gray-100'
 						]"
-						:title="sortBy ? `Sorted by ${getSortLabel(sortBy)} (${sortOrder === 'asc' ? 'A-Z' : 'Z-A'})` : 'Sort items'"
-						:aria-label="'Sort items'"
+						:title="sortBy
+							? (sortOrder === 'asc'
+								? __('Sorted by {0} A-Z', [getSortLabel(sortBy)])
+								: __('Sorted by {0} Z-A', [getSortLabel(sortBy)]))
+							: __('Sort items')"
+						:aria-label="__('Sort items')"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
@@ -167,12 +172,12 @@
 					<div
 						v-if="showSortDropdown"
 						@click.stop
-						class="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]"
+						class="absolute end-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999]"
 						style="box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);"
 					>
 						<div class="py-2">
 							<div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase border-b border-gray-100">
-								Sort Items
+								{{ __('Sort Items') }}
 							</div>
 							<div class="py-1">
 								<!-- Clear Sort -->
@@ -187,7 +192,7 @@
 										<svg class="w-4 h-4 text-gray-400 group-hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
 										</svg>
-										<span>No Sorting</span>
+										<span>{{ __('No Sorting') }}</span>
 									</span>
 								</button>
 
@@ -231,7 +236,7 @@
 		<div v-if="loading && !filteredItems" class="flex-1 flex items-center justify-center p-3">
 			<div class="text-center py-8">
 				<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-				<p class="mt-3 text-xs text-gray-500">Loading items...</p>
+				<p class="mt-3 text-xs text-gray-500">{{ __('Loading items...') }}</p>
 			</div>
 		</div>
 
@@ -255,9 +260,11 @@
 					/>
 				</svg>
 				<p v-if="searchTerm || selectedItemGroup" class="mt-2 text-xs font-medium text-gray-700">
-					No results for <span v-if="searchTerm">"{{ searchTerm }}"</span><span v-if="searchTerm && selectedItemGroup"> in </span><span v-if="selectedItemGroup">{{ selectedItemGroup }}</span>
+					<span v-if="searchTerm && selectedItemGroup">{{ __('No results for {0} in {1}', [searchTerm, selectedItemGroup]) }}</span>
+					<span v-else-if="selectedItemGroup">{{ __('No results in {0}', [selectedItemGroup]) }}</span>
+					<span v-else>{{ __('No results for {0}', [searchTerm]) }}</span>
 				</p>
-				<p v-else class="mt-2 text-xs text-gray-500">No items available</p>
+				<p v-else class="mt-2 text-xs text-gray-500">{{ __('No items available') }}</p>
 			</div>
 		</div>
 
@@ -285,14 +292,18 @@
 						<div
 							v-if="item.is_stock_item || item.is_bundle"
 							:class="[
-								'absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 rounded-md shadow-lg z-10',
+								'absolute -top-1.5 -end-1.5 sm:-top-2 sm:-end-2 rounded-md shadow-lg z-10',
 								'px-2 sm:px-2.5 py-1 sm:py-1',
 								'text-[10px] sm:text-xs font-bold',
 								'border-2 border-white',
 								getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).color,
 								getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).textColor
 							]"
-							:title="`${getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).label}: ${Math.floor(item.actual_qty ?? item.stock_qty ?? 0)} ${item.is_bundle ? 'Bundles' : (item.uom || item.stock_uom || 'Nos')}`"
+							:title="__('{0}: {1} {2}', [
+								getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).label,
+								Math.floor(item.actual_qty ?? item.stock_qty ?? 0),
+								(item.uom || item.stock_uom || __('Nos', null, 'UOM'))
+							], 'stock with uom')"
 						>
 							{{ Math.floor(item.actual_qty ?? item.stock_qty ?? 0) }}
 						</div>
@@ -350,8 +361,8 @@
 								v-if="(item.is_stock_item || item.is_bundle) && (item.actual_qty ?? item.stock_qty ?? 0) <= 0"
 								@click.stop="showWarehouseAvailability(item)"
 								class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-								title="Check availability in other warehouses"
-								aria-label="Check warehouse availability"
+								:title="__('Check availability in other warehouses')"
+								:aria-label="__('Check warehouse availability')"
 							>
 								<div class="p-2.5 bg-white/80 backdrop-blur-sm rounded-full">
 									<svg class="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -366,10 +377,10 @@
 							<h3 class="text-[10px] sm:text-xs font-semibold text-gray-900 truncate mb-0.5 leading-tight">
 								{{ item.item_name }}
 							</h3>
-                                                        <p class="text-[9px] sm:text-[10px] text-gray-500 leading-tight">
-                                                                <span class="font-semibold text-blue-600">{{ formatCurrency(item.rate || item.price_list_rate || 0) }}</span>
-                                                                <span class="text-gray-400">/ {{ item.uom || item.stock_uom || 'Nos' }}</span>
-                                                        </p>
+							<p class="text-[9px] sm:text-[10px] text-gray-500 leading-tight">
+									<span class="font-semibold text-blue-600">{{ formatCurrency(item.rate || item.price_list_rate || 0) }}</span>
+									<span class="text-gray-400">/ {{ item.uom || item.stock_uom || __('Nos', null, 'UOM') }}</span>
+							</p>
 						</div>
 					</div>
 				</div>
@@ -377,17 +388,17 @@
 				<!-- Loading More Indicator for Grid View -->
 				<div v-if="loadingMore" class="flex justify-center items-center py-4">
 					<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-					<p class="ml-2 text-xs text-gray-500">Loading more items...</p>
+					<p class="ms-2 text-xs text-gray-500">{{ __('Loading more items...') }}</p>
 				</div>
 
 				<!-- End of Results Indicator - Only show on last page or when all items fit in one page -->
 				<div v-else-if="!hasMore && filteredItems.length > 0 && !searchTerm && (currentPage === totalPages || totalPages === 1)" class="flex justify-center items-center py-3">
-					<p class="text-xs text-gray-400">All items loaded</p>
+					<p class="text-xs text-gray-400">{{ __('All items loaded') }}</p>
 				</div>
 
 				<!-- Search Results Count -->
 				<div v-else-if="searchTerm && filteredItems.length > 0" class="flex justify-center items-center py-3">
-					<p class="text-xs text-gray-500">{{ filteredItems.length }} items found</p>
+					<p class="text-xs text-gray-500">{{ __('{0} items found', [filteredItems.length]) }}</p>
 				</div>
 			</div>
 
@@ -395,9 +406,13 @@
 			<div v-if="totalPages > 1" class="px-2 sm:px-3 py-2 bg-white border-t border-gray-200">
 				<div class="flex flex-col sm:flex-row items-center justify-between gap-2">
 					<div class="text-[10px] sm:text-xs text-gray-600 order-2 sm:order-1">
-						{{ ((currentPage - 1) * itemsPerPage) + 1 }}-{{ Math.min(currentPage * itemsPerPage, filteredItems.length) }} of {{ filteredItems.length }}
+						{{ __('{0} - {1} of {2}', [
+							(((currentPage - 1) * itemsPerPage) + 1),
+							Math.min(currentPage * itemsPerPage, filteredItems.length),
+							filteredItems.length
+						]) }}
 					</div>
-					<div class="flex items-center space-x-1 order-1 sm:order-2">
+					<div class="flex items-center gap-1 order-1 sm:order-2">
 						<button
 							@click="goToPage(1)"
 							:disabled="currentPage === 1"
@@ -407,9 +422,9 @@
 									? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
 									: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 							]"
-							:aria-label="'Go to first page'"
+							:aria-label="__('Go to first page')"
 						>
-							<span class="hidden xs:inline">First</span>
+							<span class="hidden xs:inline">{{ __('First') }}</span>
 							<span class="xs:hidden">«</span>
 						</button>
 						<button
@@ -421,12 +436,12 @@
 									? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
 									: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 							]"
-							:aria-label="'Go to previous page'"
+							:aria-label="__('Go to previous page')"
 						>
-							<span class="hidden xs:inline">Previous</span>
+							<span class="hidden xs:inline">{{ __('Previous') }}</span>
 							<span class="xs:hidden">‹</span>
 						</button>
-						<div class="flex items-center space-x-0.5 sm:space-x-1">
+						<div class="flex items-center gap-0.5 sm:gap-1">
 							<button
 								v-for="page in getPaginationRange()"
 								:key="page"
@@ -437,7 +452,7 @@
 										? 'bg-blue-600 text-white border-blue-600'
 										: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 								]"
-								:aria-label="'Go to page ' + page"
+								:aria-label="__('Go to page {0}', [page])"
 							>
 								{{ page }}
 							</button>
@@ -451,9 +466,9 @@
 									? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
 									: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 							]"
-							:aria-label="'Go to next page'"
+							:aria-label="__('Go to next page')"
 						>
-							<span class="hidden xs:inline">Next</span>
+							<span class="hidden xs:inline">{{ __('Next') }}</span>
 							<span class="xs:hidden">›</span>
 						</button>
 						<button
@@ -465,9 +480,9 @@
 									? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
 									: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 							]"
-							:aria-label="'Go to last page'"
+							:aria-label="__('Go to last page')"
 						>
-							<span class="hidden xs:inline">Last</span>
+							<span class="hidden xs:inline">{{ __('Last') }}</span>
 							<span class="xs:hidden">»</span>
 						</button>
 					</div>
@@ -485,12 +500,12 @@
 				<table v-if="paginatedItems.length > 0" class="min-w-full divide-y divide-gray-200">
 					<thead class="bg-gray-50 sticky top-0 z-10">
 						<tr>
-							<th scope="col" class="px-2 sm:px-3 py-2 sm:py-2.5 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider bg-gray-50 border-b-2 border-gray-200 sticky top-0 z-10 w-[50px] sm:w-[60px]">Image</th>
-							<th scope="col" class="px-2 sm:px-3 py-2 sm:py-2.5 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider bg-gray-50 border-b-2 border-gray-200 sticky top-0 z-10 max-w-[120px] sm:max-w-[180px] md:max-w-[200px]">Name</th>
-							<th scope="col" class="hidden sm:table-cell px-2 sm:px-3 py-2 sm:py-2.5 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider bg-gray-50 border-b-2 border-gray-200 sticky top-0 z-10 sm:max-w-[150px]">Code</th>
-							<th scope="col" class="px-2 sm:px-3 py-2 sm:py-2.5 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider bg-gray-50 border-b-2 border-gray-200 sticky top-0 z-10 w-[70px] sm:w-[100px]">Rate</th>
-							<th scope="col" class="px-2 sm:px-3 py-2 sm:py-2.5 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider bg-gray-50 border-b-2 border-gray-200 sticky top-0 z-10 w-[70px] sm:w-[100px]">Qty</th>
-							<th scope="col" class="hidden md:table-cell px-2 sm:px-3 py-2 sm:py-2.5 text-left text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider bg-gray-50 border-b-2 border-gray-200 sticky top-0 z-10 md:w-[80px]">UOM</th>
+							<th scope="col" class="px-2 sm:px-3 py-2 sm:py-2.5 text-start text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider bg-gray-50 border-b-2 border-gray-200 sticky top-0 z-10 w-[50px] sm:w-[60px]">{{ __('Image') }}</th>
+							<th scope="col" class="px-2 sm:px-3 py-2 sm:py-2.5 text-start text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider bg-gray-50 border-b-2 border-gray-200 sticky top-0 z-10 max-w-[120px] sm:max-w-[180px] md:max-w-[200px]">{{ __('Name') }}</th>
+							<th scope="col" class="hidden sm:table-cell px-2 sm:px-3 py-2 sm:py-2.5 text-start text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider bg-gray-50 border-b-2 border-gray-200 sticky top-0 z-10 sm:max-w-[150px]">{{ __('Code') }}</th>
+							<th scope="col" class="px-2 sm:px-3 py-2 sm:py-2.5 text-start text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider bg-gray-50 border-b-2 border-gray-200 sticky top-0 z-10 w-[70px] sm:w-[100px]">{{ __('Rate') }}</th>
+							<th scope="col" class="px-2 sm:px-3 py-2 sm:py-2.5 text-start text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider bg-gray-50 border-b-2 border-gray-200 sticky top-0 z-10 w-[70px] sm:w-[100px]">{{ __('Qty') }}</th>
+							<th scope="col" class="hidden md:table-cell px-2 sm:px-3 py-2 sm:py-2.5 text-start text-[10px] sm:text-xs font-semibold text-gray-700 uppercase tracking-wider bg-gray-50 border-b-2 border-gray-200 sticky top-0 z-10 md:w-[80px]">{{ __('UOM') }}</th>
 						</tr>
 					</thead>
 					<tbody class="bg-white divide-y divide-gray-200">
@@ -549,7 +564,16 @@
 											getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).textColor,
 											(item.actual_qty ?? item.stock_qty ?? 0) <= 0 ? 'group-hover:blur-sm group-hover:brightness-90' : ''
 										]"
-										:title="`${getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).label}: ${Math.floor(item.actual_qty ?? item.stock_qty ?? 0)} ${item.is_bundle ? 'Bundles' : (item.uom || item.stock_uom || 'Nos')}`"
+										:title="item.is_bundle 
+											? __('{0}: {1} Bundles', [
+											getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).label,
+											Math.floor(item.actual_qty ?? item.stock_qty ?? 0)
+										], 'item bundle stock')
+											: __('{0}: {1} {2}', [
+											getStockStatus(item.actual_qty ?? item.stock_qty ?? 0).label,
+											Math.floor(item.actual_qty ?? item.stock_qty ?? 0),
+											(item.uom || item.stock_uom || __('Nos', null, 'UOM'))
+										], 'item stock with uom')"
 									>
 										{{ Math.floor(item.actual_qty ?? item.stock_qty ?? 0) }}
 									</span>
@@ -558,7 +582,7 @@
 										v-if="(item.actual_qty ?? item.stock_qty ?? 0) <= 0"
 										@click.stop="showWarehouseAvailability(item)"
 										class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-										title="Check availability in other warehouses"
+										:title="__('Check availability in other warehouses')"
 									>
 										<div class="p-1.5 bg-white/90 backdrop-blur-sm rounded-full">
 											<svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -571,11 +595,11 @@
 									v-else
 									class="text-xs sm:text-sm text-gray-400 italic"
 								>
-									N/A
+									{{ __('N/A') }}
 								</span>
 							</td>
 							<td class="hidden md:table-cell px-2 sm:px-3 py-2 whitespace-nowrap md:w-[80px]">
-								<div class="text-xs sm:text-sm text-gray-500">{{ item.uom || item.stock_uom || 'Nos' }}</div>
+								<div class="text-xs sm:text-sm text-gray-500">{{ item.uom || item.stock_uom || __('Nos', null, 'UOM') }}</div>
 							</td>
 						</tr>
 						<!-- Loading More Indicator Row -->
@@ -583,7 +607,7 @@
 							<td colspan="6" class="px-2 sm:px-3 py-4 text-center bg-white">
 								<div class="flex justify-center items-center">
 									<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-									<p class="ml-2 text-xs text-gray-500">Loading more items...</p>
+									<p class="ms-2 text-xs text-gray-500">{{ __('Loading more items...') }}</p>
 								</div>
 							</td>
 						</tr>
@@ -591,14 +615,14 @@
 						<!-- End of Results Indicator Row - Only show on last page or when all items fit in one page -->
 						<tr v-else-if="!hasMore && filteredItems.length > 0 && !searchTerm && (currentPage === totalPages || totalPages === 1)">
 							<td colspan="6" class="px-2 sm:px-3 py-3 text-center bg-white">
-								<p class="text-xs text-gray-400">All items loaded</p>
+								<p class="text-xs text-gray-400">{{ __('All items loaded') }}</p>
 							</td>
 						</tr>
 
 						<!-- Search Results Count Row -->
 						<tr v-else-if="searchTerm && filteredItems.length > 0">
 							<td colspan="6" class="px-2 sm:px-3 py-3 text-center bg-white">
-								<p class="text-xs text-gray-500">{{ filteredItems.length }} items found</p>
+								<p class="text-xs text-gray-500">{{ __('{0} items found', [filteredItems.length]) }}</p>
 							</td>
 						</tr>
 					</tbody>
@@ -609,9 +633,13 @@
 			<div v-if="totalPages > 1" class="px-2 sm:px-3 py-2 bg-white border-t border-gray-200">
 				<div class="flex flex-col sm:flex-row items-center justify-between gap-2">
 					<div class="text-[10px] sm:text-xs text-gray-600 order-2 sm:order-1">
-						{{ ((currentPage - 1) * itemsPerPage) + 1 }}-{{ Math.min(currentPage * itemsPerPage, filteredItems.length) }} of {{ filteredItems.length }}
+						{{ __('{0} - {1} of {2}', [
+							(((currentPage - 1) * itemsPerPage) + 1),
+							Math.min(currentPage * itemsPerPage, filteredItems.length),
+							filteredItems.length
+						]) }}
 					</div>
-					<div class="flex items-center space-x-1 order-1 sm:order-2">
+					<div class="flex items-center gap-1 order-1 sm:order-2">
 						<button
 							@click="goToPage(1)"
 							:disabled="currentPage === 1"
@@ -621,9 +649,9 @@
 									? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
 									: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 							]"
-							:aria-label="'Go to first page'"
+							:aria-label="__('Go to first page')"
 						>
-							<span class="hidden xs:inline">First</span>
+							<span class="hidden xs:inline">{{ __('First') }}</span>
 							<span class="xs:hidden">«</span>
 						</button>
 						<button
@@ -635,12 +663,12 @@
 									? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
 									: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 							]"
-							:aria-label="'Go to previous page'"
+							:aria-label="__('Go to previous page')"
 						>
-							<span class="hidden xs:inline">Previous</span>
+							<span class="hidden xs:inline">{{ __('Previous') }}</span>
 							<span class="xs:hidden">‹</span>
 						</button>
-						<div class="flex items-center space-x-0.5 sm:space-x-1">
+						<div class="flex items-center gap-0.5 sm:gap-1">
 							<button
 								v-for="page in getPaginationRange()"
 								:key="page"
@@ -651,7 +679,7 @@
 										? 'bg-blue-600 text-white border-blue-600'
 										: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 								]"
-								:aria-label="'Go to page ' + page"
+								:aria-label="__('Go to page {0}', [page])"
 							>
 								{{ page }}
 							</button>
@@ -665,9 +693,9 @@
 									? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
 									: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 							]"
-							:aria-label="'Go to next page'"
+							:aria-label="__('Go to next page')"
 						>
-							<span class="hidden xs:inline">Next</span>
+							<span class="hidden xs:inline">{{ __('Next') }}</span>
 							<span class="xs:hidden">›</span>
 						</button>
 						<button
@@ -679,9 +707,9 @@
 									? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
 									: 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 active:bg-gray-100'
 							]"
-							:aria-label="'Go to last page'"
+							:aria-label="__('Go to last page')"
 						>
-							<span class="hidden xs:inline">Last</span>
+							<span class="hidden xs:inline">{{ __('Last') }}</span>
 							<span class="xs:hidden">»</span>
 						</button>
 					</div>
@@ -799,36 +827,36 @@ const totalPages = computed(() => {
 })
 
 const SEARCH_PLACEHOLDERS = Object.freeze({
-	auto: "Auto-Add ON - Type or scan barcode",
-	scanner: "Scanner ON - Enable Auto for automatic addition",
-	default: "Search by item code, name or scan barcode",
+	auto: __("Auto-Add ON - Type or scan barcode"),
+	scanner: __("Scanner ON - Enable Auto for automatic addition"),
+	default: __("Search by item code, name or scan barcode"),
 })
 
 // Sort configuration
 const SORT_OPTIONS = Object.freeze([
 	{
 		field: 'name',
-		label: 'Name',
+		label: __('Name'),
 		icon: 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z'
 	},
 	{
 		field: 'quantity',
-		label: 'Quantity',
+		label: __('Quantity'),
 		icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4'
 	},
 	{
 		field: 'item_group',
-		label: 'Item Group',
+		label: __('Item Group'),
 		icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'
 	},
 	{
 		field: 'price',
-		label: 'Price',
+		label: __('Price'),
 		icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
 	},
 	{
 		field: 'item_code',
-		label: 'Item Code',
+		label: __('Item Code'),
 		icon: 'M7 20l4-16m2 16l4-16M6 9h14M4 15h14'
 	}
 ])
@@ -1089,8 +1117,9 @@ function handleItemClick(itemCode) {
 	// Check stock for stock items AND Product Bundles (bundles now have calculated stock)
 	const qty = Math.floor(item.actual_qty ?? item.stock_qty ?? 0)
 	if ((item.is_stock_item || item.is_bundle) && !item.has_variants && !item.has_serial_no && !item.has_batch_no && qty <= 0 && settingsStore.shouldEnforceStockValidation()) {
-		const itemType = item.is_bundle ? "Bundle" : "Item"
-		showError(`"${item.item_name}" cannot be added to cart. ${itemType} is out of stock. Allow Negative Stock is disabled.`)
+		showError(item.is_bundle 
+			? __('"{0}" cannot be added to cart. Bundle is out of stock. Allow Negative Stock is disabled.', [item.item_name])
+			: __('"{0}" cannot be added to cart. Item is out of stock. Allow Negative Stock is disabled.', [item.item_name]))
 		return
 	}
 
@@ -1128,7 +1157,7 @@ async function handleBarcodeSearch(forceAutoAdd = false) {
 		emit("item-selected", filteredItems.value[0], shouldAutoAdd)
 		itemStore.clearSearch()
 	} else if (filteredItems.value.length === 0) {
-		showWarning(`Item Not Found: No item found with barcode: ${barcode}`)
+		showWarning(__('Item Not Found: No item found with barcode: {0}', [barcode]))
 
 		// If scanner mode is enabled, clear search immediately for next scan
 		if (shouldAutoAdd) {
@@ -1137,9 +1166,9 @@ async function handleBarcodeSearch(forceAutoAdd = false) {
 	} else {
 		if (shouldAutoAdd) {
 			// In scanner mode, don't show manual selection - just notify
-			showWarning(`Multiple Items Found: ${filteredItems.value.length} items match barcode. Please refine search.`)
+			showWarning(__('Multiple Items Found: {0} items match barcode. Please refine search.', [filteredItems.value.length]))
 		} else {
-			showWarning(`Multiple Items Found: ${filteredItems.value.length} items match. Please select one.`)
+			showWarning(__('Multiple Items Found: {0} items match. Please select one.', [filteredItems.value.length]))
 		}
 	}
 }
@@ -1329,7 +1358,7 @@ function getSortIconState(field) {
 function handleClickOutside(event) {
 	if (showSortDropdown.value) {
 		const dropdown = event.target.closest('.relative')
-		if (!dropdown || !dropdown.querySelector('button[aria-label="Sort items"]')?.contains(event.target)) {
+		if (!dropdown || !dropdown.querySelector('button[data-sort-button]')?.contains(event.target)) {
 			showSortDropdown.value = false
 		}
 	}

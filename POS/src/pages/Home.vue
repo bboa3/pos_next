@@ -5,12 +5,12 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
           <div class="flex items-center space-x-4">
-            <h1 class="text-xl font-semibold text-gray-900">POS Next</h1>
+            <h1 class="text-xl font-semibold text-gray-900">{{ __('POS Next') }}</h1>
 
             <!-- Shift Status Indicator -->
             <div v-if="hasOpenShift" class="flex items-center space-x-2 px-3 py-1 bg-green-100 rounded-full">
               <div class="h-2 w-2 bg-green-500 rounded-full"></div>
-              <span class="text-xs font-medium text-green-700">Shift Open</span>
+              <span class="text-xs font-medium text-green-700">{{ __('Shift Open') }}</span>
             </div>
           </div>
 
@@ -37,7 +37,7 @@
               :loading="session.logout.loading"
               class="text-gray-500 hover:text-gray-700"
             >
-              {{ session.logout.loading ? 'Signing out...' : 'Sign out' }}
+              {{ session.logout.loading ? __('Signing out...') : __('Sign out') }}
             </Button>
           </div>
         </div>
@@ -50,17 +50,17 @@
         <div class="border-4 border-dashed border-gray-200 rounded-lg min-h-96 p-8">
           <div class="text-center">
             <h2 class="text-2xl font-bold text-gray-900 mb-4">
-              Welcome to POS Next!
+              {{ __('Welcome to POS Next!') }}
             </h2>
             <p class="text-gray-600 mb-8">
-              Your point of sale system is ready to use.
+              {{ __('Your point of sale system is ready to use.') }}
             </p>
 
             <!-- Shift Management Section -->
             <div class="max-w-2xl mx-auto space-y-4">
               <!-- Shift Status Card -->
               <div class="bg-white p-6 rounded-lg shadow">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Shift Status</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('Shift Status') }}</h3>
 
                 <div v-if="hasOpenShift" class="space-y-4">
                   <div class="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -68,12 +68,21 @@
                       <div class="flex-1">
                         <div class="flex items-center space-x-2 mb-2">
                           <div class="h-3 w-3 bg-green-500 rounded-full"></div>
-                          <span class="font-medium text-green-900">Shift is Open</span>
+                          <span class="font-medium text-green-900">{{ __('Shift is Open') }}</span>
                         </div>
                         <div class="text-sm text-green-700 space-y-1">
-                          <p><strong>POS Profile:</strong> {{ currentProfile?.name }}</p>
-                          <p><strong>Company:</strong> {{ currentCompany?.name }}</p>
-                          <p><strong>Opened:</strong> {{ formatDateTime(currentShift?.period_start_date) }}</p>
+                          <TranslatedHTML 
+                            :tag="'p'"
+                            :inner="__('&lt;strong&gt;POS Profile:&lt;strong&gt; {0}', [currentProfile?.name])"
+                          />
+                          <TranslatedHTML 
+                            :tag="'p'"
+                            :inner="__('&lt;strong&gt;Company:&lt;strong&gt;', [currentCompany?.name])"
+                          />
+                          <TranslatedHTML 
+                            :tag="'p'"
+                            :inner="__('&lt;strong&gt;Opened:&lt;strong&gt;', [formatDateTime(currentShift?.period_start_date)])"
+                          />
                         </div>
                       </div>
                     </div>
@@ -86,7 +95,7 @@
                       @click="openCloseShiftDialog"
                       class="flex-1"
                     >
-                      Close Shift
+                      {{ __('Close Shift') }}
                     </Button>
                     <Button
                       variant="solid"
@@ -94,7 +103,7 @@
                       @click="startSale"
                       class="flex-1"
                     >
-                      Start Sale
+                      {{ __('Start Sale') }}
                     </Button>
                   </div>
                 </div>
@@ -105,10 +114,10 @@
                       <svg class="h-5 w-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
                       </svg>
-                      <span class="font-medium text-yellow-900">No Active Shift</span>
+                      <span class="font-medium text-yellow-900">{{ __('No Active Shift') }}</span>
                     </div>
                     <p class="text-sm text-yellow-700">
-                      You need to open a shift before you can start making sales.
+                      {{ __('You need to open a shift before you can start making sales.') }}
                     </p>
                   </div>
 
@@ -118,14 +127,14 @@
                     @click="showOpenShiftDialog = true"
                     class="w-full"
                   >
-                    Open Shift
+                    {{ __('Open Shift') }}
                   </Button>
                 </div>
               </div>
 
               <!-- System Test -->
               <div class="bg-white p-6 rounded-lg shadow">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">System Test</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">{{ __('System Test') }}</h3>
                 <Button
                   theme="blue"
                   variant="solid"
@@ -133,18 +142,18 @@
                   :loading="ping.loading"
                   class="w-full"
                 >
-                  Test Connection
+                  {{ __('Test Connection') }}
                 </Button>
 
                 <div v-if="ping.data" class="mt-4 p-3 bg-green-50 rounded-md">
                   <div class="text-sm text-green-800">
-                    ✓ Connection successful: {{ ping.data }}
+                    {{ __('✓ Connection successful: {0}', [ping.data]) }}
                   </div>
                 </div>
 
                 <div v-if="ping.error" class="mt-4 p-3 bg-red-50 rounded-md">
                   <div class="text-sm text-red-800">
-                    ✗ Connection failed: {{ ping.error }}
+                    {{ __('✗ Connection failed: {0}', [ping.error]) }}
                   </div>
                 </div>
               </div>
@@ -157,7 +166,7 @@
     <!-- Logout Confirmation Dialog -->
     <Dialog
       v-model="showLogoutDialog"
-      :options="{ title: 'Confirm Sign Out' }"
+      :options="{ title: __('Confirm Sign Out') }"
       :dismissable="!session.logout.loading"
     >
       <template #body-content>
@@ -171,17 +180,17 @@
               </div>
               <div class="ml-3">
                 <h3 class="text-sm font-medium text-yellow-800">
-                  Active Shift Detected
+                  {{ __('Active Shift Detected') }}
                 </h3>
                 <div class="mt-2 text-sm text-yellow-700">
-                  <p>You have an active shift open. Would you like to:</p>
+                  <p>{{ __('You have an active shift open. Would you like to:') }}</p>
                 </div>
               </div>
             </div>
           </div>
 
           <p v-else class="text-sm text-gray-500">
-            Are you sure you want to sign out of POS Next?
+            {{ __('Are you sure you want to sign out of POS Next?') }}
           </p>
         </div>
       </template>
@@ -194,7 +203,7 @@
             @click="showLogoutDialog = false"
             :disabled="session.logout.loading"
           >
-            Cancel
+            {{ __('Cancel') }}
           </Button>
           <Button
             v-if="hasOpenShift"
@@ -202,7 +211,7 @@
             variant="solid"
             @click="logoutWithCloseShift"
           >
-            Close Shift & Sign Out
+            {{ __('Close Shift & Sign Out') }}
           </Button>
           <Button
             theme="red"
@@ -210,7 +219,7 @@
             @click="handleLogout"
             :loading="session.logout.loading"
           >
-            {{ hasOpenShift ? 'Sign Out Only' : 'Sign Out' }}
+            {{ hasOpenShift ? __('Sign Out Only') : __('Sign Out') }}
           </Button>
         </div>
       </template>
@@ -241,6 +250,7 @@ import ShiftClosingDialog from "../components/ShiftClosingDialog.vue"
 import ShiftOpeningDialog from "../components/ShiftOpeningDialog.vue"
 import { useShift } from "../composables/useShift"
 import { session } from "../data/session"
+import TranslatedHTML from "../components/common/TranslatedHTML.vue"
 
 const router = useRouter()
 

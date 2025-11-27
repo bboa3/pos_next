@@ -1,9 +1,39 @@
 import Dexie from "dexie"
+import { logger } from "../logger"
 
-// Initialize Dexie database
+/** @type {import('../logger').Logger} */
+const log = logger.create("OfflineDB")
+
+/**
+ * @fileoverview IndexedDB persistence layer for POS Next offline functionality.
+ *
+ * This module provides:
+ * - Auto-versioned Dexie database with schema migration
+ * - Offline caching for items, customers, stock, prices
+ * - Queue management for offline invoices and payments
+ * - Settings persistence and translation cache
+ *
+ * Schema changes are auto-detected via hash comparison and trigger version bumps.
+ *
+ * @module db
+ * @see {@link https://dexie.org/} Dexie.js documentation
+ */
+
+/** @type {Dexie} Main database instance */
 export const db = new Dexie("pos_next_offline")
 
-// Current schema definition - modify this when you need to change the schema
+/**
+ * Database schema definition.
+ * Modify this object to change the schema - version will auto-increment.
+ *
+ * Index notation:
+ * - `&` = unique primary key
+ * - `++` = auto-increment primary key
+ * - `*` = multi-entry index (array field)
+ * - `[a+b]` = compound index
+ *
+ * @constant {Object}
+ */
 const CURRENT_SCHEMA = {
 	// Key-value store for settings and metadata
 	settings: "&key",
@@ -31,9 +61,18 @@ const CURRENT_SCHEMA = {
 
 	// Drafts (already handled by draftManager, but keeping for consistency)
 	drafts: "++id, draft_id, timestamp",
+
+	// Translations cache for offline language support
+	translations: "&locale, timestamp",
 }
 
-// Generate a hash of the schema for versioning
+/**
+ * Generates a 32-bit hash of the schema for change detection.
+ * Uses djb2 algorithm for fast, deterministic hashing.
+ * @param {Object} schema - Schema object to hash
+ * @returns {number} Positive 32-bit integer hash
+ * @private
+ */
 function getSchemaHash(schema) {
 	const schemaString = JSON.stringify(schema)
 	let hash = 0
@@ -45,7 +84,14 @@ function getSchemaHash(schema) {
 	return Math.abs(hash)
 }
 
-// Get or calculate schema version (synchronous using localStorage)
+/**
+ * Determines the current schema version using localStorage tracking.
+ * Compares stored hash against current schema hash to detect changes.
+ * Auto-increments version when schema changes are detected.
+ *
+ * @returns {number} Current schema version number
+ * @private
+ */
 function getSchemaVersion() {
 	const schemaHash = getSchemaHash(CURRENT_SCHEMA)
 	const storedHash = localStorage.getItem("pos_next_schema_hash")
@@ -56,9 +102,7 @@ function getSchemaVersion() {
 	if (storedHash !== schemaHash.toString()) {
 		// Schema changed, increment version
 		const newVersion = storedVersion + 1
-		console.log(
-			`Schema changed detected. Upgrading from v${storedVersion} to v${newVersion}`,
-		)
+		log.info(`Schema changed detected. Upgrading from v${storedVersion} to v${newVersion}`)
 		localStorage.setItem("pos_next_schema_hash", schemaHash.toString())
 		localStorage.setItem("pos_next_schema_version", newVersion.toString())
 		return newVersion
@@ -69,28 +113,36 @@ function getSchemaVersion() {
 
 // Apply schema with auto-versioning
 const schemaVersion = getSchemaVersion()
-console.log(`Initializing database with schema version: ${schemaVersion}`)
+log.debug(`Initializing database with schema version: ${schemaVersion}`)
 db.version(schemaVersion).stores(CURRENT_SCHEMA)
 
-// Database initialization
+/**
+ * Opens the database connection.
+ * Called automatically on module import.
+ * @returns {Promise<boolean>} True if opened successfully
+ */
 export const initDB = async () => {
 	try {
 		await db.open()
-		console.log("POS Next offline database initialized")
+		log.success("POS Next offline database initialized")
 		return true
 	} catch (error) {
-		console.error("Failed to initialize offline database:", error)
+		log.error("Failed to initialize offline database:", error)
 		return false
 	}
 }
 
-// Health check
+/**
+ * Verifies database health and attempts recovery if needed.
+ * Handles VersionError and InvalidStateError by recreating the database.
+ * @returns {Promise<boolean>} True if database is healthy or recovered
+ */
 export const checkDBHealth = async () => {
 	try {
 		await db.settings.get("health_check")
 		return true
 	} catch (error) {
-		console.error("Database health check failed:", error)
+		log.error("Database health check failed:", error)
 
 		// Try to reopen
 		try {
@@ -98,24 +150,24 @@ export const checkDBHealth = async () => {
 				db.close()
 			}
 			await db.open()
-			console.log("Database reopened successfully")
+			log.info("Database reopened successfully")
 			return true
 		} catch (reopenError) {
-			console.error("Failed to reopen database:", reopenError)
+			log.error("Failed to reopen database:", reopenError)
 
 			// If corrupted, recreate
 			if (
 				reopenError.name === "VersionError" ||
 				reopenError.name === "InvalidStateError"
 			) {
-				console.log("Database appears corrupted, recreating...")
+				log.warn("Database appears corrupted, recreating...")
 				try {
 					await Dexie.delete("pos_next_offline")
 					await db.open()
-					console.log("Database recreated successfully")
+					log.success("Database recreated successfully")
 					return true
 				} catch (recreateError) {
-					console.error("Failed to recreate database:", recreateError)
+					log.error("Failed to recreate database:", recreateError)
 					return false
 				}
 			}
@@ -124,22 +176,33 @@ export const checkDBHealth = async () => {
 	}
 }
 
-// Get/Set settings
+/**
+ * Retrieves a setting value from the database.
+ * @param {string} key - Setting key to retrieve
+ * @param {*} [defaultValue=null] - Value to return if key not found
+ * @returns {Promise<*>} Stored value or defaultValue
+ */
 export const getSetting = async (key, defaultValue = null) => {
 	try {
 		const result = await db.settings.get(key)
 		return result ? result.value : defaultValue
 	} catch (error) {
-		console.error(`Error getting setting ${key}:`, error)
+		log.error(`Error getting setting ${key}:`, error)
 		return defaultValue
 	}
 }
 
+/**
+ * Stores a setting value in the database.
+ * @param {string} key - Setting key
+ * @param {*} value - Value to store (must be IndexedDB-serializable)
+ * @returns {Promise<void>}
+ */
 export const setSetting = async (key, value) => {
 	try {
 		await db.settings.put({ key, value })
 	} catch (error) {
-		console.error(`Error setting ${key}:`, error)
+		log.error(`Error setting ${key}:`, error)
 	}
 }
 
@@ -195,10 +258,10 @@ export const clearCachedData = async (options = {}) => {
 			results.settings = await db.settings.clear()
 		}
 
-		console.log("Cached data cleared:", results)
+		log.info("Cached data cleared:", results)
 		return { success: true, cleared: results }
 	} catch (error) {
-		console.error("Error clearing cached data:", error)
+		log.error("Error clearing cached data:", error)
 		return { success: false, error: error.message, cleared: results }
 	}
 }
@@ -210,7 +273,7 @@ export const clearCachedData = async (options = {}) => {
  */
 export const nukeDatabase = async () => {
 	try {
-		console.warn("NUKING DATABASE - All data will be lost!")
+		log.warn("NUKING DATABASE - All data will be lost!")
 
 		// Close database connection
 		if (db.isOpen()) {
@@ -227,10 +290,10 @@ export const nukeDatabase = async () => {
 		// Recreate database
 		await db.open()
 
-		console.log("Database nuked and recreated successfully")
+		log.success("Database nuked and recreated successfully")
 		return true
 	} catch (error) {
-		console.error("Error nuking database:", error)
+		log.error("Error nuking database:", error)
 		return false
 	}
 }
@@ -274,10 +337,10 @@ export const clearBrowserCache = () => {
 			results.sessionStorage++
 		})
 
-		console.log("Browser cache cleared:", results)
+		log.info("Browser cache cleared:", results)
 		return { success: true, cleared: results }
 	} catch (error) {
-		console.error("Error clearing browser cache:", error)
+		log.error("Error clearing browser cache:", error)
 		return { success: false, error: error.message, cleared: results }
 	}
 }

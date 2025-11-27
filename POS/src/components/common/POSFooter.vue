@@ -1,7 +1,7 @@
 <template>
 	<div ref="footerRoot" :class="footerClass" :style="footerStyle" :data-bw-sig="brandSignature"
 		@contextmenu.prevent @selectstart.prevent>
-		<div class="footer-content">
+		<div class="footer-content" dir="ltr">
 			<span class="footer-text">{{ footerText }}</span>
 			<a :href="footerLink" target="_blank" rel="noopener noreferrer" class="footer-link"
 				@click="handleLinkClick">

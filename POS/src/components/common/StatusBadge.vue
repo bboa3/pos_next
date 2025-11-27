@@ -1,11 +1,11 @@
 <template>
-	<div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border" :class="badgeClasses">
+	<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border" :class="badgeClasses">
 		<svg v-if="icon" class="w-4 h-4" :class="iconClasses" :fill="iconFill" stroke="currentColor" viewBox="0 0 24 24">
 			<path :stroke-linecap="strokeLinecap" :stroke-linejoin="strokeLinejoin" :stroke-width="strokeWidth" :d="icon"/>
 		</svg>
 		<div v-if="label || value" :class="textSize">
 			<span v-if="label" class="text-gray-600">{{ label }}</span>
-			<span v-if="value" class="font-semibold text-gray-900" :class="{ 'ml-1': label }">{{ value }}</span>
+			<span v-if="value" class="font-semibold text-gray-900" :class="{ 'ms-1': label }">{{ value }}</span>
 		</div>
 		<span v-else class="font-semibold text-gray-900" :class="textSize">{{ text }}</span>
 	</div>

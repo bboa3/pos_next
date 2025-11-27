@@ -1,24 +1,24 @@
 <template>
-	<Dialog v-model="show" :options="{ title: 'Create New Customer', size: 'md' }">
+	<Dialog v-model="show" :options="{ title: __('Create New Customer'), size: 'md' }">
 		<template #body-content>
-			<div class="space-y-4">
+			<div class="flex flex-col gap-6">
 				<!-- Customer Name -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Customer Name <span class="text-red-500">*</span>
+					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
+						{{ __('Customer Name') }} <span class="text-red-500">*</span>
 					</label>
 					<Input
 						v-model="customerData.customer_name"
 						type="text"
-						placeholder="Enter customer name"
+						:placeholder="__('Enter customer name')"
 						required
 					/>
 				</div>
 
 				<!-- Mobile Number with Country Code -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Mobile Number
+					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
+						{{ __('Mobile Number') }}
 					</label>
 					<div class="flex gap-2">
 						<!-- Country Code Searchable Dropdown -->
@@ -26,7 +26,7 @@
 							<button
 								type="button"
 								@click="showCountryDropdown = !showCountryDropdown"
-								class="flex items-center gap-1 w-24 pl-2 pr-1 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white hover:bg-gray-50"
+								class="flex items-center gap-1 w-24 ps-2 pe-1 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white hover:bg-gray-50"
 							>
 								<img
 									:src="`https://flagcdn.com/h24/${currentCountryCode}.png`"
@@ -34,7 +34,7 @@
 									class="w-6 h-auto rounded-sm"
 									@error="handleFlagError"
 								/>
-								<span class="flex-1 text-left">{{ selectedCountryCode || "+20" }}</span>
+								<span class="flex-1 text-start">{{ selectedCountryCode || "+20" }}</span>
 								<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
 								</svg>
@@ -43,7 +43,7 @@
 							<!-- Dropdown Menu -->
 							<div
 								v-if="showCountryDropdown"
-								class="absolute left-0 z-50 mt-1 w-80 max-h-80 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
+								class="absolute start-0 z-50 mt-1 w-80 max-h-80 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
 							>
 								<!-- Search Input -->
 								<div class="sticky top-0 bg-white border-b border-gray-200 p-2">
@@ -51,7 +51,7 @@
 										ref="countrySearchRef"
 										v-model="countrySearchQuery"
 										type="text"
-										placeholder="Search country or code..."
+										:placeholder="__('Search country or code...')"
 										class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
 										@keydown.escape="showCountryDropdown = false"
 									/>
@@ -64,7 +64,7 @@
 										:key="country.code"
 										type="button"
 										@click="selectCountry(country)"
-										class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left"
+										class="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors text-start"
 										:class="{ 'bg-blue-50': selectedCountryCode === country.isd }"
 									>
 										<img
@@ -77,7 +77,7 @@
 										<span class="text-sm text-gray-500">{{ country.isd }}</span>
 									</button>
 									<div v-if="filteredCountries.length === 0" class="px-4 py-8 text-center text-sm text-gray-500">
-										No countries found
+										{{ __('No countries found') }}
 									</div>
 								</div>
 							</div>
@@ -87,7 +87,7 @@
 						<input
 							v-model="phoneNumber"
 							type="tel"
-							placeholder="Enter phone number"
+							:placeholder="__('Enter phone number')"
 							class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 							@input="updateMobileNumber"
 						/>
@@ -96,26 +96,26 @@
 
 				<!-- Email -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Email
+					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
+						{{ __('Email') }}
 					</label>
 					<Input
 						v-model="customerData.email_id"
 						type="email"
-						placeholder="Enter email address"
+						:placeholder="__('Enter email address')"
 					/>
 				</div>
 
 				<!-- Customer Group -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Customer Group
+					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
+						{{ __('Customer Group') }}
 					</label>
 					<select
 						v-model="customerData.customer_group"
-						class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full px-8 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 					>
-						<option value="">Select Customer Group</option>
+						<option value="">{{ __('Select Customer Group') }}</option>
 						<option v-for="group in customerGroups" :key="group" :value="group">
 							{{ group }}
 						</option>
@@ -124,14 +124,14 @@
 
 				<!-- Territory -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">
-						Territory
+					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
+						{{ __('Territory') }}
 					</label>
 					<select
 						v-model="customerData.territory"
-						class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full px-8 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 					>
-						<option value="">Select Territory</option>
+						<option value="">{{ __('Select Territory') }}</option>
 						<option v-for="territory in territories" :key="territory" :value="territory">
 							{{ territory }}
 						</option>
@@ -141,31 +141,31 @@
 		</template>
 
 		<template #actions>
-			<div class="flex flex-col space-y-2">
+			<div class="flex flex-col flex flex-col gap-2">
 				<!-- Permission Warning -->
 				<div v-if="!hasPermission" class="px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
-					<div class="flex items-start space-x-2">
+					<div class="flex items-start gap-2">
 						<svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
 						</svg>
 						<div class="flex-1">
-							<p class="text-sm font-medium text-amber-900">Permission Required</p>
-							<p class="text-xs text-amber-700 mt-0.5">You don't have permission to create customers. Contact your administrator.</p>
+							<p class="text-sm font-medium text-amber-900">{{ __('Permission Required') }}</p>
+							<p class="text-xs text-amber-700 mt-0.5">{{ __("You don't have permission to create customers. Contact your administrator.") }}</p>
 						</div>
 					</div>
 				</div>
 
-				<div class="flex space-x-2">
-					<Button variant="subtle" @click="show = false">
-						Cancel
-					</Button>
+				<div class="flex gap-2">
 					<Button
 						variant="solid"
 						@click="handleCreate"
 						:loading="createCustomerResource.loading || checkingPermission"
 						:disabled="!customerData.customer_name || !hasPermission"
-					>
-						Create Customer
+						>
+						{{ __('Create Customer') }}
+					</Button>
+					<Button variant="subtle" @click="show = false">
+						{{ __('Cancel') }}
 					</Button>
 				</div>
 			</div>
@@ -367,22 +367,22 @@ const createCustomerResource = createResource({
 				doctype: "Customer",
 				customer_name: customerData.value.customer_name,
 				customer_type: "Individual",
-				customer_group: customerData.value.customer_group || "Individual",
-				territory: customerData.value.territory || "All Territories",
+				customer_group: customerData.value.customer_group || __('Individual'),
+				territory: customerData.value.territory || __('All Territories'),
 				mobile_no: customerData.value.mobile_no || "",
 				email_id: customerData.value.email_id || "",
 			},
 		}
 	},
 	onSuccess(data) {
-		showSuccess(`Customer ${data.customer_name} created successfully`)
+		showSuccess(__('Customer {0} created successfully', [data.customer_name]))
 
 		emit("customer-created", data)
 		show.value = false
 	},
 	onError(error) {
 		log.error("Error creating customer", error)
-		showError(error.message || "Failed to create customer")
+		showError(error.message || __("Failed to create customer"))
 	},
 })
 
@@ -470,7 +470,7 @@ const checkPermissions = async () => {
 }
 
 const handleCreate = async () => {
-	if (!customerData.value.customer_name) return showError("Customer Name is required")
+	if (!customerData.value.customer_name) return showError(__("Customer Name is required"))
 	await createCustomerResource.submit()
 }
 

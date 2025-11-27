@@ -1,12 +1,12 @@
 <template>
-	<Dialog v-model="show" :options="{ title: 'Edit Item Details', size: 'md' }">
+	<Dialog v-model="show" :options="{ title: __('Edit Item Details'), size: 'md' }">
 		<template #body-title>
-			<span class="sr-only">Edit item quantity, UOM, warehouse, and discount</span>
+			<span class="sr-only">{{ __('Edit item quantity, UOM, warehouse, and discount') }}</span>
 		</template>
 		<template #body-content>
-			<div v-if="localItem" class="space-y-4">
+			<div v-if="localItem" class="flex flex-col gap-4">
 				<!-- Item Header -->
-				<div class="flex items-center space-x-3 pb-4 border-b border-gray-200">
+				<div class="flex items-center gap-3 pb-4 border-b border-gray-200">
 					<!-- Item Image -->
 					<div class="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
 						<img
@@ -36,7 +36,7 @@
 							{{ localItem.item_name }}
 						</h3>
 						<p class="text-sm text-gray-500 truncate">
-							{{ formatCurrency(localItem.price_list_rate || localItem.rate) }} / {{ localItem.stock_uom || 'Nos' }}
+							{{ formatCurrency(localItem.price_list_rate || localItem.rate) }} / {{ localItem.stock_uom || __('Nos', null, 'UOM') }}
 						</p>
 					</div>
 				</div>
@@ -44,10 +44,10 @@
 				<!-- Two Column Layout for Quantity, UOM, Rate, Warehouse -->
 				<div class="grid grid-cols-2 gap-4">
 					<!-- Left Column: Quantity and Rate -->
-					<div class="space-y-4">
+					<div class="flex flex-col gap-4">
 						<!-- Quantity Control -->
 						<div>
-							<label class="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+							<label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Quantity') }}</label>
 							<div class="w-full h-10 border border-gray-300 rounded-lg bg-white flex items-center overflow-hidden">
 								<button
 									type="button"
@@ -83,9 +83,9 @@
 
 						<!-- Rate -->
 						<div>
-							<label class="block text-sm font-medium text-gray-700 mb-2">Rate</label>
+							<label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Rate') }}</label>
 							<div class="relative h-10">
-								<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 text-sm font-medium">
+								<span class="absolute inset-y-0 start-0 ps-3 flex items-center text-gray-500 text-sm font-medium">
 									{{ currencySymbol }}
 								</span>
 								<input
@@ -94,17 +94,17 @@
 									min="0"
 									step="0.01"
 									readonly
-									class="w-full h-10 border border-gray-300 rounded-lg pl-16 pr-3 text-sm font-semibold bg-gray-50 cursor-not-allowed"
+									class="w-full h-10 border border-gray-300 rounded-lg ps-16 pe-3 text-sm font-semibold bg-gray-50 cursor-not-allowed"
 								/>
 							</div>
 						</div>
 					</div>
 
 					<!-- Right Column: UOM and Warehouse -->
-					<div class="space-y-4">
+					<div class="flex flex-col gap-4">
 						<!-- UOM Selector -->
 						<div>
-							<label class="block text-sm font-medium text-gray-700 mb-2">UOM</label>
+							<label class="block text-sm font-medium text-gray-700 mb-2">{{ __('UOM') }}</label>
 							<select
 								v-model="localUom"
 								@change="handleUomChange"
@@ -124,7 +124,7 @@
 
 						<!-- Warehouse Selector -->
 						<div>
-							<label class="block text-sm font-medium text-gray-700 mb-2">Warehouse</label>
+							<label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Warehouse') }}</label>
 							<select
 								v-model="localWarehouse"
 								@change="handleWarehouseChange"
@@ -139,7 +139,7 @@
 									{{ warehouse.warehouse || warehouse.name }}
 								</option>
 								<option v-else :value="localWarehouse">
-									{{ localWarehouse || 'Default' }}
+									{{ localWarehouse || __('Default') }}
 								</option>
 							</select>
 						</div>
@@ -148,23 +148,23 @@
 
 				<!-- Item Discount Section (only if allowed by POS Profile) -->
 				<div v-if="settingsStore.allowItemDiscount" class="border-t border-gray-200 pt-4">
-					<label class="block text-sm font-medium text-gray-700 mb-3">Item Discount</label>
+					<label class="block text-sm font-medium text-gray-700 mb-3">{{ __('Item Discount') }}</label>
 					<div class="grid grid-cols-2 gap-3">
 						<!-- Discount Type -->
 						<div>
-							<label class="block text-xs text-gray-600 mb-1">Discount Type</label>
+							<label class="block text-xs text-gray-600 mb-1">{{ __('Discount Type') }}</label>
 							<select
 								v-model="discountType"
 								@change="handleDiscountTypeChange"
 								class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 							>
-								<option value="percentage">Percentage (%)</option>
-								<option value="amount">Amount</option>
+								<option value="percentage">{{ __('Percentage (%)') }}</option>
+								<option value="amount">{{ __('Amount') }}</option>
 							</select>
 						</div>
 						<!-- Discount Value -->
 						<div>
-							<label class="block text-xs text-gray-600 mb-1">{{ discountType === 'percentage' ? 'Percentage' : 'Amount' }}</label>
+							<label class="block text-xs text-gray-600 mb-1">{{ discountType === 'percentage' ? __('Percentage') : __('Amount') }}</label>
 							<div class="relative">
 								<input
 									v-model.number="discountValue"
@@ -172,10 +172,10 @@
 									min="0"
 									:max="discountType === 'percentage' ? 100 : undefined"
 									step="0.01"
-									class="w-full border border-gray-300 rounded-lg px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+									class="w-full border border-gray-300 rounded-lg px-3 py-2 pe-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									@input="calculateDiscount"
 								/>
-								<span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 text-sm">
+								<span class="absolute inset-y-0 end-0 pe-3 flex items-center text-gray-500 text-sm">
 									{{ discountType === 'percentage' ? '%' : '' }}
 								</span>
 							</div>
@@ -184,17 +184,17 @@
 				</div>
 
 				<!-- Totals -->
-				<div class="bg-gray-50 rounded-lg p-4 space-y-2">
+				<div class="bg-gray-50 rounded-lg p-4 flex flex-col gap-2">
 					<div class="flex items-center justify-between text-sm">
-						<span class="text-gray-600">Subtotal:</span>
+						<span class="text-gray-600">{{ __('Subtotal:') }}</span>
 						<span class="font-semibold text-gray-900">{{ formatCurrency(calculatedSubtotal) }}</span>
 					</div>
 					<div v-if="calculatedDiscount > 0" class="flex items-center justify-between text-sm text-red-600">
-						<span>Discount:</span>
+						<span>{{ __('Discount:') }}</span>
 						<span class="font-semibold">-{{ formatCurrency(calculatedDiscount) }}</span>
 					</div>
 					<div class="flex items-center justify-between pt-2 border-t border-gray-200">
-						<span class="text-base font-bold text-gray-900">Total:</span>
+						<span class="text-base font-bold text-gray-900">{{ __('Total:') }}</span>
 						<span class="text-lg font-bold text-blue-600">{{ formatCurrency(calculatedTotal) }}</span>
 					</div>
 				</div>
@@ -202,16 +202,16 @@
 		</template>
 
 		<template #actions>
-			<div class="flex items-center justify-end space-x-2">
-				<Button variant="subtle" @click="cancel">Cancel</Button>
+			<div class="flex items-center justify-end gap-2">
+				<Button variant="subtle" @click="cancel">{{ __('Cancel') }}</Button>
 				<Button
 					variant="solid"
 					@click="updateItem"
 					:disabled="!hasStock || isCheckingStock"
 				>
-					<span v-if="isCheckingStock">Checking Stock...</span>
-					<span v-else-if="!hasStock">No Stock Available</span>
-					<span v-else>Update Item</span>
+					<span v-if="isCheckingStock">{{ __('Checking Stock...') }}</span>
+					<span v-else-if="!hasStock">{{ __('No Stock Available') }}</span>
+					<span v-else>{{ __('Update Item') }}</span>
 				</Button>
 			</div>
 		</template>
@@ -279,7 +279,7 @@ watch(
 		if (newItem) {
 			localItem.value = { ...newItem }
 			localQuantity.value = newItem.quantity || 1
-			localUom.value = newItem.uom || newItem.stock_uom || "Nos"
+			localUom.value = newItem.uom || newItem.stock_uom || __("Nos")
 			localRate.value = newItem.rate || 0
 			localWarehouse.value =
 				newItem.warehouse || props.warehouses[0]?.name || ""
@@ -398,17 +398,23 @@ async function handleWarehouseChange() {
 		if (availableStock === 0) {
 			hasStock.value = false
 			showError(
-				`"${localItem.value.item_name}" is not available in warehouse "${localWarehouse.value}". Please select another warehouse.`,
+				__('"{0}" is not available in warehouse "{1}". Please select another warehouse.', 
+				[localItem.value.item_name, localWarehouse.value])
 			)
 		} else if (availableStock < localQuantity.value) {
 			hasStock.value = false
 			showWarning(
-				`Only ${availableStock} units of "${localItem.value.item_name}" available in "${localWarehouse.value}". Current quantity: ${localQuantity.value}`,
+				__('Only {0} units of "{1}" available in "{2}". Current quantity: {3}', [
+					availableStock,
+					localItem.value.item_name,
+					localWarehouse.value,
+					localQuantity.value
+				])
 			)
 		} else {
 			hasStock.value = true
 			showSuccess(
-				`${availableStock} units available in "${localWarehouse.value}"`,
+				__('{0} units available in "{1}"', [availableStock, localWarehouse.value])
 			)
 		}
 	} catch (error) {
