@@ -170,6 +170,24 @@ function printInvoiceCustom(invoiceData) {
 					margin-top: 2px;
 				}
 
+				.item-serials {
+					font-size: 9px;
+					color: #666;
+					margin-top: 3px;
+					padding: 3px 5px;
+					background-color: #f5f5f5;
+					border-radius: 2px;
+				}
+
+				.item-serials-label {
+					font-weight: bold;
+					margin-bottom: 2px;
+				}
+
+				.item-serials-list {
+					word-break: break-all;
+				}
+
 				.totals {
 					margin-top: 15px;
 					border-top: 1px dashed #000;
@@ -322,6 +340,16 @@ function printInvoiceCustom(invoiceData) {
 							<div class="item-discount">
 								<span>Discount ${item.discount_percentage ? `(${Number(item.discount_percentage).toFixed(2)}%)` : ""}</span>
 								<span>-${formatCurrency(item.discount_amount || 0)}</span>
+							</div>
+							`
+									: ""
+							}
+							${
+								item.serial_no
+									? `
+							<div class="item-serials">
+								<div class="item-serials-label">${__('Serial No:')}</div>
+								<div class="item-serials-list">${item.serial_no.replace(/\n/g, ', ')}</div>
 							</div>
 							`
 									: ""

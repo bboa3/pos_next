@@ -48,7 +48,12 @@
 						<!-- Quantity Control -->
 						<div>
 							<label class="block text-sm font-medium text-gray-700 mb-2">{{ __('Quantity') }}</label>
-							<div class="w-full h-10 border border-gray-300 rounded-lg bg-white flex items-center overflow-hidden">
+							<!-- For serial items, quantity is read-only (controlled by serial list) -->
+							<div v-if="localItem?.has_serial_no && localSerials.length > 0" class="w-full h-10 border border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center">
+								<span class="text-sm font-semibold text-gray-600">{{ localSerials.length }}</span>
+							</div>
+							<!-- For non-serial items, show quantity controls -->
+							<div v-else class="w-full h-10 border border-gray-300 rounded-lg bg-white flex items-center overflow-hidden">
 								<button
 									type="button"
 									@click="decrementQuantity"
@@ -146,6 +151,43 @@
 					</div>
 				</div>
 
+				<!-- Serial Numbers Section (only for serial items) -->
+				<div v-if="localItem?.has_serial_no && localSerials.length > 0" class="border-t border-gray-200 pt-4">
+					<div class="flex items-center justify-between mb-3">
+						<label class="block text-sm font-medium text-gray-700">
+							{{ __('Serial Numbers') }}
+							<span class="ms-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+								{{ localSerials.length }}
+							</span>
+						</label>
+					</div>
+					<div class="flex flex-col gap-2 max-h-40 overflow-y-auto">
+						<div
+							v-for="(serial, index) in localSerials"
+							:key="serial"
+							class="flex items-center justify-between gap-2 p-2 bg-gray-50 rounded-lg"
+						>
+							<div class="flex items-center gap-2">
+								<span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-medium">
+									{{ index + 1 }}
+								</span>
+								<span class="text-sm font-medium text-gray-900">{{ serial }}</span>
+							</div>
+							<button
+								type="button"
+								@click="removeSerial(serial)"
+								:disabled="localSerials.length <= 1"
+								class="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+								:title="localSerials.length <= 1 ? __('Cannot remove last serial') : __('Remove serial')"
+							>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
+
 				<!-- Item Discount Section (only if allowed by POS Profile) -->
 				<div v-if="settingsStore.allowItemDiscount" class="border-t border-gray-200 pt-4">
 					<label class="block text-sm font-medium text-gray-700 mb-3">{{ __('Item Discount') }}</label>
@@ -221,6 +263,7 @@
 <script setup>
 import { useToast } from "@/composables/useToast"
 import { usePOSSettingsStore } from "@/stores/posSettings"
+import { useSerialNumberStore } from "@/stores/serialNumber"
 import { getItemStock } from "@/utils/stockValidator"
 import { formatCurrency as formatCurrencyUtil, getCurrencySymbol } from "@/utils/currency"
 import { Button, Dialog } from "frappe-ui"
@@ -228,6 +271,7 @@ import { computed, ref, watch } from "vue"
 
 const { showSuccess, showError, showWarning } = useToast()
 const settingsStore = usePOSSettingsStore()
+const serialStore = useSerialNumberStore()
 
 const props = defineProps({
 	modelValue: Boolean,
@@ -257,6 +301,9 @@ const calculatedDiscount = ref(0)
 const calculatedTotal = ref(0)
 const hasStock = ref(true)
 const isCheckingStock = ref(false)
+const localSerials = ref([]) // List of serial numbers for this item
+const removedSerials = ref([]) // Track serials removed during this edit session
+const originalSerials = ref([]) // Original serials when dialog opened
 
 const show = computed({
 	get: () => props.modelValue,
@@ -283,6 +330,20 @@ watch(
 			localRate.value = newItem.rate || 0
 			localWarehouse.value =
 				newItem.warehouse || props.warehouses[0]?.name || ""
+
+			// Initialize serial numbers
+			if (newItem.has_serial_no && newItem.serial_no) {
+				const serials = newItem.serial_no.split('\n').filter(s => s.trim())
+				localSerials.value = [...serials]
+				originalSerials.value = [...serials] // Keep original for cancel
+				removedSerials.value = [] // Reset removed serials tracker
+				// For serial items, quantity must match serial count
+				localQuantity.value = serials.length
+			} else {
+				localSerials.value = []
+				originalSerials.value = []
+				removedSerials.value = []
+			}
 
 			// Initialize discount
 			if (newItem.discount_percentage && newItem.discount_percentage > 0) {
@@ -454,6 +515,19 @@ function calculateTotals() {
 	calculateDiscount()
 }
 
+function removeSerial(serialNo) {
+	// Remove from local list
+	const index = localSerials.value.indexOf(serialNo)
+	if (index > -1) {
+		localSerials.value.splice(index, 1)
+		// Track removed serial (will be returned to cache on confirm)
+		removedSerials.value.push(serialNo)
+		// Update quantity to match serial count
+		localQuantity.value = localSerials.value.length
+		calculateTotals()
+	}
+}
+
 function formatCurrency(amount) {
 	return formatCurrencyUtil(Number.parseFloat(amount || 0), props.currency)
 }
@@ -469,6 +543,17 @@ function updateItem() {
 			discountType.value === "percentage" ? discountValue.value : 0,
 		discount_amount:
 			discountType.value === "amount" ? discountValue.value : 0,
+	}
+
+	// Update serial numbers if item has serials
+	if (localItem.value.has_serial_no) {
+		updatedItem.serial_no = localSerials.value.join('\n')
+		updatedItem.quantity = localSerials.value.length
+
+		// Return removed serials to cache now that update is confirmed
+		if (removedSerials.value.length > 0) {
+			serialStore.returnSerials(localItem.value.item_code, removedSerials.value)
+		}
 	}
 
 	emit("update-item", updatedItem)

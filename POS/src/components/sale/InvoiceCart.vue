@@ -418,7 +418,28 @@
 							<div class="flex items-center justify-between gap-1.5">
 								<div class="flex items-center gap-1.5" @click.stop>
 									<!-- Quantity Counter -->
-									<div class="flex items-center bg-gray-50 border-2 border-gray-200 rounded-lg overflow-hidden">
+									<!-- For serial items, show serial badge with edit button -->
+									<div v-if="item.has_serial_no && item.serial_no"
+										class="flex items-center gap-1"
+									>
+										<!-- Serial count badge -->
+										<div class="flex items-center bg-blue-50 border border-blue-200 rounded-lg px-2 h-7 sm:h-8">
+											<FeatherIcon name="hash" class="w-3.5 h-3.5 text-blue-500 me-1" />
+											<span class="text-sm sm:text-base font-bold text-blue-700">{{ item.quantity }}</span>
+											<span class="text-[10px] text-blue-500 ms-1 hidden sm:inline">{{ __('serials') }}</span>
+										</div>
+										<!-- Edit button -->
+										<button
+											type="button"
+											@click="openEditDialog(item)"
+											class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg transition-colors shadow-sm"
+											:title="__('Edit serials')"
+										>
+											<FeatherIcon name="edit-2" class="w-3.5 h-3.5" />
+										</button>
+									</div>
+									<!-- For non-serial items, show normal quantity controls -->
+									<div v-else class="flex items-center bg-gray-50 border-2 border-gray-200 rounded-lg overflow-hidden">
 										<button
 											type="button"
 											@click="decrementQuantity(item)"
@@ -661,6 +682,7 @@ import { usePOSOffersStore } from "@/stores/posOffers"
 import { formatCurrency as formatCurrencyUtil } from "@/utils/currency"
 import { useFormatters } from "@/composables/useFormatters"
 import { isOffline } from "@/utils/offline"
+import { FeatherIcon } from "frappe-ui"
 import { offlineWorker } from "@/utils/offline/workerClient"
 import { createResource } from "frappe-ui"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"

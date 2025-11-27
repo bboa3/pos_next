@@ -1742,13 +1742,15 @@ async function handleApplyOffer(offer) {
 
 function handleBatchSerialSelected(batchSerial) {
 	if (cartStore.pendingItem) {
+		// Use quantity from batchSerial if provided (for multiple serial numbers), otherwise use pendingItemQty
+		const qty = batchSerial.quantity || cartStore.pendingItemQty
 		const itemToAdd = {
 			...cartStore.pendingItem,
-			quantity: cartStore.pendingItemQty,
+			quantity: qty,
 			...batchSerial,
 		}
 		try {
-			cartStore.addItem(itemToAdd, cartStore.pendingItemQty, false, shiftStore.currentProfile)
+			cartStore.addItem(itemToAdd, qty, false, shiftStore.currentProfile)
 			cartStore.clearPendingItem()
 		} catch (error) {
 			showError(error.message)

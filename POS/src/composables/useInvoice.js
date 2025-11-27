@@ -1,8 +1,11 @@
 import { createResource } from "frappe-ui"
 import { computed, ref, toRaw } from "vue"
 import { isOffline } from "@/utils/offline"
+import { useSerialNumberStore } from "@/stores/serialNumber"
 
 export function useInvoice() {
+	// Serial Number Store for returning serials when items are removed
+	const serialStore = useSerialNumberStore()
 	// State
 	const invoiceItems = ref([])
 	const customer = ref(null)
@@ -160,7 +163,20 @@ export function useInvoice() {
 			const oldTax = existingItem.tax_amount || 0
 			const oldDiscount = existingItem.discount_amount || 0
 
-			existingItem.quantity += quantity
+			// For serial items, merge the serial numbers
+			if (existingItem.has_serial_no && item.serial_no) {
+				const existingSerials = existingItem.serial_no
+					? existingItem.serial_no.split('\n').filter(s => s.trim())
+					: []
+				const newSerials = item.serial_no.split('\n').filter(s => s.trim())
+				// Combine serials (avoid duplicates)
+				const allSerials = [...new Set([...existingSerials, ...newSerials])]
+				existingItem.serial_no = allSerials.join('\n')
+				// For serial items, quantity must match serial count
+				existingItem.quantity = allSerials.length
+			} else {
+				existingItem.quantity += quantity
+			}
 			recalculateItem(existingItem)
 
 			// Update cache incrementally (new values - old values)
@@ -223,6 +239,11 @@ export function useInvoice() {
 			_cachedSubtotal.value -= itemToRemove.quantity * priceListRate
 			_cachedTotalTax.value -= itemToRemove.tax_amount || 0
 			_cachedTotalDiscount.value -= itemToRemove.discount_amount || 0
+
+			// Return serial numbers back to cache if item has serials
+			if (itemToRemove.serial_no && itemToRemove.has_serial_no) {
+				serialStore.returnSerials(itemCode, itemToRemove.serial_no)
+			}
 		}
 
 		invoiceItems.value = invoiceItems.value.filter(
@@ -239,8 +260,29 @@ export function useInvoice() {
 			const oldAmount = item.quantity * oldPriceListRate
 			const oldTax = item.tax_amount || 0
 			const oldDiscount = item.discount_amount || 0
+			const oldQuantity = item.quantity
 
-			item.quantity = Number.parseFloat(quantity) || 1
+			const newQuantity = Number.parseFloat(quantity) || 1
+
+			// Handle serial number items - adjust serials when quantity changes
+			if (item.has_serial_no && item.serial_no) {
+				const serialList = item.serial_no.split('\n').filter(s => s.trim())
+
+				if (newQuantity < oldQuantity) {
+					// Quantity decreased - return excess serials to cache
+					const serialsToReturn = serialList.slice(newQuantity)
+					const serialsToKeep = serialList.slice(0, newQuantity)
+
+					if (serialsToReturn.length > 0) {
+						serialStore.returnSerials(itemCode, serialsToReturn)
+						item.serial_no = serialsToKeep.join('\n')
+					}
+				}
+				// Note: Increasing quantity for serial items requires selecting new serials
+				// which should be handled by reopening the serial dialog
+			}
+
+			item.quantity = newQuantity
 			recalculateItem(item)
 
 			// Update cache incrementally (new values - old values)
@@ -827,6 +869,13 @@ export function useInvoice() {
 	 * If a POS Profile is active and has a default customer, it will be pre-selected.
 	 */
 	async function clearCart() {
+		// Return all serial numbers back to cache before clearing
+		for (const item of invoiceItems.value) {
+			if (item.has_serial_no && item.serial_no) {
+				serialStore.returnSerials(item.item_code, item.serial_no)
+			}
+		}
+
 		invoiceItems.value = []
 		payments.value = []
 		additionalDiscount.value = 0

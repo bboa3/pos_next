@@ -658,6 +658,10 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			if (updatedDetails.price_list_rate !== undefined) {
 				cartItem.price_list_rate = updatedDetails.price_list_rate
 			}
+			// Update serial numbers if provided
+			if (updatedDetails.serial_no !== undefined) {
+				cartItem.serial_no = updatedDetails.serial_no
+			}
 
 			// Recalculate item totals (this will compute the correct rate from price_list_rate and discount)
 			recalculateItem(cartItem)
