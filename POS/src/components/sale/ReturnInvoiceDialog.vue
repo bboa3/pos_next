@@ -7,54 +7,52 @@
 			<div class="flex flex-col gap-4">
 				<!-- Recent Invoices List -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-3">
+					<label class="block text-sm text-start font-medium text-gray-700 mb-3">
 						{{ __('Select Invoice to Return') }}
 					</label>
 
 					<!-- Search/Filter Input -->
 					<div class="mb-3">
-									<Input
-										v-model="invoiceListFilter"
-										type="text"
-										:placeholder="__('Search by invoice number or customer name...')"
-										class="w-full"
-									/>
-								</div>
+						<Input
+							v-model="invoiceListFilter"
+							type="text"
+							:placeholder="__('Search by invoice number or customer name...')"
+							class="w-full"
+						/>
+					</div>
 
-								<!-- Loading State -->
-								<div v-if="loadInvoicesResource.loading" class="text-center py-8">
-									<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-									<p class="mt-2 text-xs text-gray-500">{{ __('Loading invoices...') }}</p>
-								</div>
+					<!-- Loading State -->
+					<div v-if="loadInvoicesResource.loading" class="text-center py-8">
+						<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+						<p class="mt-2 text-xs text-gray-500">{{ __('Loading invoices...') }}</p>
+					</div>
 
-								<!-- Invoice List -->
-								<div v-else class="max-h-96 overflow-y-auto flex flex-col gap-2 pe-2">
-									<div
-										v-for="invoice in filteredInvoiceList"
-										:key="invoice.name"
-										@click="openReturnModal(invoice)"
-										class="bg-white border border-gray-200 rounded-lg p-3 hover:border-blue-400 hover:bg-blue-50/30 cursor-pointer transition-all"
-									>
-										<div class="flex items-start justify-between gap-3">
-											<div class="flex-1 min-w-0">
-												<div class="flex items-center gap-2 flex-wrap">
-													<h4 class="text-sm font-bold text-gray-900">{{ invoice.name }}</h4>
-													<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-800 whitespace-nowrap">
-														{{ invoice.status }}
-													</span>
-												</div>
-												<p class="text-xs text-gray-600 mt-1">{{ invoice.customer_name }}</p>
-												<p class="text-xs text-gray-500">{{ formatDate(invoice.posting_date) }}</p>
-											</div>
-											<div class="text-end flex-shrink-0">
-												<p class="text-sm font-bold text-gray-900">{{ formatCurrency(invoice.grand_total) }}</p>
-											</div>
-										</div>
-									</div>
-									<p v-if="!loadInvoicesResource.loading && filteredInvoiceList.length === 0" class="text-center py-8 text-gray-500 text-sm">
-										{{ __('No invoices found') }}
-									</p>
+					<!-- Invoice List -->
+					<div v-else class="max-h-96 overflow-y-auto flex flex-col gap-2 pe-2">
+						<div
+							v-for="invoice in filteredInvoiceList"
+							:key="invoice.name"
+							@click="openReturnModal(invoice)"
+							class="bg-white border border-gray-200 rounded-lg p-3 hover:border-blue-400 hover:bg-blue-50/30 cursor-pointer transition-all"
+						>
+							<div class="flex items-start justify-between gap-3">
+								<div class="flex-1 flex items-center gap-2 flex-wrap">
+									<h4 class="text-sm font-bold text-gray-900">{{ invoice.name }}</h4>
+									<span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-800 whitespace-nowrap">
+										{{ invoice.status }}
+									</span>
 								</div>
+								<div class="text-center">
+									<p class="text-sm font-bold text-gray-900">{{ formatCurrency(invoice.grand_total) }}</p>
+									<p class="text-xs text-gray-600 mt-1">{{ invoice.customer_name }}</p>
+									<p class="text-xs text-gray-500">{{ formatDate(invoice.posting_date) }}</p>
+								</div>
+							</div>
+						</div>
+						<p v-if="!loadInvoicesResource.loading && filteredInvoiceList.length === 0" class="text-center py-8 text-gray-500 text-sm">
+							{{ __('No invoices found') }}
+						</p>
+					</div>
 				</div>
 			</div>
 		</template>

@@ -14,7 +14,7 @@
 						<div class="flex items-center gap-3">
 							<FeatherIcon name="tag" class="w-5 h-5 text-gray-700" />
 							<div>
-								<h2 class="text-lg font-semibold text-gray-900">{{ __('Promotion & Coupon Management') }}</h2>
+								<h2 class="text-lg mb-1 font-semibold text-gray-900">{{ __('Promotion & Coupon Management') }}</h2>
 								<p class="text-sm text-gray-600">{{ __('Manage promotional schemes and coupons') }}</p>
 							</div>
 						</div>

@@ -80,11 +80,11 @@
 								</div>
 							</div>
 
-							<div class="text-end ms-4">
-								<p class="text-sm font-bold text-gray-900">
+							<div class="ms-4">
+								<p class="text-sm text-start font-bold text-gray-900">
 									{{ formatCurrency(invoice.grand_total) }}
 								</p>
-								<div class="flex items-center gap-1 mt-2">
+								<div class="flex items-center justify-between mt-2">
 									<button
 										@click="viewInvoice(invoice)"
 										class="p-1.5 hover:bg-blue-50 rounded transition-colors"

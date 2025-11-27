@@ -120,7 +120,8 @@
                   <TranslatedHTML
                     :tag="'p'"
                     :inner="__('&lt;strong&gt;POS Profile:&lt;/strong&gt; {0}', [existingShift.pos_profile?.name])"
-                  />  
+                  />
+                  <div class="h-2"></div>
                   <TranslatedHTML
                     :tag="'p'"
                     :inner="__('&lt;strong&gt;Opened:&lt;/strong&gt; {0}', [formatDateTime(existingShift.pos_opening_shift?.period_start_date)])"

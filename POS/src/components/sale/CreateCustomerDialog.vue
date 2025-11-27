@@ -1,10 +1,10 @@
 <template>
 	<Dialog v-model="show" :options="{ title: __('Create New Customer'), size: 'md' }">
 		<template #body-content>
-			<div class="flex flex-col gap-4">
+			<div class="flex flex-col gap-6">
 				<!-- Customer Name -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">
+					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
 						{{ __('Customer Name') }} <span class="text-red-500">*</span>
 					</label>
 					<Input
@@ -17,7 +17,7 @@
 
 				<!-- Mobile Number with Country Code -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">
+					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
 						{{ __('Mobile Number') }}
 					</label>
 					<div class="flex gap-2">
@@ -96,7 +96,7 @@
 
 				<!-- Email -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">
+					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
 						{{ __('Email') }}
 					</label>
 					<Input
@@ -108,12 +108,12 @@
 
 				<!-- Customer Group -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">
+					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
 						{{ __('Customer Group') }}
 					</label>
 					<select
 						v-model="customerData.customer_group"
-						class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full px-8 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 					>
 						<option value="">{{ __('Select Customer Group') }}</option>
 						<option v-for="group in customerGroups" :key="group" :value="group">
@@ -124,12 +124,12 @@
 
 				<!-- Territory -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-2">
+					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
 						{{ __('Territory') }}
 					</label>
 					<select
 						v-model="customerData.territory"
-						class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+						class="w-full px-8 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 					>
 						<option value="">{{ __('Select Territory') }}</option>
 						<option v-for="territory in territories" :key="territory" :value="territory">
@@ -156,16 +156,16 @@
 				</div>
 
 				<div class="flex gap-2">
-					<Button variant="subtle" @click="show = false">
-						{{ __('Cancel') }}
-					</Button>
 					<Button
 						variant="solid"
 						@click="handleCreate"
 						:loading="createCustomerResource.loading || checkingPermission"
 						:disabled="!customerData.customer_name || !hasPermission"
-					>
+						>
 						{{ __('Create Customer') }}
+					</Button>
+					<Button variant="subtle" @click="show = false">
+						{{ __('Cancel') }}
 					</Button>
 				</div>
 			</div>
