@@ -7,6 +7,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2025-11-28
+
+### Added
+- **Comprehensive Localization System**
+  - Added locale management with Arabic translations for the entire POS application
+  - Implemented LanguageSwitcher component integrated into POSHeader
+  - User language change API with locale management in useLocale composable
+  - Translation caching with IndexedDB for improved performance
+  - Dynamic translation updates ensuring components re-render with selected language
+  - Page reload mechanism to apply new translations consistently
+  - Translation function calls added throughout the codebase for full i18n support
+
+- **Sales Person Feature**
+  - Implemented sales person selection and allocation in payment dialog
+  - Sales person tracking in invoice processing for commission management
+
+- **Enhanced Stock Validation**
+  - Improved stock validation and item handling in cart and selection dialogs
+  - Better error handling for stock-related operations
+
+### Changed
+- **RTL/LTR Support Improvements**
+  - Enhanced RTL support for TextInput components with better layout alignment
+  - Improved InvoiceDetailDialog RTL/mobile support with currency formatting
+  - Standardized invoice status colors for both LTR and RTL layouts
+  - Fixed RTL support for resizing behavior in POSSale component
+  - Adjusted cache tooltip positioning and styling for RTL direction in POSHeader
+
+- **Language Switcher UX**
+  - Moved language switcher to user menu on mobile for a more compact header
+  - Improved button and dropdown styles for better UI consistency
+
+- **Serial Number Management**
+  - Enhanced serial number management in POS for better tracking and selection
+
+- **Layout and Spacing Improvements**
+  - Refactored layout and spacing across UserMenu, POSHeader, ItemsSelector, and POSSale components
+  - Improved overall UI consistency throughout the application
+
+### Fixed
+- **Dependency Updates**
+  - Fixed frappe-ui dependency version format in package.json
+
+- **POS Settings Configuration**
+  - Removed problematic autoname field from POS settings configuration
+
+- **Arabic Translations**
+  - Updated Arabic translations for improved clarity and accuracy
+  - Enhanced Arabic translations for invoices and item sorting functionality
+
 ## [1.9.0] - 2025-11-23
 
 ### Added
@@ -519,7 +569,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shift management
 - Stock tracking
 
-[Unreleased]: https://github.com/BrainWise-DEV/POSNext/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/BrainWise-DEV/POSNext/compare/v1.10.0...HEAD
+[1.10.0]: https://github.com/BrainWise-DEV/POSNext/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/BrainWise-DEV/POSNext/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/BrainWise-DEV/POSNext/compare/v1.7.1...v1.8.0
 [1.7.1]: https://github.com/BrainWise-DEV/POSNext/compare/v1.7.0...v1.7.1
