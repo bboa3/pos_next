@@ -2,10 +2,10 @@
 	<Dialog v-model="show" :options="{ title: __('Create New Customer'), size: 'md' }">
 		<template #body-content>
 			<div class="flex flex-col gap-6">
-				<!-- Customer Name -->
+				<!-- Customer Name (Required) -->
 				<div>
 					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
-						{{ __('Customer Name') }} <span class="text-red-500">*</span>
+						{{ __("Customer Name") }} <span class="text-red-500">*</span>
 					</label>
 					<Input
 						v-model="customerData.customer_name"
@@ -15,13 +15,13 @@
 					/>
 				</div>
 
-				<!-- Mobile Number with Country Code -->
+				<!-- Mobile Number with Country Code Selector -->
 				<div>
 					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
-						{{ __('Mobile Number') }}
+						{{ __("Mobile Number") }}
 					</label>
 					<div class="flex gap-2">
-						<!-- Country Code Searchable Dropdown -->
+						<!-- Country Code Dropdown -->
 						<div class="relative" ref="dropdownRef">
 							<button
 								type="button"
@@ -40,12 +40,11 @@
 								</svg>
 							</button>
 
-							<!-- Dropdown Menu -->
+							<!-- Country Search Dropdown -->
 							<div
 								v-if="showCountryDropdown"
 								class="absolute start-0 z-50 mt-1 w-80 max-h-80 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
 							>
-								<!-- Search Input -->
 								<div class="sticky top-0 bg-white border-b border-gray-200 p-2">
 									<input
 										ref="countrySearchRef"
@@ -56,8 +55,6 @@
 										@keydown.escape="showCountryDropdown = false"
 									/>
 								</div>
-
-								<!-- Countries List -->
 								<div class="overflow-y-auto max-h-64">
 									<button
 										v-for="country in filteredCountries"
@@ -77,7 +74,7 @@
 										<span class="text-sm text-gray-500">{{ country.isd }}</span>
 									</button>
 									<div v-if="filteredCountries.length === 0" class="px-4 py-8 text-center text-sm text-gray-500">
-										{{ __('No countries found') }}
+										{{ __("No countries found") }}
 									</div>
 								</div>
 							</div>
@@ -97,25 +94,21 @@
 				<!-- Email -->
 				<div>
 					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
-						{{ __('Email') }}
+						{{ __("Email") }}
 					</label>
-					<Input
-						v-model="customerData.email_id"
-						type="email"
-						:placeholder="__('Enter email address')"
-					/>
+					<Input v-model="customerData.email_id" type="email" :placeholder="__('Enter email address')" />
 				</div>
 
 				<!-- Customer Group -->
 				<div>
 					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
-						{{ __('Customer Group') }}
+						{{ __("Customer Group") }}
 					</label>
 					<select
 						v-model="customerData.customer_group"
 						class="w-full px-8 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 					>
-						<option value="">{{ __('Select Customer Group') }}</option>
+						<option value="">{{ __("Select Customer Group") }}</option>
 						<option v-for="group in customerGroups" :key="group" :value="group">
 							{{ group }}
 						</option>
@@ -125,13 +118,13 @@
 				<!-- Territory -->
 				<div>
 					<label class="block text-start text-sm font-medium text-gray-700 mb-2">
-						{{ __('Territory') }}
+						{{ __("Territory") }}
 					</label>
 					<select
 						v-model="customerData.territory"
 						class="w-full px-8 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
 					>
-						<option value="">{{ __('Select Territory') }}</option>
+						<option value="">{{ __("Select Territory") }}</option>
 						<option v-for="territory in territories" :key="territory" :value="territory">
 							{{ territory }}
 						</option>
@@ -141,16 +134,22 @@
 		</template>
 
 		<template #actions>
-			<div class="flex flex-col flex flex-col gap-2">
+			<div class="flex flex-col gap-2">
 				<!-- Permission Warning -->
 				<div v-if="!hasPermission" class="px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
 					<div class="flex items-start gap-2">
 						<svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-							<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+							<path
+								fill-rule="evenodd"
+								d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+								clip-rule="evenodd"
+							/>
 						</svg>
 						<div class="flex-1">
-							<p class="text-sm font-medium text-amber-900">{{ __('Permission Required') }}</p>
-							<p class="text-xs text-amber-700 mt-0.5">{{ __("You don't have permission to create customers. Contact your administrator.") }}</p>
+							<p class="text-sm font-medium text-amber-900">{{ __("Permission Required") }}</p>
+							<p class="text-xs text-amber-700 mt-0.5">
+								{{ __("You don't have permission to create customers. Contact your administrator.") }}
+							</p>
 						</div>
 					</div>
 				</div>
@@ -161,11 +160,11 @@
 						@click="handleCreate"
 						:loading="createCustomerResource.loading || checkingPermission"
 						:disabled="!customerData.customer_name || !hasPermission"
-						>
-						{{ __('Create Customer') }}
+					>
+						{{ __("Create Customer") }}
 					</Button>
 					<Button variant="subtle" @click="show = false">
-						{{ __('Cancel') }}
+						{{ __("Cancel") }}
 					</Button>
 				</div>
 			</div>
@@ -174,6 +173,16 @@
 </template>
 
 <script setup>
+/**
+ * CreateCustomerDialog - Quick customer creation from POS
+ *
+ * Features:
+ * - Country code selector with flag icons and search
+ * - Auto-sets territory based on selected country
+ * - Permission checking before allowing creation
+ * - Lazy loads countries data when dialog opens (not on app startup)
+ */
+
 import { usePOSPermissions } from "@/composables/usePermissions"
 import { useToast } from "@/composables/useToast"
 import { useCountriesStore } from "@/stores/countries"
@@ -183,23 +192,30 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
 const log = logger.create("CreateCustomerDialog")
 
-// Stores
+// =============================================================================
+// Composables & Stores
+// =============================================================================
+
 const countriesStore = useCountriesStore()
 const { canCreateCustomer } = usePOSPermissions()
 const { showSuccess, showError } = useToast()
 
-// Load countries immediately during setup (before mount)
-countriesStore.loadCountries()
-
+// =============================================================================
 // Props & Emits
+// =============================================================================
+
 const props = defineProps({
 	modelValue: Boolean,
 	posProfile: String,
 	initialName: String,
 })
+
 const emit = defineEmits(["update:modelValue", "customer-created"])
 
+// =============================================================================
 // State
+// =============================================================================
+
 const hasPermission = ref(true)
 const checkingPermission = ref(false)
 const selectedCountryCode = ref("")
@@ -209,7 +225,21 @@ const countrySearchQuery = ref("")
 const dropdownRef = ref(null)
 const countrySearchRef = ref(null)
 
+const customerGroups = ref(["Commercial", "Individual", "Non Profit", "Government"])
+const territories = ref(["All Territories"])
+
+const customerData = ref({
+	customer_name: "",
+	mobile_no: "",
+	email_id: "",
+	customer_group: "Individual",
+	territory: "All Territories",
+})
+
+// =============================================================================
 // Computed
+// =============================================================================
+
 const show = computed({
 	get: () => props.modelValue,
 	set: (val) => emit("update:modelValue", val),
@@ -225,14 +255,14 @@ const filteredCountries = computed(() => {
 
 	const query = countrySearchQuery.value.toLowerCase()
 	return countriesStore.countries.filter(
-		(c) =>
-			c.name.toLowerCase().includes(query) ||
-			c.isd.includes(query) ||
-			c.code.toLowerCase().includes(query)
+		(c) => c.name.toLowerCase().includes(query) || c.isd.includes(query) || c.code.toLowerCase().includes(query)
 	)
 })
 
-// Methods
+// =============================================================================
+// Country & Territory Methods
+// =============================================================================
+
 const handleFlagError = (e) => (e.target.style.display = "none")
 
 const selectCountry = (country) => {
@@ -240,13 +270,10 @@ const selectCountry = (country) => {
 	showCountryDropdown.value = false
 	countrySearchQuery.value = ""
 	updateMobileNumber()
-	// Territory will be updated by the watcher automatically
 }
 
 const updateMobileNumber = () => {
-	customerData.value.mobile_no = phoneNumber.value
-		? `${selectedCountryCode.value}-${phoneNumber.value}`
-		: ""
+	customerData.value.mobile_no = phoneNumber.value ? `${selectedCountryCode.value}-${phoneNumber.value}` : ""
 }
 
 const handleClickOutside = (event) => {
@@ -267,126 +294,65 @@ const setCountryFromName = (countryName) => {
 		selectedCountryCode.value = isd
 		log.info(`Set country code to ${isd} for ${countryName}`)
 	} else {
-		log.warn(`Country "${countryName}" not found in map`, {
-			available: Object.keys(countriesStore.countryNameToISDMap).slice(0, 10),
-		})
+		log.warn(`Country "${countryName}" not found`)
 		selectedCountryCode.value = "+20"
 	}
 }
 
+/** Auto-set territory based on selected country (exact or fuzzy match) */
 const updateTerritoryFromCountry = () => {
-	if (!territories.value.length) {
-		log.debug("No territories loaded yet")
-		return
-	}
+	if (!territories.value.length) return
 
 	const country = countriesStore.countries.find((c) => c.isd === selectedCountryCode.value)
-	if (!country) {
-		log.warn(`No country found for code ${selectedCountryCode.value}`)
-		return
-	}
-
-	log.info(`Updating territory for ${country.name}`, {
-		availableTerritories: territories.value.length,
-	})
+	if (!country) return
 
 	// Try exact match first
 	if (territories.value.includes(country.name)) {
 		customerData.value.territory = country.name
-		log.info(`Territory set to exact match: ${country.name}`)
+		log.info(`Territory set to: ${country.name}`)
 		return
 	}
 
 	// Try fuzzy match
 	const fuzzyMatch = territories.value.find(
-		(t) =>
-			t.toLowerCase().includes(country.name.toLowerCase()) ||
-			country.name.toLowerCase().includes(t.toLowerCase())
+		(t) => t.toLowerCase().includes(country.name.toLowerCase()) || country.name.toLowerCase().includes(t.toLowerCase())
 	)
 
 	if (fuzzyMatch) {
 		customerData.value.territory = fuzzyMatch
-		log.info(`Territory set to fuzzy match: ${fuzzyMatch} for ${country.name}`)
-	} else {
-		log.warn(`No territory match found for ${country.name}`)
+		log.info(`Territory set to fuzzy match: ${fuzzyMatch}`)
 	}
 }
 
-const customerGroups = ref([
-	"Commercial",
-	"Individual",
-	"Non Profit",
-	"Government",
-])
-const territories = ref(["All Territories"])
+// =============================================================================
+// API Resources
+// =============================================================================
 
-const customerData = ref({
-	customer_name: "",
-	mobile_no: "",
-	email_id: "",
-	customer_group: "Individual",
-	territory: "All Territories",
-})
-
-// Watchers
-watch(
-	() => props.initialName,
-	(name) => name && (customerData.value.customer_name = name)
-)
-
-watch(
-	() => customerData.value.mobile_no,
-	(value) => {
-		if (value?.includes("-")) {
-			const [code, ...rest] = value.split("-")
-			selectedCountryCode.value = code
-			phoneNumber.value = rest.join("-")
-		}
-	}
-)
-
-// Watch country code changes and update territory (with slight delay to ensure territories loaded)
-watch(selectedCountryCode, async () => {
-	await nextTick()
-	updateTerritoryFromCountry()
-})
-
-watch(showCountryDropdown, async (isOpen) => {
-	if (isOpen) {
-		await nextTick()
-		countrySearchRef.value?.focus()
-	}
-})
-
-// Create customer resource
 const createCustomerResource = createResource({
 	url: "frappe.client.insert",
-	makeParams() {
-		return {
-			doc: {
-				doctype: "Customer",
-				customer_name: customerData.value.customer_name,
-				customer_type: "Individual",
-				customer_group: customerData.value.customer_group || __('Individual'),
-				territory: customerData.value.territory || __('All Territories'),
-				mobile_no: customerData.value.mobile_no || "",
-				email_id: customerData.value.email_id || "",
-			},
-		}
-	},
-	onSuccess(data) {
-		showSuccess(__('Customer {0} created successfully', [data.customer_name]))
-
+	makeParams: () => ({
+		doc: {
+			doctype: "Customer",
+			customer_name: customerData.value.customer_name,
+			customer_type: "Individual",
+			customer_group: customerData.value.customer_group || __("Individual"),
+			territory: customerData.value.territory || __("All Territories"),
+			mobile_no: customerData.value.mobile_no || "",
+			email_id: customerData.value.email_id || "",
+		},
+	}),
+	onSuccess: (data) => {
+		showSuccess(__("Customer {0} created successfully", [data.customer_name]))
 		emit("customer-created", data)
 		show.value = false
 	},
-	onError(error) {
+	onError: (error) => {
 		log.error("Error creating customer", error)
 		showError(error.message || __("Failed to create customer"))
 	},
 })
 
-// Resources
+/** Helper to create list fetch resources */
 const createListResource = (doctype, onSuccess) =>
 	createResource({
 		url: "frappe.client.get_list",
@@ -401,13 +367,8 @@ const createListResource = (doctype, onSuccess) =>
 		onError: (err) => log.error(`Error loading ${doctype}`, err),
 	})
 
-const customerGroupsResource = createListResource("Customer Group", (names) => {
-	customerGroups.value = names
-})
-
-const territoriesResource = createListResource("Territory", (names) => {
-	territories.value = names
-})
+const customerGroupsResource = createListResource("Customer Group", (names) => (customerGroups.value = names))
+const territoriesResource = createListResource("Territory", (names) => (territories.value = names))
 
 const posProfileResource = createResource({
 	url: "frappe.client.get_value",
@@ -424,14 +385,20 @@ const posProfileResource = createResource({
 	},
 })
 
-// Dialog lifecycle
+// =============================================================================
+// Dialog Lifecycle
+// =============================================================================
+
 const loadDialogData = async () => {
-	// Load territories first (needed for territory matching)
+	// Lazy load countries (non-blocking)
+	countriesStore.loadCountries()
+
+	// Load form options
 	await territoriesResource.reload()
 	customerGroupsResource.reload()
 	checkPermissions()
 
-	// Load country from POS Profile after territories are loaded
+	// Set country from POS Profile
 	if (props.posProfile) {
 		await posProfileResource.reload()
 	} else {
@@ -439,24 +406,6 @@ const loadDialogData = async () => {
 	}
 }
 
-watch(() => props.modelValue, async (isOpen) => {
-	show.value = isOpen
-	isOpen ? await loadDialogData() : resetForm()
-})
-
-watch(show, (val) => emit("update:modelValue", val))
-
-// Initialize
-onMounted(() => {
-	loadDialogData()
-	document.addEventListener("click", handleClickOutside)
-})
-
-onBeforeUnmount(() => {
-	document.removeEventListener("click", handleClickOutside)
-})
-
-// Handlers
 const checkPermissions = async () => {
 	checkingPermission.value = true
 	try {
@@ -470,7 +419,9 @@ const checkPermissions = async () => {
 }
 
 const handleCreate = async () => {
-	if (!customerData.value.customer_name) return showError(__("Customer Name is required"))
+	if (!customerData.value.customer_name) {
+		return showError(__("Customer Name is required"))
+	}
 	await createCustomerResource.submit()
 }
 
@@ -485,6 +436,61 @@ const resetForm = () => {
 	selectedCountryCode.value = ""
 	phoneNumber.value = ""
 }
+
+// =============================================================================
+// Watchers
+// =============================================================================
+
+watch(
+	() => props.initialName,
+	(name) => name && (customerData.value.customer_name = name)
+)
+
+watch(
+	() => customerData.value.mobile_no,
+	(value) => {
+		if (value?.includes("-")) {
+			const [code, ...rest] = value.split("-")
+			selectedCountryCode.value = code
+			phoneNumber.value = rest.join("-")
+		}
+	}
+)
+
+watch(selectedCountryCode, async () => {
+	await nextTick()
+	updateTerritoryFromCountry()
+})
+
+watch(showCountryDropdown, async (isOpen) => {
+	if (isOpen) {
+		await nextTick()
+		countrySearchRef.value?.focus()
+	}
+})
+
+watch(
+	() => props.modelValue,
+	async (isOpen) => {
+		show.value = isOpen
+		isOpen ? await loadDialogData() : resetForm()
+	}
+)
+
+watch(show, (val) => emit("update:modelValue", val))
+
+// =============================================================================
+// Lifecycle Hooks
+// =============================================================================
+
+onMounted(() => {
+	loadDialogData()
+	document.addEventListener("click", handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+	document.removeEventListener("click", handleClickOutside)
+})
 </script>
 
 <style scoped>

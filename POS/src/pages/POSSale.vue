@@ -723,7 +723,8 @@ const draftsStore = usePOSDraftsStore()
 const posSettingsStore = usePOSSettingsStore()
 const itemStore = useItemSearchStore()
 const stockStore = useStockStore()
-const settingsStore = usePOSSettingsStore()
+// Note: settingsStore is an alias to posSettingsStore (same Pinia store singleton)
+const settingsStore = posSettingsStore
 
 // Real-time stock updates
 const { onStockUpdate } = useRealtimeStock()
@@ -1003,8 +1004,8 @@ onMounted(async () => {
 				// Set default customer from POS Profile if configured
 				await cartStore.setDefaultCustomer()
 
-				// Load POS Settings for the current profile
-				await settingsStore.loadSettings(shiftStore.profileName)
+				// Note: POS Settings already loaded above via posSettingsStore.loadSettings()
+				// No need to call again since settingsStore is an alias to posSettingsStore
 
 				// Set warehouse context in stock store for stock operations
 				if (shiftStore.profileWarehouse) {

@@ -1,6 +1,7 @@
 import { createResource } from "frappe-ui"
 import { defineStore } from "pinia"
 import { computed, ref } from "vue"
+import { useBootstrapStore } from "./bootstrap"
 
 export const usePOSSettingsStore = defineStore("posSettings", () => {
 	// State
@@ -221,6 +222,23 @@ export const usePOSSettingsStore = defineStore("posSettings", () => {
 		isLoading.value = true
 		settings.value.pos_profile = posProfile
 
+		// OPTIMIZATION: Check if bootstrap has preloaded the settings
+		try {
+			const bootstrapStore = useBootstrapStore()
+			const preloadedSettings = bootstrapStore.getPreloadedPOSSettings()
+			if (preloadedSettings && Object.keys(preloadedSettings).length > 0) {
+				console.log('[POSSettings Store] Using preloaded settings from bootstrap:', preloadedSettings)
+				Object.assign(settings.value, preloadedSettings)
+				isLoaded.value = true
+				isLoading.value = false
+				return true
+			}
+		} catch (error) {
+			// Bootstrap store may not be available, fall through to API call
+			console.log('[POSSettings Store] Bootstrap not available, fetching from API')
+		}
+
+		// Fallback to API call
 		try {
 			await settingsResource.submit({ pos_profile: posProfile })
 			return true

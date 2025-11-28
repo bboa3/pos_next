@@ -3,6 +3,7 @@ import { translationVersion } from "../utils/translation"
 import { call } from "../utils/apiWrapper"
 import { offlineState } from "../utils/offline/offlineState"
 import { logger } from "../utils/logger"
+import { useBootstrapStore } from "../stores/bootstrap"
 
 const log = logger.create("Locale")
 
@@ -44,9 +45,24 @@ export const SUPPORTED_LOCALES = {
 
 /**
  * Fetch user's language preference from the server
+ * Checks bootstrap store first for preloaded data to avoid redundant API call
  * @returns {Promise<string|null>} Language code or null if fetch fails
  */
 async function fetchLanguageFromServer() {
+	// OPTIMIZATION: Check if bootstrap has preloaded the locale
+	try {
+		const bootstrapStore = useBootstrapStore()
+		const preloadedLocale = bootstrapStore.getPreloadedLocale()
+		if (preloadedLocale && SUPPORTED_LOCALES[preloadedLocale]) {
+			log.info(`Using preloaded language from bootstrap: ${preloadedLocale}`)
+			return preloadedLocale
+		}
+	} catch (error) {
+		// Bootstrap store may not be available yet, fall through to API call
+		log.debug("Bootstrap store not available, fetching language from API")
+	}
+
+	// Fallback to direct API call
 	try {
 		const response = await call("pos_next.api.localization.get_user_language", {})
 		if (response?.locale && SUPPORTED_LOCALES[response.locale]) {

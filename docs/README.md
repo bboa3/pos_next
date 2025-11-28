@@ -4,6 +4,14 @@ Welcome to the POS Next documentation directory. This folder contains comprehens
 
 ## 📚 Available Documentation
 
+### Architecture
+- **[STARTUP_SEQUENCE.md](STARTUP_SEQUENCE.md)** - Application initialization flow
+  - PWA service worker registration
+  - Parallel authentication (CSRF + User)
+  - Bootstrap data preloading
+  - Performance optimizations
+  - Offline worker integration
+
 ### Version Control
 - **[VERSION_CONTROL.md](VERSION_CONTROL.md)** - Complete guide to the version control system
   - Architecture overview
@@ -51,6 +59,7 @@ yarn build
 ```
 docs/
 ├── README.md                    # This file
+├── STARTUP_SEQUENCE.md          # Application initialization flow
 ├── VERSION_CONTROL.md           # Comprehensive version control guide
 └── QUICKSTART_VERSION.md        # Quick reference guide
 ```
