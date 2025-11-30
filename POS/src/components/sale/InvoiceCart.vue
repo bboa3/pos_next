@@ -1,34 +1,97 @@
+<!--
+  InvoiceCart.vue - Shopping Cart Component for POS System
+
+  ============================================================================
+  OVERVIEW
+  ============================================================================
+  This component displays the shopping cart in the POS interface, including:
+  - Customer selection/search with instant in-memory filtering
+  - Cart items list with quantity controls, UOM selection, and pricing
+  - Offers and coupon application buttons
+  - Order totals (subtotal, discount, tax, grand total)
+  - Checkout and Hold order actions
+  - Quick action buttons when cart is empty
+
+  ============================================================================
+  COMPONENT STRUCTURE
+  ============================================================================
+
+  1. HEADER SECTION (Customer Selection)
+     - Shows selected customer info with edit/remove options
+     - Search input with instant filtering from cached customer list
+     - Dropdown with search results and "Create New Customer" option
+     - Works offline using cached customer data
+
+  2. ACTION BUTTONS SECTION (Offers & Coupons)
+     - "Offers" button - Shows available promotional offers
+     - "Coupon" button - Apply coupon/gift card codes
+     - Badge indicators show count of available/applied offers
+
+  3. CART ITEMS SECTION
+     - Scrollable list of cart items
+     - Each item shows: thumbnail, name, badges (free/discount), price, quantity controls
+     - Quantity controls: increment/decrement buttons + manual input
+     - UOM (Unit of Measure) dropdown selector
+     - Serial item support with edit dialog
+     - Empty cart state with quick action buttons
+
+  4. TOTALS SECTION
+     - Total Quantity
+     - Subtotal
+     - Discount (highlighted when applied)
+     - Tax
+     - Grand Total (emphasized)
+
+  5. ACTION BUTTONS
+     - Checkout - Proceed to payment
+     - Hold - Save as draft order
+
+  ============================================================================
+  FEATURES
+  ============================================================================
+
+  - Offline Support: Customer search works offline using cached data
+  - Instant Search: In-memory customer filtering for zero-latency results
+  - Smart Quantity Steps: Automatically detects decimal precision for +/- buttons
+  - UOM Conversion: Change units with automatic price recalculation
+  - Serial Number Support: Special handling for serialized inventory items
+  - Responsive Design: Adapts to mobile and desktop layouts
+  - Touch Optimized: Large tap targets and touch feedback
+  - RTL Support: Fully supports right-to-left languages
+
+  ============================================================================
+-->
 <template>
 	<div class="flex flex-col h-full bg-white">
                 <!-- Header with Customer -->
-                <div class="px-3 py-3 border-b border-gray-200 bg-gray-50">
+                <div class="px-2.5 py-2 border-b border-gray-200 bg-gray-50">
                         <!-- Inline Customer Search/Selection -->
                         <div ref="customerSearchContainer" class="relative">
-                                <div v-if="customer" class="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
-                                        <div class="flex items-center gap-3 min-w-0 flex-1">
-                                                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
-                                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div v-if="customer" class="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm">
+                                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
+                                                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
 							</svg>
 						</div>
 						<div class="min-w-0 flex-1">
-							<p class="text-sm font-semibold text-gray-900 truncate">
+							<p class="text-xs font-semibold text-gray-900 truncate">
 								{{ customer.customer_name || customer.name }}
 							</p>
-							<p v-if="customer.mobile_no" class="text-xs text-gray-500 truncate mt-0.5">
+							<p v-if="customer.mobile_no" class="text-[10px] text-gray-500 truncate">
 								{{ customer.mobile_no }}
 							</p>
 						</div>
 					</div>
-					<div class="flex items-center gap-2">
+					<div class="flex items-center gap-1">
 						<!-- Create New Customer Button -->
 						<button
 							type="button"
 							@click="$emit('create-customer', '')"
-							class="flex items-center justify-center w-10 h-10 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-xl text-white transition-colors shadow-sm hover:shadow touch-manipulation flex-shrink-0"
+							class="flex items-center justify-center w-8 h-8 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-lg text-white transition-colors shadow-sm hover:shadow touch-manipulation flex-shrink-0"
 							:title="__('Create new customer')"
 						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
 							</svg>
 						</button>
@@ -36,25 +99,25 @@
 						<button
 							type="button"
 							@click="clearCustomer"
-							class="flex items-center justify-center w-10 h-10 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl flex-shrink-0 transition-colors touch-manipulation"
+							class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg flex-shrink-0 transition-colors touch-manipulation"
 							:title="__('Remove customer')"
 						>
-							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
 							</svg>
 						</button>
 					</div>
 				</div>
 				<div v-else>
-					<div class="flex gap-2">
+					<div class="flex gap-1.5">
 						<!-- Search Input -->
 						<div class="relative flex-1">
 							<!-- Search Icon Prefix -->
-							<div class="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none">
-								<svg v-if="customersLoaded" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<div class="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
+								<svg v-if="customersLoaded" class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
 								</svg>
-								<div v-else class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+								<div v-else class="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-blue-500"></div>
 							</div>
 
 							<!-- Native Input for Instant Search -->
@@ -65,7 +128,7 @@
 								@input="handleSearchInput"
 								type="text"
 								:placeholder="__('Search or add customer...')"
-								class="w-full h-11 ps-11 pe-4 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-shadow"
+								class="w-full h-10 ps-9 pe-3 text-xs border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-shadow"
 								:disabled="!customersLoaded"
 								@keydown="handleKeydown"
 								:aria-label="__('Search customer in cart')"
@@ -76,11 +139,11 @@
 						<button
 							type="button"
 							@click="createNewCustomer"
-							class="flex items-center justify-center w-11 h-11 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-xl text-white transition-colors shadow-sm hover:shadow touch-manipulation flex-shrink-0"
+							class="flex items-center justify-center w-10 h-10 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-xl text-white transition-colors shadow-sm hover:shadow touch-manipulation flex-shrink-0"
 							:title="__('Create new customer')"
 							:aria-label="__('Create new customer')"
 						>
-							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 								<path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
 							</svg>
 						</button>
@@ -89,33 +152,33 @@
 					<!-- Customer Dropdown -->
 					<div
 						v-if="customerSearch.trim().length >= 2"
-						class="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-hidden"
+						class="absolute z-50 mt-0.5 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-hidden"
 					>
 						<!-- Customer Results -->
-						<div v-if="customerResults.length > 0" class="max-h-64 overflow-y-auto">
+						<div v-if="customerResults.length > 0" class="max-h-48 overflow-y-auto">
 							<button
 								type="button"
 								v-for="(cust, index) in customerResults"
 								:key="cust.name"
 								@click="selectCustomer(cust)"
 								:class="[
-									'w-full text-start px-3 py-2.5 flex items-center gap-2 border-b border-gray-100 last:border-0 transition-colors duration-75',
+									'w-full text-start px-2 py-1.5 flex items-center gap-1.5 border-b border-gray-100 last:border-0 transition-colors duration-75',
 									index === selectedIndex ? 'bg-blue-100' : 'hover:bg-blue-50'
 								]"
 							>
-								<div class="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-									<span class="text-[11px] font-bold text-blue-600">{{ getInitials(cust.customer_name) }}</span>
+								<div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+									<span class="text-[10px] font-bold text-blue-600">{{ getInitials(cust.customer_name) }}</span>
 								</div>
 								<div class="flex-1 min-w-0">
-									<p class="text-xs font-semibold text-gray-900 truncate">{{ cust.customer_name }}</p>
-									<p v-if="cust.mobile_no" class="text-[10px] text-gray-600">{{ cust.mobile_no }}</p>
+									<p class="text-[11px] font-semibold text-gray-900 truncate">{{ cust.customer_name }}</p>
+									<p v-if="cust.mobile_no" class="text-[9px] text-gray-600">{{ cust.mobile_no }}</p>
 								</div>
 							</button>
 						</div>
 
 						<!-- No Results + Create New Option -->
 						<div v-else-if="customerSearch.trim().length >= 2">
-							<div class="px-3 py-2 text-center text-xs font-medium text-gray-700 border-b border-gray-100">
+							<div class="px-2 py-1.5 text-center text-[11px] font-medium text-gray-700 border-b border-gray-100">
 								{{ __('No results for "{0}"', [customerSearch]) }}
 							</div>
 						</div>
@@ -125,16 +188,16 @@
 							type="button"
 							v-if="customerSearch.trim().length >= 2"
 							@click="createNewCustomer"
-							class="w-full text-start px-3 py-2.5 hover:bg-green-50 flex items-center gap-2 transition-colors border-t border-gray-200"
+							class="w-full text-start px-2 py-1.5 hover:bg-green-50 flex items-center gap-1.5 transition-colors border-t border-gray-200"
 						>
-							<div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-								<svg class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<div class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+								<svg class="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
 								</svg>
 							</div>
 							<div class="flex-1">
-								<p class="text-xs font-medium text-green-700">{{  __('Create New Customer') }}</p>
-								<p class="text-[10px] text-green-600">"{{ customerSearch }}"</p>
+								<p class="text-[11px] font-medium text-green-700">{{  __('Create New Customer') }}</p>
+								<p class="text-[9px] text-green-600">"{{ customerSearch }}"</p>
 							</div>
 						</button>
                                         </div>
@@ -143,9 +206,9 @@
                 </div>
 
                 <!-- Action Buttons Section -->
-                <div v-if="items.length > 0" class="px-3 py-3 border-b border-gray-200 bg-white">
-                        <div class="flex items-center justify-between mb-2.5">
-                                <h2 class="text-sm font-bold text-gray-900">{{ __('Cart Items') }}</h2>
+                <div v-if="items.length > 0" class="px-2 py-2 border-b border-gray-200 bg-white">
+                        <div class="flex items-center justify-between mb-1.5">
+                                <h2 class="text-xs font-bold text-gray-900">{{ __('Cart Items') }}</h2>
                                 <button
                                         @click="$emit('clear-cart')"
                                         class="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors touch-manipulation"
@@ -165,18 +228,16 @@
                                 <button
                                         type="button"
                                         @click="$emit('show-offers')"
-                                        class="relative flex-1 flex items-center justify-between px-3 py-2.5 rounded-xl bg-white border border-gray-200 hover:border-green-400 hover:bg-green-50 hover:shadow-sm transition-all min-w-0 touch-manipulation"
+                                        class="relative flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 hover:border-green-400 hover:from-green-100 hover:to-emerald-100 hover:shadow-sm transition-all min-w-0 touch-manipulation active:scale-[0.98]"
                                         :aria-label="__('View all available offers')"
                                 >
-                                        <div class="flex items-center gap-2 min-w-0 flex-1">
-                                                <svg class="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                                                </svg>
-                                                <span class="text-xs font-semibold text-gray-700 truncate">{{ __('Offers') }}</span>
-                                        </div>
+                                        <svg class="w-3.5 h-3.5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                        </svg>
+                                        <span class="text-[11px] font-bold text-green-700">{{ __('Offers') }}</span>
                                         <span
                                                 v-if="appliedOfferCount > 0 || offersStore.autoEligibleCount > 0"
-                                                class="bg-green-600 text-white text-xs font-bold rounded-full px-2 py-0.5 flex-shrink-0 min-w-[20px] text-center"
+                                                class="bg-green-600 text-white text-[9px] font-bold rounded-full px-1.5 py-0.5 flex-shrink-0 min-w-[16px] text-center"
                                         >
                                                 {{ appliedOfferCount > 0 ? appliedOfferCount : offersStore.autoEligibleCount }}
                                         </span>
@@ -186,16 +247,14 @@
                                 <button
                                         type="button"
                                         @click="$emit('apply-coupon')"
-                                        class="relative flex-1 flex items-center justify-between px-3 py-2.5 rounded-xl bg-white border border-gray-200 hover:border-purple-400 hover:bg-purple-50 hover:shadow-sm transition-all min-w-0 touch-manipulation"
+                                        class="relative flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-200 hover:border-purple-400 hover:from-purple-100 hover:to-violet-100 hover:shadow-sm transition-all min-w-0 touch-manipulation active:scale-[0.98]"
                                         :aria-label="__('Apply coupon code')"
                                 >
-                                        <div class="flex items-center gap-2 min-w-0 flex-1">
-                                                <svg class="w-4 h-4 text-purple-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd"/>
-                                                </svg>
-                                                <span class="text-xs font-semibold text-gray-700 truncate">{{ __('Coupon') }}</span>
-                                        </div>
-                                        <span v-if="availableGiftCards.length > 0" class="bg-purple-600 text-white text-xs font-bold rounded-full px-2 py-0.5 flex-shrink-0 min-w-[20px] text-center">
+                                        <svg class="w-3.5 h-3.5 text-purple-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span class="text-[11px] font-bold text-purple-700">{{ __('Coupon') }}</span>
+                                        <span v-if="availableGiftCards.length > 0" class="bg-purple-600 text-white text-[9px] font-bold rounded-full px-1.5 py-0.5 flex-shrink-0 min-w-[16px] text-center">
                                                 {{ availableGiftCards.length }}
                                         </span>
                                 </button>
@@ -203,7 +262,7 @@
                 </div>
 
 		<!-- Cart Items -->
-		<div class="flex-1 overflow-y-auto p-1 sm:p-2.5 bg-gray-50">
+		<div class="flex-1 overflow-y-auto p-0.5 sm:p-1.5 bg-gray-50">
 			<div v-if="items.length === 0" class="flex flex-col items-center justify-center h-full px-3 sm:px-4 py-6">
 				<!-- Empty Cart Icon & Message -->
 				<div class="w-14 h-14 sm:w-16 sm:h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
@@ -321,12 +380,12 @@
 				</div>
 			</div>
 
-			<div v-else class="flex flex-col gap-1 sm:flex flex-col gap-2">
+			<div v-else class="flex flex-col gap-0.5 sm:gap-1">
 				<div
 					v-for="(item, index) in items"
 					:key="index"
 					@click="openEditDialog(item)"
-					class="bg-white border-2 border-gray-200 rounded-lg p-1.5 sm:p-2 hover:border-blue-300 hover:shadow-lg transition-all duration-200 active:scale-[0.99] cursor-pointer group"
+					class="bg-white border border-gray-200 rounded-md p-1.5 sm:p-2 hover:border-blue-300 hover:shadow-md transition-all duration-200 active:scale-[0.99] cursor-pointer group"
 				>
 					<div class="flex gap-1.5 sm:gap-2">
 						<!-- Item Image Thumbnail -->
@@ -358,11 +417,11 @@
 						</div>
 
 						<!-- Item Content -->
-						<div class="flex-1 min-w-0 flex flex-col">
-							<!-- Header: Item Name & Delete -->
-							<div class="flex items-start justify-between gap-1 mb-1">
+						<div class="flex-1 min-w-0 flex flex-col justify-center">
+							<!-- Header: Item Name, Badges & Delete -->
+							<div class="flex items-start justify-between gap-0.5 mb-0.5">
 								<div class="flex items-center gap-1.5 flex-1 min-w-0">
-									<h4 class="text-[11px] sm:text-xs font-bold text-gray-900 truncate leading-tight">
+									<h4 class="text-xs sm:text-sm font-extrabold text-gray-900 truncate leading-tight">
 										{{ item.item_name }}
 									</h4>
 									<!-- Free Item Badge -->
@@ -376,6 +435,16 @@
 										</svg>
 										{{ __('+{0} FREE',  [item.free_qty]) }}
 									</span>
+									<!-- Discount Badge -->
+									<div
+										v-if="item.discount_amount && item.discount_amount > 0"
+										class="inline-flex items-center px-1.5 py-0.5 bg-gradient-to-r from-red-50 to-orange-50 text-red-700 rounded-full text-[9px] font-bold border border-red-200 flex-shrink-0"
+									>
+										<svg class="w-2.5 h-2.5 me-0.5" fill="currentColor" viewBox="0 0 20 20">
+											<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+										</svg>
+										{{ __('{0}%', [Number(item.discount_percentage).toFixed(0)]) }}
+									</div>
 								</div>
 								<button
 									type="button"
@@ -384,37 +453,13 @@
 									:aria-label="__('Remove {0}', [item.item_name])"
 									:title="__('Remove item')"
 								>
-									<svg class="h-4 w-4 sm:h-4.5 sm:w-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
 									</svg>
 								</button>
 							</div>
 
-							<!-- Price & UOM Row -->
-							<div class="flex items-center flex-wrap gap-1.5 mb-1.5">
-								<div class="flex items-center gap-1">
-									<span class="text-[11px] sm:text-xs font-bold text-gray-900">
-										{{ formatCurrency(item.rate) }}
-									</span>
-									<span class="text-[10px] text-gray-500">/</span>
-									<span class="inline-flex items-center px-1.5 py-0.5 bg-gray-100 text-gray-700 rounded text-[10px] sm:text-xs font-semibold">
-										{{ item.uom || item.stock_uom || __('Nos', null, 'UOM') }}
-									</span>
-								</div>
-
-								<!-- Discount Badge if any -->
-								<div
-									v-if="item.discount_amount && item.discount_amount > 0"
-									class="inline-flex items-center px-1.5 py-0.5 bg-gradient-to-r from-red-50 to-orange-50 text-red-700 rounded-full text-[9px] font-bold border border-red-200"
-								>
-									<svg class="w-2 h-2 me-0.5" fill="currentColor" viewBox="0 0 20 20">
-										<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
-									</svg>
-									{{ __('{0}% OFF', [Number(item.discount_percentage).toFixed(2)]) }}
-								</div>
-							</div>
-
-							<!-- Bottom Row: Quantity Controls, UOM Selector & Total -->
+							<!-- Single Row: Quantity Counter, UOM, Price & Total -->
 							<div class="flex items-center justify-between gap-1.5">
 								<div class="flex items-center gap-1.5" @click.stop>
 									<!-- Quantity Counter -->
@@ -423,31 +468,30 @@
 										class="flex items-center gap-1"
 									>
 										<!-- Serial count badge -->
-										<div class="flex items-center bg-blue-50 border border-blue-200 rounded-lg px-2 h-7 sm:h-8">
-											<FeatherIcon name="hash" class="w-3.5 h-3.5 text-blue-500 me-1" />
-											<span class="text-sm sm:text-base font-bold text-blue-700">{{ item.quantity }}</span>
-											<span class="text-[10px] text-blue-500 ms-1 hidden sm:inline">{{ __('serials') }}</span>
+										<div class="flex items-center bg-blue-50 border border-blue-200 rounded px-1.5 h-6 sm:h-7">
+											<FeatherIcon name="hash" class="w-3 h-3 text-blue-500 me-0.5" />
+											<span class="text-xs sm:text-sm font-bold text-blue-700">{{ item.quantity }}</span>
 										</div>
 										<!-- Edit button -->
 										<button
 											type="button"
 											@click="openEditDialog(item)"
-											class="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded-lg transition-colors shadow-sm"
+											class="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white rounded transition-colors shadow-sm"
 											:title="__('Edit serials')"
 										>
-											<FeatherIcon name="edit-2" class="w-3.5 h-3.5" />
+											<FeatherIcon name="edit-2" class="w-3 h-3" />
 										</button>
 									</div>
 									<!-- For non-serial items, show normal quantity controls -->
-									<div v-else class="flex items-center bg-gray-50 border-2 border-gray-200 rounded-lg overflow-hidden">
+									<div v-else class="flex items-center bg-gray-50 border border-gray-200 rounded overflow-hidden">
 										<button
 											type="button"
 											@click="decrementQuantity(item)"
-											class="w-7 h-7 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 active:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors touch-manipulation border-e-2 border-gray-200"
+											class="w-6 h-6 sm:w-7 sm:h-7 bg-white hover:bg-gray-100 active:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors touch-manipulation border-e border-gray-200"
 											:aria-label="__('Decrease quantity')"
 											:title="__('Decrease quantity')"
 										>
-											<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/>
 											</svg>
 										</button>
@@ -460,115 +504,85 @@
 											min="0.0001"
 											step="any"
 											inputmode="decimal"
-											class="w-16 sm:w-20 text-center bg-white border-0 text-sm sm:text-base font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+											class="w-10 sm:w-12 h-6 sm:h-7 text-center bg-white border-0 text-xs sm:text-sm font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 											:aria-label="__('Quantity')"
 										/>
 										<button
 											type="button"
 											@click="incrementQuantity(item)"
-											class="w-7 h-7 sm:w-8 sm:h-8 bg-white hover:bg-gray-100 active:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors touch-manipulation border-s-2 border-gray-200"
+											class="w-6 h-6 sm:w-7 sm:h-7 bg-white hover:bg-gray-100 active:bg-gray-200 flex items-center justify-center font-bold text-gray-700 transition-colors touch-manipulation border-s border-gray-200"
 											:aria-label="__('Increase quantity')"
 											:title="__('Increase quantity')"
 										>
-											<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/>
 											</svg>
 										</button>
 									</div>
 
-									<!-- UOM Selector Dropdown (Custom) -->
+									<!-- UOM Selector Dropdown -->
 									<div class="relative group/uom">
-										<!-- Dropdown Button -->
 										<button
 											type="button"
 											@click="toggleUomDropdown(item.item_code)"
 											:disabled="!item.item_uoms || item.item_uoms.length === 0"
 											:class="[
-												'h-7 sm:h-8 text-[10px] sm:text-xs font-bold rounded-lg ps-2.5 pe-7 transition-all touch-manipulation shadow-sm flex items-center justify-center min-w-[60px]',
+												'h-6 sm:h-7 text-[10px] sm:text-xs font-bold rounded ps-2 pe-5 transition-all touch-manipulation flex items-center justify-center min-w-[45px]',
 												item.item_uoms && item.item_uoms.length > 0
-													? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white border-2 border-blue-400 hover:from-blue-600 hover:to-blue-700 hover:border-blue-500 hover:shadow-md active:scale-95 cursor-pointer'
-													: 'bg-gray-100 text-gray-500 border-2 border-gray-200 cursor-not-allowed opacity-60'
+													? 'bg-blue-500 text-white border border-blue-400 hover:bg-blue-600 active:scale-95 cursor-pointer'
+													: 'bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed opacity-60'
 											]"
 											:title="item.item_uoms && item.item_uoms.length > 0 ? __('Click to change unit') : __('Only one unit available')"
 										>
 											{{ item.uom || item.stock_uom || __('Nos', null, 'UOM') }}
 										</button>
-
-										<!-- Dropdown Arrow Icon -->
 										<svg
 											:class="[
-												'absolute end-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none transition-transform',
+												'absolute end-1.5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 pointer-events-none transition-transform',
 												openUomDropdown === item.item_code ? 'rotate-180' : '',
 												item.item_uoms && item.item_uoms.length > 0 ? 'text-white' : 'text-gray-400'
 											]"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
+											fill="none" stroke="currentColor" viewBox="0 0 24 24"
 										>
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
 										</svg>
-
-										<!-- Dropdown Menu -->
 										<div
 											v-if="openUomDropdown === item.item_code && item.item_uoms && item.item_uoms.length > 0"
-											class="absolute top-full start-0 mt-1 bg-white border-2 border-blue-300 rounded-lg shadow-xl z-50 min-w-full overflow-hidden"
+											class="absolute top-full start-0 mt-0.5 bg-white border border-blue-300 rounded shadow-xl z-50 min-w-full overflow-hidden"
 										>
-											<!-- Stock UOM Option -->
 											<button
 												type="button"
 												@click="selectUom(item, item.stock_uom)"
 												:class="[
-													'w-full text-start px-3 py-2 text-[10px] sm:text-xs font-semibold transition-colors border-b border-gray-100',
-													(item.uom || item.stock_uom) === item.stock_uom
-														? 'bg-blue-50 text-blue-700'
-														: 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+													'w-full text-start px-2 py-1.5 text-[10px] sm:text-xs font-semibold transition-colors border-b border-gray-100',
+													(item.uom || item.stock_uom) === item.stock_uom ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-blue-50'
 												]"
 											>
-												<div class="flex items-center justify-between">
-													<span>{{ item.stock_uom || __('Nos', null, 'UOM') }}</span>
-													<svg
-														v-if="(item.uom || item.stock_uom) === item.stock_uom"
-														class="w-4 h-4 text-blue-600"
-														fill="currentColor"
-														viewBox="0 0 20 20"
-													>
-														<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-													</svg>
-												</div>
+												{{ item.stock_uom || __('Nos', null, 'UOM') }}
 											</button>
-
-											<!-- Other UOM Options -->
 											<button
 												v-for="uomData in item.item_uoms"
 												:key="uomData.uom"
 												type="button"
 												@click="selectUom(item, uomData.uom)"
 												:class="[
-													'w-full text-start px-3 py-2 text-[10px] sm:text-xs font-semibold transition-colors border-b border-gray-100 last:border-0',
-													(item.uom || item.stock_uom) === uomData.uom
-														? 'bg-blue-50 text-blue-700'
-														: 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+													'w-full text-start px-2 py-1.5 text-[10px] sm:text-xs font-semibold transition-colors border-b border-gray-100 last:border-0',
+													(item.uom || item.stock_uom) === uomData.uom ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-blue-50'
 												]"
 											>
-												<div class="flex items-center justify-between">
-													<span>{{ uomData.uom }}</span>
-													<svg
-														v-if="(item.uom || item.stock_uom) === uomData.uom"
-														class="w-4 h-4 text-blue-600"
-														fill="currentColor"
-														viewBox="0 0 20 20"
-													>
-														<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-													</svg>
-												</div>
+												{{ uomData.uom }}
 											</button>
 										</div>
 									</div>
+
+									<!-- Price -->
+									<span class="text-[10px] sm:text-xs font-bold text-gray-700">
+										{{ formatCurrency(item.rate) }}
+									</span>
 								</div>
 
-								<!-- Item Total Price -->
-								<div class="text-end">
-									<div class="text-[9px] text-gray-500 leading-none mb-0.5">{{ __('Total') }}</div>
+								<!-- Item Total -->
+								<div class="text-end flex-shrink-0">
 									<div class="text-xs sm:text-sm font-bold text-blue-600 leading-none">
 										{{ formatCurrency(item.amount || item.rate * item.quantity) }}
 									</div>
@@ -581,69 +595,69 @@
 		</div>
 
 		<!-- Totals Summary -->
-		<div class="p-2 sm:p-2.5 bg-white border-t border-gray-200">
+		<div class="p-1.5 sm:p-2 bg-white border-t border-gray-200">
 			<!-- Summary Details -->
-			<div v-if="items.length > 0" class="mb-2.5">
-				<div class="flex items-center justify-between text-[10px] text-gray-600 mb-1">
-					<span>{{ __('Total Quantity') }}</span>
-					<span class="font-medium text-gray-900">{{ formatQuantity(totalQuantity) }}</span>
+			<div v-if="items.length > 0" class="mb-1.5">
+				<div class="flex items-center justify-between text-xs text-gray-600 mb-0.5">
+					<span class="font-medium">{{ __('Total Quantity') }}</span>
+					<span class="font-bold text-gray-900">{{ formatQuantity(totalQuantity) }}</span>
 				</div>
-				<div class="flex items-center justify-between text-[10px] text-gray-600 mb-2">
-					<span>{{ __('Subtotal') }}</span>
-					<span class="font-medium text-gray-900">{{ formatCurrency(subtotal) }}</span>
+				<div class="flex items-center justify-between text-xs text-gray-600">
+					<span class="font-medium">{{ __('Subtotal') }}</span>
+					<span class="font-bold text-gray-900">{{ formatCurrency(subtotal) }}</span>
 				</div>
 			</div>
 
 			<!-- Summary Details (continued) -->
-			<div v-if="items.length > 0" class="mb-2.5">
+			<div v-if="items.length > 0" class="mb-1.5">
 				<!-- Discount Display - Highlighted -->
-				<div v-if="discountAmount > 0" class="flex items-center justify-between mb-1 bg-red-50 rounded px-1.5 py-1 -mx-0.5">
+				<div v-if="discountAmount > 0" class="flex items-center justify-between mb-0.5 bg-red-50 rounded px-1.5 py-1 -mx-0.5">
 					<div class="flex items-center gap-1">
-						<svg class="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+						<svg class="w-3.5 h-3.5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
 							<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
 						</svg>
-						<span class="text-[10px] font-semibold text-red-700">{{ __('Discount') }}</span>
+						<span class="text-xs font-bold text-red-700">{{ __('Discount') }}</span>
 					</div>
-					<span class="text-xs font-bold text-red-600">{{ formatCurrency(discountAmount) }}</span>
+					<span class="text-sm font-extrabold text-red-600">{{ formatCurrency(discountAmount) }}</span>
 				</div>
 
-				<div class="flex items-center justify-between text-[10px] text-gray-600 mb-2">
+				<div class="flex items-center justify-between text-xs text-gray-600">
 					<div class="flex items-center gap-1">
-						<svg class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
 						</svg>
-						<span>{{ __('Tax') }}</span>
+						<span class="font-medium">{{ __('Tax') }}</span>
 					</div>
-					<span class="font-medium text-gray-900">{{ formatCurrency(taxAmount) }}</span>
+					<span class="font-bold text-gray-900">{{ formatCurrency(taxAmount) }}</span>
 				</div>
 			</div>
 
 			<!-- Grand Total -->
-			<div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-2.5 mb-2.5">
+			<div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-2.5 mb-1.5">
 				<div class="flex items-center justify-between">
-					<span class="text-sm font-bold text-gray-900">{{ __('Grand Total') }}</span>
-					<span class="text-lg font-bold text-blue-600">
+					<span class="text-sm font-extrabold text-gray-900">{{ __('Grand Total') }}</span>
+					<span class="text-lg sm:text-xl font-extrabold text-blue-600">
 						{{ formatCurrency(grandTotal) }}
 					</span>
 				</div>
 			</div>
 
 			<!-- Action Buttons -->
-			<div class="flex gap-2">
+			<div class="flex gap-1.5">
 				<!-- Checkout Button (Primary - 50% width) -->
 				<button
 					type="button"
 					@click="$emit('proceed-to-payment')"
 					:disabled="items.length === 0"
 					:class="[
-						'flex-1 py-3 px-4 rounded-xl font-bold text-sm text-white transition-all flex items-center justify-center touch-manipulation',
+						'flex-1 py-2.5 px-3 rounded-lg font-bold text-xs text-white transition-all flex items-center justify-center touch-manipulation',
 						items.length === 0
 							? 'bg-gray-300 cursor-not-allowed'
 							: 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-lg hover:shadow-xl active:scale-[0.98]'
 					]"
 					:aria-label="__('Proceed to payment')"
 				>
-					<svg class="w-5 h-5 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
 					</svg>
 					<span>{{ __('Checkout') }}</span>
@@ -654,10 +668,10 @@
 					type="button"
 					v-if="items.length > 0"
 					@click="$emit('save-draft')"
-					class="flex-1 py-3 px-3 rounded-xl font-semibold text-sm text-orange-700 bg-orange-50 hover:bg-orange-100 active:bg-orange-200 transition-all touch-manipulation active:scale-[0.98] flex items-center justify-center"
+					class="flex-1 py-2.5 px-2 rounded-lg font-semibold text-xs text-orange-700 bg-orange-50 hover:bg-orange-100 active:bg-orange-200 transition-all touch-manipulation active:scale-[0.98] flex items-center justify-center"
 					:aria-label="__('Hold order as draft')"
 				>
-					<svg class="w-5 h-5 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+					<svg class="w-4 h-4 me-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
 					</svg>
 					<span>{{ __('Hold', null, 'order') }}</span>
@@ -677,6 +691,11 @@
 </template>
 
 <script setup>
+/**
+ * ============================================================================
+ * IMPORTS
+ * ============================================================================
+ */
 import { usePOSCartStore } from "@/stores/posCart"
 import { usePOSOffersStore } from "@/stores/posOffers"
 import { formatCurrency as formatCurrencyUtil } from "@/utils/currency"
@@ -688,13 +707,30 @@ import { createResource } from "frappe-ui"
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import EditItemDialog from "./EditItemDialog.vue"
 
-// Use Pinia store
-const cartStore = usePOSCartStore()
-const offersStore = usePOSOffersStore()
+/**
+ * ============================================================================
+ * STORES & COMPOSABLES
+ * ============================================================================
+ */
+const cartStore = usePOSCartStore()      // Pinia store for cart state management
+const offersStore = usePOSOffersStore()  // Pinia store for offers/promotions
+const { formatQuantity } = useFormatters() // Quantity formatting utilities
 
-// Use formatters
-const { formatQuantity } = useFormatters()
-
+/**
+ * ============================================================================
+ * PROPS
+ * ============================================================================
+ * @prop {Array} items - Cart items array with item details (item_code, quantity, rate, etc.)
+ * @prop {Object} customer - Selected customer object (name, customer_name, mobile_no)
+ * @prop {Number} subtotal - Cart subtotal before tax and discounts
+ * @prop {Number} taxAmount - Total tax amount
+ * @prop {Number} discountAmount - Total discount amount applied
+ * @prop {Number} grandTotal - Final total (subtotal - discount + tax)
+ * @prop {String} posProfile - Current POS Profile name
+ * @prop {String} currency - Currency code for formatting (e.g., "USD", "EUR")
+ * @prop {Array} appliedOffers - List of currently applied promotional offers
+ * @prop {Array} warehouses - Available warehouses for item selection
+ */
 const props = defineProps({
 	items: {
 		type: Array,
@@ -732,43 +768,72 @@ const props = defineProps({
 	},
 })
 
+/**
+ * ============================================================================
+ * EMITS
+ * ============================================================================
+ * Events emitted to parent component for cart operations
+ */
 const emit = defineEmits([
-	"update-quantity",
-	"remove-item",
-	"select-customer",
-	"create-customer",
-	"proceed-to-payment",
-	"clear-cart",
-	"save-draft",
-	"apply-coupon",
-	"show-coupons",
-	"show-offers",
-	"remove-offer",
-	"update-uom",
-	"edit-item",
-	"view-shift",
-	"show-drafts",
-	"show-history",
-	"show-return",
-	"close-shift",
+	"update-quantity",    // (itemCode, newQty) - Update item quantity
+	"remove-item",        // (itemCode) - Remove item from cart
+	"select-customer",    // (customer) - Select/change customer
+	"create-customer",    // (searchText) - Open create customer dialog
+	"proceed-to-payment", // () - Navigate to payment screen
+	"clear-cart",         // () - Clear all items from cart
+	"save-draft",         // () - Save current cart as draft/hold order
+	"apply-coupon",       // () - Open coupon application dialog
+	"show-coupons",       // () - Show available coupons
+	"show-offers",        // () - Show available offers dialog
+	"remove-offer",       // (offerId) - Remove applied offer
+	"update-uom",         // (itemCode, newUom) - Change item's unit of measure
+	"edit-item",          // (item) - Open item edit dialog
+	"view-shift",         // () - View current shift details
+	"show-drafts",        // () - Show draft/held orders
+	"show-history",       // () - Show invoice history
+	"show-return",        // () - Open return invoice dialog
+	"close-shift",        // () - Close current shift
 ])
 
-const customerSearch = ref("")
-const customerSearchContainer = ref(null)
-const allCustomers = ref([])
-const customersLoaded = ref(false)
-const selectedIndex = ref(-1)
-const availableGiftCards = ref([])
+/**
+ * ============================================================================
+ * REACTIVE STATE
+ * ============================================================================
+ */
+// Customer search state
+const customerSearch = ref("")              // Current search query
+const customerSearchContainer = ref(null)   // Ref to search container for click-outside detection
+const allCustomers = ref([])                // All customers loaded in memory for instant filtering
+const customersLoaded = ref(false)          // Flag indicating customers are ready
+const selectedIndex = ref(-1)               // Keyboard navigation index for search results
+const availableGiftCards = ref([])          // Available gift cards for current customer
 
 // Edit item dialog state
-const showEditDialog = ref(false)
-const selectedItem = ref(null)
+const showEditDialog = ref(false)           // Controls edit dialog visibility
+const selectedItem = ref(null)              // Item being edited
 
-// UOM dropdown state - tracks which item's UOM dropdown is open
+// UOM dropdown state - tracks which item's UOM dropdown is open (by item_code)
 const openUomDropdown = ref(null)
 
-// Load customers into memory on mount for instant filtering
-// Load customers resource
+/**
+ * ============================================================================
+ * API RESOURCES
+ * ============================================================================
+ * These resources handle data fetching from the server with offline support.
+ * Data is cached in the service worker for offline access.
+ */
+
+/**
+ * Customers Resource
+ *
+ * Fetches all customers for the current POS Profile.
+ * - Loads all customers into memory for instant in-memory filtering
+ * - Caches customers in service worker for offline support
+ * - On mount: First checks cache, then refreshes from server if online
+ *
+ * @endpoint pos_next.api.customers.get_customers
+ * @cache Service Worker IndexedDB
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const customersResource = createResource({
 	url: "pos_next.api.customers.get_customers",
@@ -812,7 +877,16 @@ const customersResource = createResource({
 	}
 })()
 
-// Load offers resource and set them in store
+/**
+ * Offers Resource
+ *
+ * Fetches all promotional offers for the current POS Profile.
+ * - Loads available offers and stores them in Pinia offers store
+ * - Only fetches when online (offers not cached for offline use)
+ * - Used for the "Offers" button badge count and offers dialog
+ *
+ * @endpoint pos_next.api.offers.get_offers
+ */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const offersResource = createResource({
 	url: "pos_next.api.offers.get_offers",
@@ -836,7 +910,16 @@ if (!isOffline()) {
 	offersResource.reload()
 }
 
-// Load gift cards resource
+/**
+ * Gift Cards Resource
+ *
+ * Fetches active coupon codes and gift cards for the selected customer.
+ * - Only fetches when a customer is selected and online
+ * - Reloads when customer changes (via watcher)
+ * - Used for the "Coupon" button badge count
+ *
+ * @endpoint pos_next.api.offers.get_active_coupons
+ */
 const giftCardsResource = createResource({
 	url: "pos_next.api.offers.get_active_coupons",
 	makeParams() {
@@ -851,7 +934,11 @@ const giftCardsResource = createResource({
 	},
 })
 
-// Watch for customer changes to load their gift cards
+/**
+ * Watch for customer changes to load their gift cards.
+ * Reloads gift cards resource when customer is selected (and online).
+ * Clears gift cards when customer is removed or offline.
+ */
 watch(
 	() => props.customer,
 	(newCustomer) => {
@@ -863,9 +950,28 @@ watch(
 	},
 )
 
+/**
+ * ============================================================================
+ * COMPUTED PROPERTIES
+ * ============================================================================
+ */
+
+/**
+ * Count of currently applied promotional offers.
+ * Used for the badge on the "Offers" button.
+ * @returns {Number} Count of applied offers
+ */
 const appliedOfferCount = computed(() => (props.appliedOffers || []).length)
 
-// Direct computed results - zero latency filtering!
+/**
+ * Instant customer search results with in-memory filtering.
+ *
+ * Performs zero-latency filtering on the cached customer list.
+ * Searches across customer_name, mobile_no, and customer ID.
+ * Returns max 20 results to keep dropdown performant.
+ *
+ * @returns {Array} Filtered customer objects matching search query
+ */
 const customerResults = computed(() => {
 	const searchValue = customerSearch.value.trim().toLowerCase()
 
@@ -889,11 +995,19 @@ const customerResults = computed(() => {
 		.slice(0, 20)
 })
 
-// Reset selection when results change
+/**
+ * Reset keyboard selection index when search results change.
+ * Ensures the selection doesn't point to a non-existent result.
+ */
 watch(customerResults, () => {
 	selectedIndex.value = -1
 })
 
+/**
+ * Total quantity of all items in cart (including free items).
+ * Sums quantity + free_qty for each cart item.
+ * @returns {Number} Total item quantity
+ */
 const totalQuantity = computed(() => {
 	return props.items.reduce((sum, item) => {
 		const qty = item.quantity || 0
@@ -902,12 +1016,34 @@ const totalQuantity = computed(() => {
 	}, 0)
 })
 
-// Handle search input with instant reactivity
+/**
+ * ============================================================================
+ * FUNCTIONS
+ * ============================================================================
+ */
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Customer Search Functions
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Handle customer search input with instant reactivity.
+ * Updates the customerSearch ref which triggers computed filtering.
+ * @param {Event} event - Input event from search field
+ */
 function handleSearchInput(event) {
 	customerSearch.value = event.target.value
 }
 
-// Keyboard navigation
+/**
+ * Handle keyboard navigation in customer search dropdown.
+ * Supports:
+ * - ArrowDown/ArrowUp: Navigate through results
+ * - Enter: Select current or auto-select single result
+ * - Escape: Clear search
+ *
+ * @param {KeyboardEvent} event - Keyboard event from search input
+ */
 function handleKeydown(event) {
 	if (customerResults.value.length === 0) return
 
@@ -936,22 +1072,46 @@ function handleKeydown(event) {
 	}
 }
 
+/**
+ * Select a customer from search results.
+ * Emits select-customer event and resets search state.
+ * @param {Object} cust - Customer object to select
+ */
 function selectCustomer(cust) {
 	emit("select-customer", cust)
 	customerSearch.value = ""
 	selectedIndex.value = -1
 }
 
+/**
+ * Clear the currently selected customer.
+ * Emits select-customer with null to deselect.
+ */
 function clearCustomer() {
 	emit("select-customer", null)
 }
 
+/**
+ * Open customer creation dialog with current search text.
+ * Pre-fills the new customer name with the search query.
+ */
 function createNewCustomer() {
 	// Emit event to open customer creation dialog
 	emit("create-customer", customerSearch.value)
 	customerSearch.value = ""
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Utility Functions
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Get initials from a customer name for avatar display.
+ * Returns first letter of first two words, or first two letters if single word.
+ *
+ * @param {String} name - Customer name
+ * @returns {String} 2-letter initials (uppercase)
+ */
 function getInitials(name) {
 	if (!name) return "?"
 	const parts = name.split(" ")
@@ -961,12 +1121,23 @@ function getInitials(name) {
 	return name.substring(0, 2).toUpperCase()
 }
 
+/**
+ * Format a numeric amount as currency string.
+ * Uses the component's currency prop for formatting.
+ *
+ * @param {Number} amount - Amount to format
+ * @returns {String} Formatted currency string (e.g., "$1,234.56")
+ */
 function formatCurrency(amount) {
 	return formatCurrencyUtil(Number.parseFloat(amount || 0), props.currency)
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Quantity Control Functions
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
- * Intelligently determine the step size based on current quantity
+ * Intelligently determine the step size based on current quantity.
  * - Whole numbers (1, 2, 3): step by 1
  * - Multiples of 0.5 (1.5, 2.5): step by 0.5
  * - Multiples of 0.25 (0.25, 0.75): step by 0.25
@@ -1001,12 +1172,24 @@ function getSmartStep(quantity) {
 	return 0.01
 }
 
+/**
+ * Increment item quantity using smart step.
+ * Uses getSmartStep to determine appropriate increment value.
+ *
+ * @param {Object} item - Cart item to increment
+ */
 function incrementQuantity(item) {
 	const step = getSmartStep(item.quantity)
 	const newQty = Math.round((item.quantity + step) * 10000) / 10000
 	emit("update-quantity", item.item_code, newQty)
 }
 
+/**
+ * Decrement item quantity using smart step.
+ * Removes item if quantity would become zero or negative.
+ *
+ * @param {Object} item - Cart item to decrement
+ */
 function decrementQuantity(item) {
 	const step = getSmartStep(item.quantity)
 	const newQty = Math.round((item.quantity - step) * 10000) / 10000
@@ -1019,6 +1202,13 @@ function decrementQuantity(item) {
 	}
 }
 
+/**
+ * Update quantity from direct input (manual typing).
+ * Allows any positive number during typing without rounding.
+ *
+ * @param {Object} item - Cart item to update
+ * @param {String} value - New quantity value from input
+ */
 function updateQuantity(item, value) {
 	const qty = Number.parseFloat(value)
 	// Allow any positive number during typing (don't round yet)
@@ -1027,6 +1217,14 @@ function updateQuantity(item, value) {
 	}
 }
 
+/**
+ * Handle quantity input blur - validate and round.
+ * Called when user leaves the quantity input field.
+ * - Removes item if quantity is 0 or invalid
+ * - Rounds to 4 decimal places for consistency
+ *
+ * @param {Object} item - Cart item that lost focus
+ */
 function handleQuantityBlur(item) {
 	// When user leaves the input field, round and validate
 	if (!item.quantity || item.quantity <= 0) {
@@ -1041,6 +1239,17 @@ function handleQuantityBlur(item) {
 	}
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// UOM (Unit of Measure) Functions
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Change item's unit of measure.
+ * Updates via cart store and closes dropdown.
+ *
+ * @param {Object} item - Cart item to update
+ * @param {String} newUom - New unit of measure (e.g., "Kg", "Box")
+ */
 async function handleUomChange(item, newUom) {
 	await cartStore.changeItemUOM(item.item_code, newUom)
 	openUomDropdown.value = null // Close dropdown after selection
@@ -1048,19 +1257,48 @@ async function handleUomChange(item, newUom) {
 	emit("update-uom", item.item_code, newUom)
 }
 
+/**
+ * Toggle UOM dropdown visibility for an item.
+ * Only one dropdown can be open at a time.
+ *
+ * @param {String} itemCode - Item code to toggle dropdown for
+ */
 function toggleUomDropdown(itemCode) {
 	openUomDropdown.value = openUomDropdown.value === itemCode ? null : itemCode
 }
 
+/**
+ * Select a UOM from dropdown (convenience wrapper).
+ *
+ * @param {Object} item - Cart item
+ * @param {String} uom - Selected UOM
+ */
 function selectUom(item, uom) {
 	handleUomChange(item, uom)
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Item Edit Dialog Functions
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Open the edit item dialog for an item.
+ * Creates a copy of the item to avoid mutating the original.
+ * Used for serial number items and advanced editing.
+ *
+ * @param {Object} item - Cart item to edit
+ */
 function openEditDialog(item) {
 	selectedItem.value = { ...item }
 	showEditDialog.value = true
 }
 
+/**
+ * Handle item update from edit dialog.
+ * Updates item via cart store and emits for parent compatibility.
+ *
+ * @param {Object} updatedItem - Updated item data from dialog
+ */
 async function handleUpdateItem(updatedItem) {
 	// Use store method to update item
 	await cartStore.updateItemDetails(updatedItem.item_code, updatedItem)
@@ -1068,6 +1306,17 @@ async function handleUpdateItem(updatedItem) {
 	emit("edit-item", updatedItem)
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Event Handlers & Lifecycle
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Handle clicks outside interactive elements.
+ * - Closes customer search dropdown when clicking outside
+ * - Closes UOM dropdown when clicking outside
+ *
+ * @param {MouseEvent} event - Click event
+ */
 function handleOutsideClick(event) {
 	const target = event.target
 
@@ -1091,11 +1340,19 @@ function handleOutsideClick(event) {
 	}
 }
 
+/**
+ * Component mounted - register global click listener.
+ * Used for click-outside detection on dropdowns.
+ */
 onMounted(() => {
 	if (typeof document === "undefined") return
 	document.addEventListener("click", handleOutsideClick)
 })
 
+/**
+ * Component unmounting - cleanup global click listener.
+ * Prevents memory leaks by removing event listener.
+ */
 onBeforeUnmount(() => {
 	if (typeof document === "undefined") return
 	document.removeEventListener("click", handleOutsideClick)
