@@ -153,18 +153,143 @@
 				</div>
 			</div>
 
+			<!-- Variant Selection Section -->
+			<div v-if="showVariantSelection" class="mb-4 border border-gray-200 rounded-lg bg-gray-50">
+				<div class="p-4">
+					<div class="flex items-center justify-between mb-3">
+						<h4 class="text-sm font-semibold text-gray-900">{{ __('Select Variants') }}</h4>
+						<div class="flex gap-2">
+							<button
+								@click="selectAllVariants"
+								class="text-xs px-2 py-1 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
+							>
+								{{ __('Select All') }}
+							</button>
+							<button
+								@click="deselectAllVariants"
+								class="text-xs px-2 py-1 text-gray-600 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
+							>
+								{{ __('Deselect All') }}
+							</button>
+						</div>
+					</div>
+
+					<!-- Loading Variants -->
+					<div v-if="loadingVariants" class="flex items-center justify-center py-8">
+						<div class="text-center">
+							<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+							<p class="mt-2 text-xs text-gray-500">{{ __('Loading variants...') }}</p>
+						</div>
+					</div>
+
+					<!-- Variants List -->
+					<div v-else-if="variants.length > 0" class="space-y-2 max-h-64 overflow-y-auto">
+						<button
+							v-for="variant in variants"
+							:key="variant.item_code"
+							@click="toggleVariantSelection(variant)"
+							:class="[
+								'w-full text-start p-3 rounded-lg border transition-all',
+								isVariantSelected(variant)
+									? 'bg-blue-50 border-blue-300 shadow-sm'
+									: 'bg-white border-gray-200 hover:border-blue-200 hover:bg-gray-50'
+							]"
+						>
+							<div class="flex items-center gap-3">
+								<!-- Checkbox -->
+								<div class="flex-shrink-0">
+									<div :class="[
+										'w-5 h-5 rounded border-2 flex items-center justify-center transition-colors',
+										isVariantSelected(variant)
+											? 'bg-blue-600 border-blue-600'
+											: 'bg-white border-gray-300'
+									]">
+										<svg v-if="isVariantSelected(variant)" class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+										</svg>
+									</div>
+								</div>
+								
+								<!-- Variant Image -->
+								<div class="w-10 h-10 bg-gray-100 rounded flex items-center justify-center overflow-hidden flex-shrink-0">
+									<img
+										v-if="variant.image"
+										:src="variant.image"
+										:alt="variant.item_name"
+										class="w-full h-full object-cover"
+									/>
+									<svg v-else class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+									</svg>
+								</div>
+
+								<!-- Variant Info -->
+								<div class="flex-1 min-w-0">
+									<p class="text-sm font-medium text-gray-900 truncate">{{ variant.item_name }}</p>
+									<p class="text-xs text-gray-500 truncate">{{ variant.item_code }}</p>
+									<!-- Attributes -->
+									<div v-if="variant.attributes && Object.keys(variant.attributes).length > 0" class="mt-1 flex flex-wrap gap-1">
+										<span
+											v-for="(value, key) in variant.attributes"
+											:key="key"
+											class="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-700"
+										>
+											{{ key }}: {{ value }}
+										</span>
+									</div>
+								</div>
+
+								<!-- Stock & Price -->
+								<div class="text-end flex-shrink-0">
+									<div :class="[
+										'text-sm font-semibold',
+										(variant.actual_qty || 0) > 0 ? 'text-green-600' : 'text-red-500'
+									]">
+										{{ Math.floor(variant.actual_qty || 0) }} {{ variant.stock_uom || 'Nos' }}
+									</div>
+									<div v-if="variant.rate" class="text-xs text-gray-500 mt-0.5">
+										{{ formatPrice(variant.rate) }}
+									</div>
+								</div>
+							</div>
+						</button>
+					</div>
+
+					<!-- No Variants -->
+					<div v-else class="text-center py-6">
+						<p class="text-sm text-gray-500">{{ __('No variants found') }}</p>
+					</div>
+
+					<!-- Confirm Button -->
+					<div v-if="variants.length > 0" class="mt-4 pt-4 border-t border-gray-200">
+						<button
+							@click="confirmVariantSelection"
+							:disabled="selectedVariants.length === 0"
+							:class="[
+								'w-full px-4 py-2 rounded-lg font-medium transition-colors',
+								selectedVariants.length > 0
+									? 'bg-blue-600 text-white hover:bg-blue-700'
+									: 'bg-gray-300 text-gray-500 cursor-not-allowed'
+							]"
+						>
+							{{ __('Check Availability') }} ({{ selectedVariants.length }} {{ __('selected') }})
+						</button>
+					</div>
+				</div>
+			</div>
+
 			<!-- Content -->
 			<div class="flex-1 overflow-y-auto">
-				<!-- Loading State -->
-				<div v-if="loading" class="flex items-center justify-center py-12">
+				<!-- Loading State (only show if not in variant selection) -->
+				<div v-if="loading && !showVariantSelection" class="flex items-center justify-center py-12">
 					<div class="text-center">
 						<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
 						<p class="mt-4 text-sm text-gray-500">{{ __('Checking warehouse availability...') }}</p>
 					</div>
 				</div>
 
-				<!-- Error State -->
-				<div v-else-if="error" class="flex items-center justify-center py-12">
+				<!-- Error State (only show if not in variant selection) -->
+				<div v-else-if="error && !showVariantSelection" class="flex items-center justify-center py-12">
 					<div class="text-center">
 						<svg class="mx-auto h-12 w-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -180,7 +305,7 @@
 				</div>
 
 				<!-- Prompt to Search (Search Mode, No Item Selected) -->
-				<div v-else-if="isSearchMode && !selectedItemCode" class="flex items-center justify-center py-12">
+				<div v-else-if="isSearchMode && !selectedItemCode && !showVariantSelection" class="flex items-center justify-center py-12">
 					<div class="text-center">
 						<svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -204,45 +329,111 @@
 					</div>
 				</div>
 
-				<!-- Warehouses List -->
-				<div v-else-if="warehouses && warehouses.length > 0" class="flex flex-col gap-3">
-					<div
-						v-for="warehouse in warehouses"
-						:key="warehouse.warehouse"
-						class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-blue-300 transition-colors"
-					>
-						<div class="flex items-center justify-between gap-4">
-							<div class="flex-1 min-w-0 text-start">
-								<h3 class="font-medium text-gray-900 truncate">{{ warehouse.warehouse_name }}</h3>
-								<p class="text-sm text-gray-500 mt-0.5 truncate">{{ warehouse.company }}</p>
-							</div>
-							<div class="text-end flex-shrink-0">
-								<div :class="[
-									'text-lg font-bold',
-									warehouse.available_qty > 0 ? 'text-green-600' : 'text-red-500'
-								]">
-									{{ Math.floor(warehouse.available_qty) }} {{ displayUom }}
+				<!-- Warehouses List (only show if not in variant selection) -->
+				<div v-else-if="warehouses && warehouses.length > 0 && !showVariantSelection" class="flex flex-col gap-3">
+					<!-- Group by warehouse if multiple variants selected -->
+					<template v-if="selectedVariants.length > 1">
+						<!-- Group warehouses by warehouse name -->
+						<div
+							v-for="(warehouseGroup, warehouseName) in groupedWarehouses"
+							:key="warehouseName"
+							class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-blue-300 transition-colors"
+						>
+							<div class="flex items-center justify-between gap-4 mb-3 pb-3 border-b border-gray-200">
+								<div class="flex-1 min-w-0 text-start">
+									<h3 class="font-medium text-gray-900 truncate">{{ warehouseGroup[0].warehouse_name }}</h3>
+									<p class="text-sm text-gray-500 mt-0.5 truncate">{{ warehouseGroup[0].company }}</p>
 								</div>
-								<div class="text-xs text-gray-500 mt-0.5">
-									<span v-if="warehouse.reserved_qty > 0" class="text-orange-600">
-										{{ __( '{0} reserved', [Math.floor(warehouse.reserved_qty)]) }}
-									</span>
-									<span v-else>{{ __('Available') }}</span>
+								<div class="text-end flex-shrink-0">
+									<div class="text-xs text-gray-500">
+										{{ warehouseGroup.length }} {{ warehouseGroup.length === 1 ? __('variant') : __('variants') }}
+									</div>
+								</div>
+							</div>
+							<!-- Variants in this warehouse -->
+							<div class="space-y-2">
+								<div
+									v-for="warehouse in warehouseGroup"
+									:key="`${warehouse.warehouse}-${warehouse.item_code}`"
+									class="bg-white rounded p-3 border border-gray-100"
+								>
+									<div class="flex items-center justify-between gap-4">
+										<div class="flex-1 min-w-0 text-start">
+											<p class="text-sm font-medium text-gray-900 truncate">
+												{{ getVariantName(warehouse.item_code) }}
+											</p>
+											<p class="text-xs text-gray-500 truncate">{{ warehouse.item_code }}</p>
+										</div>
+										<div class="text-end flex-shrink-0">
+											<div :class="[
+												'text-base font-bold',
+												warehouse.available_qty > 0 ? 'text-green-600' : 'text-red-500'
+											]">
+												{{ Math.floor(warehouse.available_qty) }} {{ getVariantUom(warehouse.item_code) }}
+											</div>
+											<div class="text-xs text-gray-500 mt-0.5">
+												<span v-if="warehouse.reserved_qty > 0" class="text-orange-600">
+													{{ __( '{0} reserved', [Math.floor(warehouse.reserved_qty)]) }}
+												</span>
+												<span v-else>{{ __('Available') }}</span>
+											</div>
+										</div>
+									</div>
+									<!-- Actual vs Available -->
+									<div v-if="warehouse.actual_qty !== warehouse.available_qty" class="mt-2 pt-2 border-t border-gray-100">
+										<div class="flex items-center justify-between text-xs text-gray-600">
+											<span class="text-start">{{ __('Actual Stock') }}</span>
+											<span class="font-medium text-end">{{ Math.floor(warehouse.actual_qty) }} {{ getVariantUom(warehouse.item_code) }}</span>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
-						<!-- Actual vs Available -->
-						<div v-if="warehouse.actual_qty !== warehouse.available_qty" class="mt-2 pt-2 border-t border-gray-200">
-							<div class="flex items-center justify-between text-xs text-gray-600">
-								<span class="text-start">{{ __('Actual Stock') }}</span>
-								<span class="font-medium text-end">{{ Math.floor(warehouse.actual_qty) }} {{ displayUom }}</span>
+					</template>
+					<!-- Single variant or no variants - show simple list -->
+					<template v-else>
+						<div
+							v-for="warehouse in warehouses"
+							:key="warehouse.warehouse"
+							class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-blue-300 transition-colors"
+						>
+							<div class="flex items-center justify-between gap-4">
+								<div class="flex-1 min-w-0 text-start">
+									<h3 class="font-medium text-gray-900 truncate">{{ warehouse.warehouse_name }}</h3>
+									<p class="text-sm text-gray-500 mt-0.5 truncate">{{ warehouse.company }}</p>
+									<!-- Show variant name if single variant selected -->
+									<p v-if="warehouse.item_code && selectedVariants.length === 1" class="text-xs text-blue-600 mt-1">
+										{{ getVariantName(warehouse.item_code) }}
+									</p>
+								</div>
+								<div class="text-end flex-shrink-0">
+									<div :class="[
+										'text-lg font-bold',
+										warehouse.available_qty > 0 ? 'text-green-600' : 'text-red-500'
+									]">
+										{{ Math.floor(warehouse.available_qty) }} {{ warehouse.item_code ? getVariantUom(warehouse.item_code) : displayUom }}
+									</div>
+									<div class="text-xs text-gray-500 mt-0.5">
+										<span v-if="warehouse.reserved_qty > 0" class="text-orange-600">
+											{{ __( '{0} reserved', [Math.floor(warehouse.reserved_qty)]) }}
+										</span>
+										<span v-else>{{ __('Available') }}</span>
+									</div>
+								</div>
+							</div>
+							<!-- Actual vs Available -->
+							<div v-if="warehouse.actual_qty !== warehouse.available_qty" class="mt-2 pt-2 border-t border-gray-200">
+								<div class="flex items-center justify-between text-xs text-gray-600">
+									<span class="text-start">{{ __('Actual Stock') }}</span>
+									<span class="font-medium text-end">{{ Math.floor(warehouse.actual_qty) }} {{ warehouse.item_code ? getVariantUom(warehouse.item_code) : displayUom }}</span>
+								</div>
 							</div>
 						</div>
-					</div>
+					</template>
 				</div>
 
-				<!-- No Stock State -->
-				<div v-else-if="selectedItemCode || itemCode" class="flex items-center justify-center py-12">
+				<!-- No Stock State (only show if not in variant selection) -->
+				<div v-else-if="(selectedItemCode || itemCode) && !showVariantSelection" class="flex items-center justify-center py-12">
 					<div class="text-center">
 						<svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -352,6 +543,13 @@ const selectedItemCode = ref('')
 const selectedItemName = ref('')
 const selectedItemImage = ref('')
 const selectedUom = ref('Nos')
+const selectedItemHasVariants = ref(false)
+
+// Variant state
+const variants = ref([])
+const selectedVariants = ref([])
+const loadingVariants = ref(false)
+const showVariantSelection = ref(false)
 
 // Warehouse availability state
 const loading = ref(false)
@@ -378,6 +576,32 @@ const totalAvailable = computed(() => {
 	return Math.floor(warehouses.value.reduce((sum, w) => sum + (w.available_qty || 0), 0))
 })
 
+// Group warehouses by warehouse name when multiple variants selected
+const groupedWarehouses = computed(() => {
+	if (selectedVariants.value.length <= 1) return {}
+	
+	const grouped = {}
+	for (const warehouse of warehouses.value) {
+		const key = warehouse.warehouse || warehouse.warehouse_name
+		if (!grouped[key]) {
+			grouped[key] = []
+		}
+		grouped[key].push(warehouse)
+	}
+	return grouped
+})
+
+// Helper functions for variant info
+function getVariantName(itemCode) {
+	const variant = variants.value.find(v => v.item_code === itemCode)
+	return variant ? variant.item_name : itemCode
+}
+
+function getVariantUom(itemCode) {
+	const variant = variants.value.find(v => v.item_code === itemCode)
+	return variant ? (variant.stock_uom || 'Nos') : displayUom.value
+}
+
 // Initialize and load based on mode
 watch(() => props.modelValue, async (newVal) => {
 	if (newVal) {
@@ -387,8 +611,30 @@ watch(() => props.modelValue, async (newVal) => {
 			await nextTick()
 			focusSearch()
 		} else if (props.itemCode) {
-			// Item mode - load availability for provided item
-			loadAvailability()
+			// Item mode - check if item has variants first
+			// We need to fetch item details to check has_variants
+			try {
+				const itemResponse = await call('pos_next.api.items.get_items', {
+					pos_profile: props.posProfile,
+					search_term: props.itemCode,
+					start: 0,
+					limit: 1
+				})
+				const item = itemResponse?.[0]
+				if (item && item.has_variants) {
+					selectedItemCode.value = props.itemCode
+					selectedItemName.value = props.itemName || props.itemCode
+					selectedItemHasVariants.value = true
+					await loadVariants()
+				} else {
+					// No variants, directly load availability
+					loadAvailability()
+				}
+			} catch (err) {
+				console.error('Error checking item variants:', err)
+				// Fallback to direct load
+				loadAvailability()
+			}
 		}
 	} else {
 		// Reset when dialog closes
@@ -407,6 +653,12 @@ function resetSearchState() {
 	selectedItemName.value = ''
 	selectedItemImage.value = ''
 	selectedUom.value = 'Nos'
+	selectedItemHasVariants.value = false
+	variants.value = []
+	selectedVariants.value = []
+	showVariantSelection.value = false
+	warehouses.value = []
+	error.value = null
 }
 
 function focusSearch() {
@@ -491,16 +743,24 @@ function selectFirstResult() {
 	}
 }
 
-function selectItem(item) {
+async function selectItem(item) {
 	selectedItemCode.value = item.item_code
 	selectedItemName.value = item.item_name
 	selectedItemImage.value = item.image || ''
 	selectedUom.value = item.stock_uom || item.uom || 'Nos'
+	selectedItemHasVariants.value = item.has_variants || false
 	searchQuery.value = ''
 	searchResults.value = []
 	showSearchResults.value = false
 	selectedResultIndex.value = -1
-	loadAvailability()
+	
+	// Check if item has variants
+	if (selectedItemHasVariants.value) {
+		await loadVariants()
+	} else {
+		// No variants, directly load availability
+		loadAvailability()
+	}
 }
 
 function handleEscape() {
@@ -529,11 +789,77 @@ function clearSelectedItem() {
 	selectedItemName.value = ''
 	selectedItemImage.value = ''
 	selectedUom.value = 'Nos'
+	selectedItemHasVariants.value = false
+	variants.value = []
+	selectedVariants.value = []
+	showVariantSelection.value = false
 	warehouses.value = []
 	error.value = null
 	nextTick(() => {
 		focusSearch()
 	})
+}
+
+async function loadVariants() {
+	const templateItem = isSearchMode.value ? selectedItemCode.value : props.itemCode
+	if (!templateItem || !props.posProfile) return
+
+	loadingVariants.value = true
+	variants.value = []
+	selectedVariants.value = []
+	showVariantSelection.value = true
+	error.value = null
+
+	try {
+		const response = await call('pos_next.api.items.get_item_variants', {
+			template_item: templateItem,
+			pos_profile: props.posProfile
+		})
+
+		variants.value = response || []
+		
+		// If no variants found, load availability for the template item itself
+		if (variants.value.length === 0) {
+			showVariantSelection.value = false
+			loadAvailability()
+		}
+	} catch (err) {
+		console.error('Error loading variants:', err)
+		error.value = err.message || __('Failed to load variants')
+		showVariantSelection.value = false
+	} finally {
+		loadingVariants.value = false
+	}
+}
+
+function toggleVariantSelection(variant) {
+	const index = selectedVariants.value.findIndex(v => v.item_code === variant.item_code)
+	if (index >= 0) {
+		selectedVariants.value.splice(index, 1)
+	} else {
+		selectedVariants.value.push(variant)
+	}
+}
+
+function isVariantSelected(variant) {
+	return selectedVariants.value.some(v => v.item_code === variant.item_code)
+}
+
+function confirmVariantSelection() {
+	if (selectedVariants.value.length === 0) {
+		error.value = __('Please select at least one variant')
+		return
+	}
+	showVariantSelection.value = false
+	loadAvailability()
+}
+
+function selectAllVariants() {
+	selectedVariants.value = [...variants.value]
+}
+
+function deselectAllVariants() {
+	selectedVariants.value = []
 }
 
 async function loadAvailability() {
@@ -546,12 +872,22 @@ async function loadAvailability() {
 	warehouses.value = []
 
 	try {
-		const response = await call('pos_next.api.items.get_item_warehouse_availability', {
-			item_code: targetItemCode,
-			company: props.company
-		})
-
-		warehouses.value = response || []
+		// If variants are selected, use item_codes parameter
+		if (selectedVariants.value.length > 0) {
+			const itemCodes = selectedVariants.value.map(v => v.item_code)
+			const response = await call('pos_next.api.items.get_item_warehouse_availability', {
+				item_codes: JSON.stringify(itemCodes),
+				company: props.company
+			})
+			warehouses.value = response || []
+		} else {
+			// Single item (backward compatible)
+			const response = await call('pos_next.api.items.get_item_warehouse_availability', {
+				item_code: targetItemCode,
+				company: props.company
+			})
+			warehouses.value = response || []
+		}
 	} catch (err) {
 		console.error('Error loading warehouse availability:', err)
 		error.value = err.message || __('Failed to load warehouse availability')

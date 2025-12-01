@@ -1324,24 +1324,27 @@ def get_stock_quantities(item_codes, warehouse):
 
 
 @frappe.whitelist()
-def get_item_warehouse_availability(item_code, company=None):
+def get_item_warehouse_availability(item_code=None, item_codes=None, company=None):
 	"""
-	Get stock availability for an item across all warehouses.
+	Get stock availability for an item or multiple items across all warehouses.
 	Useful for showing cashiers where out-of-stock items are available.
 
 	Handles:
 	- Regular items: Shows stock in all warehouses
 	- Item variants: Shows stock for the specific variant
 	- Template items (has_variants): Shows combined stock of all variants
+	- Multiple items: Shows stock for each item separately
 
 	Args:
-		item_code: Item code or template item code
+		item_code: Single item code (for backward compatibility)
+		item_codes: List of item codes (JSON string or list) - if provided, item_code is ignored
 		company: Optional company filter
 
 	Returns:
-		List of warehouses with stock:
+		List of warehouses with stock (grouped by item_code if multiple items):
 		[
 			{
+				"item_code": str,  # Only present if item_codes provided
 				"warehouse": str,
 				"warehouse_name": str,
 				"actual_qty": float,
@@ -1352,20 +1355,35 @@ def get_item_warehouse_availability(item_code, company=None):
 		]
 	"""
 	try:
-		# Check if item exists
-		item_doc = frappe.get_cached_doc("Item", item_code)
+		# Parse item_codes if provided (supports both JSON string and list)
+		if item_codes:
+			if isinstance(item_codes, str):
+				try:
+					item_codes = json.loads(item_codes)
+				except (json.JSONDecodeError, ValueError):
+					item_codes = [item_codes]
+			if not isinstance(item_codes, list):
+				item_codes = [item_codes]
+			items_to_check = item_codes.copy()
+			include_item_code_in_result = True
+		elif item_code:
+			# Check if item exists
+			item_doc = frappe.get_cached_doc("Item", item_code)
 
-		# Determine which items to check stock for
-		items_to_check = [item_code]
+			# Determine which items to check stock for
+			items_to_check = [item_code]
 
-		# If this is a template item, include all its variants
-		if item_doc.has_variants:
-			variants = frappe.get_all(
-				"Item",
-				filters={"variant_of": item_code, "disabled": 0},
-				fields=["name"]
-			)
-			items_to_check.extend([v.name for v in variants])
+			# If this is a template item, include all its variants
+			if item_doc.has_variants:
+				variants = frappe.get_all(
+					"Item",
+					filters={"variant_of": item_code, "disabled": 0},
+					fields=["name"]
+				)
+				items_to_check.extend([v.name for v in variants])
+			include_item_code_in_result = False
+		else:
+			frappe.throw(_("Either item_code or item_codes must be provided"))
 
 		# Build warehouse filter
 		warehouse_filters = {
@@ -1384,21 +1402,41 @@ def get_item_warehouse_availability(item_code, company=None):
 		)
 
 		# Get stock for all items in all warehouses
-		stock_data = frappe.db.sql("""
-			SELECT
-				warehouse,
-				SUM(actual_qty) as actual_qty,
-				SUM(reserved_qty) as reserved_qty
-			FROM `tabBin`
-			WHERE item_code IN %(items)s
-			AND warehouse IN %(warehouses)s
-			GROUP BY warehouse
-			HAVING SUM(actual_qty) > 0
-			ORDER BY SUM(actual_qty) DESC
-		""", {
-			"items": items_to_check,
-			"warehouses": [w.name for w in warehouses]
-		}, as_dict=1)
+		if include_item_code_in_result:
+			# When multiple items, group by both item_code and warehouse
+			stock_data = frappe.db.sql("""
+				SELECT
+					item_code,
+					warehouse,
+					SUM(actual_qty) AS actual_qty,
+					SUM(reserved_qty) AS reserved_qty
+				FROM `tabBin`
+				WHERE item_code IN %(items)s
+				AND warehouse IN %(warehouses)s
+				GROUP BY item_code, warehouse
+				HAVING actual_qty > 0
+				ORDER BY item_code, actual_qty DESC
+			""", {
+				"items": tuple(items_to_check),
+				"warehouses": tuple(w.name for w in warehouses)
+			}, as_dict=True)
+		else:
+			# Single item - group only by warehouse (backward compatible)
+			stock_data = frappe.db.sql("""
+				SELECT
+					warehouse,
+					SUM(actual_qty) as actual_qty,
+					SUM(reserved_qty) as reserved_qty
+				FROM `tabBin`
+				WHERE item_code IN %(items)s
+				AND warehouse IN %(warehouses)s
+				GROUP BY warehouse
+				HAVING SUM(actual_qty) > 0
+				ORDER BY SUM(actual_qty) DESC
+			""", {
+				"items": items_to_check,
+				"warehouses": [w.name for w in warehouses]
+			}, as_dict=1)
 
 		# Build warehouse map for quick lookup
 		warehouse_map = {w.name: w for w in warehouses}
@@ -1408,14 +1446,18 @@ def get_item_warehouse_availability(item_code, company=None):
 		for stock in stock_data:
 			warehouse = warehouse_map.get(stock.warehouse)
 			if warehouse:
-				result.append({
+				stock_entry = {
 					"warehouse": stock.warehouse,
 					"warehouse_name": warehouse.warehouse_name,
 					"actual_qty": flt(stock.actual_qty),
 					"reserved_qty": flt(stock.reserved_qty),
 					"available_qty": flt(stock.actual_qty) - flt(stock.reserved_qty),
 					"company": warehouse.company
-				})
+				}
+				# Add item_code if multiple items requested
+				if include_item_code_in_result:
+					stock_entry["item_code"] = stock.item_code
+				result.append(stock_entry)
 
 		return result
 
