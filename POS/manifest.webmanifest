@@ -1,0 +1,27 @@
+{
+	"name": "POS MZ",
+	"short_name": "POS",
+	"start_url": ".",
+	"display": "standalone",
+	"background_color": "#ffffff",
+	"theme_color": "#02664D",
+	"description": "Fast, offline-ready point of sale for Frappe.",
+	"icons": [
+		{
+			"src": "/favicon.png",
+			"sizes": "180x180",
+			"type": "image/png"
+		},
+		{
+			"src": "/favicon.svg",
+			"sizes": "any",
+			"type": "image/svg+xml"
+		},
+		{
+			"src": "/icon-maskable.svg",
+			"sizes": "512x512",
+			"type": "image/svg+xml",
+			"purpose": "maskable any"
+		}
+	]
+}
