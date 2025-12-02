@@ -593,6 +593,8 @@
 "{0}: {1} {2}","{0}: {1} {2}",""
 "Nos","قطعة",""
 "Check availability in other warehouses","التحقق من التوفر في مستودعات أخرى",""
+"Check Availability in All Wherehouses","التحقق من التوفر في كل المستودعات",
+"Selected","اختيار",
 "Check warehouse availability","التحقق من توفر المستودع",""
 "Loading more items...","جاري تحميل المزيد من المنتجات...",""
 "All items loaded","تم تحميل جميع المنتجات",""

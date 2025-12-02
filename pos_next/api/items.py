@@ -1394,12 +1394,17 @@ def get_item_warehouse_availability(item_code=None, item_codes=None, company=Non
 			warehouse_filters["company"] = company
 
 		# Get all active non-group warehouses
-		warehouses = frappe.get_all(
+		warehouses = frappe.get_list(
 			"Warehouse",
 			filters=warehouse_filters,
 			fields=["name", "warehouse_name", "company"],
 			order_by="warehouse_name"
 		)
+
+		if not items_to_check:
+			return []
+		if not warehouses:
+			return []
 
 		# Get stock for all items in all warehouses
 		if include_item_code_in_result:
