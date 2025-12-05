@@ -69,6 +69,7 @@
 						:value="searchTerm"
 						@input="handleSearchInput"
 						@keydown="handleKeyDown"
+						@click="handleSearchClick"
 						type="text"
 						:placeholder="searchPlaceholder"
 						:class="[
@@ -1059,6 +1060,11 @@ function handleSearchInput(event) {
 			handleBarcodeSearch(true) // Auto-add mode
 		}, 500) // 500ms delay after typing stops
 	}
+}
+
+// Handle click on search input to clear it
+function handleSearchClick() {
+	itemStore.clearSearch()
 }
 
 // Create optimized click handlers for better touch response

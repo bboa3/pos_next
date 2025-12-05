@@ -68,7 +68,11 @@
                         <!-- Inline Customer Search/Selection -->
                         <div ref="customerSearchContainer" class="relative">
                                 <div v-if="customer" class="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm">
-                                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                                        <div
+                                                class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer"
+                                                @click.stop="editCustomer"
+                                                :title="__('Click to change customer')"
+                                        >
                                                 <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
                                                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -98,7 +102,7 @@
 						<!-- Remove Customer Button -->
 						<button
 							type="button"
-							@click="clearCustomer"
+							@click="removeCustomer"
 							class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg flex-shrink-0 transition-colors touch-manipulation"
 							:title="__('Remove customer')"
 						>
@@ -704,7 +708,7 @@ import { isOffline } from "@/utils/offline"
 import { FeatherIcon } from "frappe-ui"
 import { offlineWorker } from "@/utils/offline/workerClient"
 import { createResource } from "frappe-ui"
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from "vue"
 import EditItemDialog from "./EditItemDialog.vue"
 
 /**
@@ -807,6 +811,7 @@ const allCustomers = ref([])                // All customers loaded in memory fo
 const customersLoaded = ref(false)          // Flag indicating customers are ready
 const selectedIndex = ref(-1)               // Keyboard navigation index for search results
 const availableGiftCards = ref([])          // Available gift cards for current customer
+const previousCustomer = ref(null)          // Store previous customer for restore on blur
 
 // Edit item dialog state
 const showEditDialog = ref(false)           // Controls edit dialog visibility
@@ -1081,14 +1086,38 @@ function selectCustomer(cust) {
 	emit("select-customer", cust)
 	customerSearch.value = ""
 	selectedIndex.value = -1
+	previousCustomer.value = null
+}
+
+/**
+ * Switch to edit/search mode for customer.
+ * Saves current customer to allow restoring on blur.
+ */
+async function editCustomer() {
+	previousCustomer.value = props.customer
+	await clearCustomer()
+}
+
+/**
+ * Remove customer permanently.
+ * Does not save for restore.
+ */
+async function removeCustomer() {
+	previousCustomer.value = null
+	await clearCustomer()
 }
 
 /**
  * Clear the currently selected customer.
  * Emits select-customer with null to deselect.
  */
-function clearCustomer() {
+async function clearCustomer() {
 	emit("select-customer", null)
+	await nextTick()
+	const searchInput = document.getElementById("cart-customer-search")
+	if (searchInput) {
+		searchInput.focus()
+	}
 }
 
 /**
@@ -1327,6 +1356,12 @@ function handleOutsideClick(event) {
 		!customerSearchContainer.value.contains(target)
 	) {
 		customerSearch.value = ""
+
+		// Restore previous customer if set and no customer selected
+		if (previousCustomer.value && !props.customer) {
+			emit("select-customer", previousCustomer.value)
+			previousCustomer.value = null
+		}
 	}
 
 	// Close UOM dropdown if clicking outside
