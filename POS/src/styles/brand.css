@@ -51,7 +51,7 @@
   /* Base surfaces */
   --mz-bg: #FFFFFF;
   --mz-surface: #FFFFFF;
-  --mz-surface-2: #F7FAF9;
+  --mz-surface-2: var(--mz-gray-100);
   --mz-text: var(--mz-gray-950);
   --mz-text-muted: var(--mz-gray-950);
   --mz-border: var(--mz-gray-200);

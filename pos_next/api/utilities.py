@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+<<<<<<< HEAD
 # Copyright (c) 2024, POS MZ and contributors
+=======
+# Copyright (c) 2024, POS Next and contributors
+>>>>>>> upstream/develop
 # For license information, please see license.txt
 
 from __future__ import unicode_literals

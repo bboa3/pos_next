@@ -335,7 +335,7 @@ function printInvoiceCustom(invoiceData) {
 							${hasItemDiscount
 						? `
 							<div class="item-discount">
-								<span>Discount ${item.discount_percentage ? `(${Number(item.discount_percentage).toFixed(2)}%)` : ""}</span>
+								<span>${__('Discount')} ${item.discount_percentage ? `(${Number(item.discount_percentage).toFixed(2)}%)` : ""}</span>
 								<span>-${formatCurrency(item.discount_amount || 0)}</span>
 							</div>
 							`

@@ -20,6 +20,7 @@ function getCurrencySymbolOnly(currency) {
 		JPY: "¥",
 		CNY: "¥",
 		USD: "$",
+		MZN: "MT",
 	}
 
 	// Return mapped symbol or try to get from Intl
@@ -29,7 +30,7 @@ function getCurrencySymbolOnly(currency) {
 
 	// Fallback to Intl with narrowSymbol
 	try {
-		const parts = new Intl.NumberFormat("en-US", {
+		const parts = new Intl.NumberFormat("pt-MZ", {
 			style: "currency",
 			currency: currency,
 			currencyDisplay: "narrowSymbol",
@@ -45,10 +46,10 @@ function getCurrencySymbolOnly(currency) {
  * Format currency with proper locale and currency code
  * @param {number} value - The numeric value to format
  * @param {string} currency - The currency code (e.g., 'USD', 'EUR', 'EGP')
- * @param {string} locale - The locale for formatting (default: 'en-US' for English numbers)
+ * @param {string} locale - The locale for formatting (default: 'pt-MZ' for Mozambican Portuguese numbers)
  * @returns {string} Formatted currency string
  */
-export function formatCurrency(value, currency = "USD", locale = "en-US") {
+export function formatCurrency(value, currency = "MZN", locale = "pt-MZ") {
 	if (typeof value !== "number" || isNaN(value)) {
 		return ""
 	}
@@ -56,7 +57,7 @@ export function formatCurrency(value, currency = "USD", locale = "en-US") {
 	const absValue = Math.abs(value)
 	const symbol = getCurrencySymbolOnly(currency)
 
-	// Format number with English locale
+	// Format number with Mozambican Portuguese locale
 	const numberFormatted = new Intl.NumberFormat(locale, {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
@@ -74,7 +75,7 @@ export function formatCurrency(value, currency = "USD", locale = "en-US") {
  * @param {string} currency - The currency code (e.g., 'USD', 'EUR')
  * @returns {string} Currency symbol
  */
-export function getCurrencySymbol(currency = "USD") {
+export function getCurrencySymbol(currency = "MZN") {
 	return getCurrencySymbolOnly(currency)
 }
 
@@ -84,7 +85,7 @@ export function getCurrencySymbol(currency = "USD") {
  * @param {string} locale - The locale for formatting
  * @returns {string} Formatted number string
  */
-export function formatCurrencyNumber(value, locale = "en-US") {
+export function formatCurrencyNumber(value, locale = "pt-MZ") {
 	if (typeof value !== "number" || isNaN(value)) {
 		return "0.00"
 	}

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # POS MZ - Feature Guide
+=======
+# POS Next - Feature Guide
+>>>>>>> upstream/develop
 
 **Version:** 1.0.2
 **Perfect for:** Retail Stores, Restaurants, Cafes, and Service Businesses
@@ -7,10 +11,17 @@
 
 ---
 
+<<<<<<< HEAD
 ## Why Choose POS MZ?
 
 ### 🚀 Works Offline
 Never lose a sale due to internet problems. POS MZ works perfectly without internet and syncs automatically when back online.
+=======
+## Why Choose POS Next?
+
+### 🚀 Works Offline
+Never lose a sale due to internet problems. POS Next works perfectly without internet and syncs automatically when back online.
+>>>>>>> upstream/develop
 
 ### ⚡ Lightning Fast
 Serve more customers in less time. Optimized for speed on any device - tablets, phones, or computers.
@@ -316,7 +327,11 @@ Stock levels and prices update instantly across all your devices. No manual refr
 
 ### vs. Standard ERPNext POS
 
+<<<<<<< HEAD
 | Feature | POS MZ | Standard POS |
+=======
+| Feature | POS Next | Standard POS |
+>>>>>>> upstream/develop
 |---------|----------|--------------|
 | Offline Mode | ✅ Full | ⚠️ Limited |
 | Mobile | ✅ Perfect | ⚠️ Desktop-focused |
@@ -327,7 +342,11 @@ Stock levels and prices update instantly across all your devices. No manual refr
 
 ### vs. Paid POS Systems
 
+<<<<<<< HEAD
 **Why POS MZ Wins:**
+=======
+**Why POS Next Wins:**
+>>>>>>> upstream/develop
 - ✅ **100% Free** - No monthly fees ever
 - ✅ **Open Source** - Modify anything you want
 - ✅ **No Limits** - Unlimited users and terminals

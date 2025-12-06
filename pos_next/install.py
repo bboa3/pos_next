@@ -11,18 +11,18 @@ logger = logging.getLogger(__name__)
 def after_install():
 	"""Hook that runs after app installation"""
 	try:
-		log_message("Installing POS MZ fixtures", level="info")
+		log_message("Installing POS Next fixtures", level="info")
 		install_fixtures()
 		setup_default_print_format()
 		frappe.db.commit()
-		log_message("POS MZ installation completed successfully", level="success")
+		log_message("POS Next installation completed successfully", level="success")
 	except Exception as e:
 		frappe.db.rollback()
 		frappe.log_error(
-			title="POS MZ Installation Error",
+			title="POS Next Installation Error",
 			message=frappe.get_traceback()
 		)
-		log_message(f"Error during POS MZ installation: {str(e)}", level="error")
+		log_message(f"Error during POS Next installation: {str(e)}", level="error")
 		raise
 
 
@@ -33,14 +33,14 @@ def after_migrate():
 		install_fixtures(quiet=True)
 		setup_default_print_format(quiet=True)
 		frappe.db.commit()
-		log_message("POS MZ: Fixtures updated successfully", level="success")
+		log_message("POS Next: Fixtures updated successfully", level="success")
 	except Exception as e:
 		frappe.db.rollback()
 		frappe.log_error(
-			title="POS MZ Migration Error",
+			title="POS Next Migration Error",
 			message=frappe.get_traceback()
 		)
-		log_message(f"POS MZ: Migration error - {str(e)}", level="error")
+		log_message(f"POS Next: Migration error - {str(e)}", level="error")
 		raise
 
 

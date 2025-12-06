@@ -182,7 +182,7 @@ async function initializeApp() {
 					log.debug("Bootstrap preload failed (non-critical)", error)
 				})
 			})
-			.catch(() => {})
+			.catch(() => { })
 	}
 
 	// -------------------------------------------------------------------------
