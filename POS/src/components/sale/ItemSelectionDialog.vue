@@ -80,31 +80,53 @@
 				</div>
 
 				<!-- UOM Options (List format) -->
-				<div v-else-if="mode === 'uom' && options.length > 0" class="flex flex-col gap-2 max-h-96 overflow-y-auto">
-					<button
-						v-for="(option, index) in options"
-						:key="index"
-						@click="selectOption(option)"
-						:class="[
-							'w-full text-start p-3 rounded-lg border-2 transition-all',
-							selectedOption === option
-								? 'border-blue-500 bg-blue-50'
-								: 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-						]"
-					>
-						<div class="flex items-center justify-between">
-							<div class="flex-1">
-								<p class="text-sm font-semibold text-gray-900">{{ option.label }}</p>
-								<p class="text-xs text-gray-500">{{ option.description }}</p>
+				<div v-else-if="mode === 'uom' && options.length > 0">
+					<!-- Quantity Input (UOM Mode) -->
+					<div class="mb-4">
+						<label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Quantity') }}</label>
+						<input
+							type="number"
+							v-model.number="quantity"
+							min="1"
+							class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 transition-colors"
+							@keydown.enter="confirm"
+							@blur="validateQuantity"
+						/>
+						<!-- Stock Warning -->
+						<p v-if="stockWarning" class="mt-1 text-xs text-orange-600 flex items-center gap-1">
+							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+							</svg>
+							{{ stockWarning }}
+						</p>
+					</div>
+
+					<div class="flex flex-col gap-2 max-h-96 overflow-y-auto">
+						<button
+							v-for="(option, index) in options"
+							:key="index"
+							@click="selectOption(option)"
+							:class="[
+								'w-full text-start p-3 rounded-lg border-2 transition-all',
+								selectedOption === option
+									? 'border-blue-500 bg-blue-50'
+									: 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+							]"
+						>
+							<div class="flex items-center justify-between">
+								<div class="flex-1">
+									<p class="text-sm font-semibold text-gray-900">{{ option.label }}</p>
+									<p class="text-xs text-gray-500">{{ option.description }}</p>
+								</div>
+								<div class="text-end ms-3">
+									<p class="text-sm font-bold text-blue-600">
+										{{ formatCurrency(option.rate || 0) }}
+									</p>
+									<p class="text-xs text-gray-500">{{ option.priceLabel }}</p>
+								</div>
 							</div>
-							<div class="text-end ms-3">
-								<p class="text-sm font-bold text-blue-600">
-									{{ formatCurrency(option.rate || 0) }}
-								</p>
-								<p class="text-xs text-gray-500">{{ option.priceLabel }}</p>
-							</div>
-						</div>
-					</button>
+						</button>
+					</div>
 				</div>
 
 				<!-- No Options -->
@@ -194,6 +216,7 @@ const isOpen = computed({
 const loading = ref(false)
 const options = ref([])
 const selectedOption = ref(null)
+const quantity = ref(1)
 const selectedAttributes = ref({}) // For variant attribute selection
 
 // Computed properties for dialog customization
@@ -212,6 +235,32 @@ const dialogDescription = computed(() => {
 const confirmButtonText = computed(() => {
 	return props.mode === "variant" ? __("Add to Cart") : __("Add to Cart")
 })
+
+// Computed: Stock warning when quantity exceeds available stock
+const stockWarning = computed(() => {
+	if (props.mode !== "uom" || !selectedOption.value) return null
+
+	const availableStock = selectedOption.value.stock_qty ?? selectedOption.value.actual_qty ?? null
+	if (availableStock === null) return null
+
+	if (quantity.value > availableStock) {
+		return __("Requested quantity ({0}) exceeds available stock ({1})", [quantity.value, Math.floor(availableStock)])
+	}
+	return null
+})
+
+/**
+ * Validates quantity input ensuring it's a valid positive integer
+ */
+function validateQuantity() {
+	// Handle invalid, negative, or decimal values
+	if (!quantity.value || isNaN(quantity.value) || quantity.value < 1) {
+		quantity.value = 1
+	} else {
+		// Round to nearest integer for UOM quantities
+		quantity.value = Math.max(1, Math.round(quantity.value))
+	}
+}
 
 // Computed: Build a map of all available attribute values
 const variantAttributesMap = computed(() => {
@@ -306,6 +355,7 @@ watch([() => props.mode, () => props.item], ([, newItem]) => {
 
 function loadOptions() {
 	selectedOption.value = null
+	quantity.value = 1
 	selectedAttributes.value = {} // Reset attribute selection
 
 	if (props.mode === "variant") {
@@ -390,7 +440,11 @@ function confirm() {
 	if (selectedOption.value) {
 		// Emit first, let parent decide if dialog should close
 		// Parent can keep dialog open by switching mode (variant → UOM)
-		emit("option-selected", selectedOption.value)
+		const option = { ...selectedOption.value }
+		if (props.mode === "uom") {
+			option.quantity = quantity.value
+		}
+		emit("option-selected", option)
 	}
 }
 

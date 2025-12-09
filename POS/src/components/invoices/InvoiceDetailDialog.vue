@@ -56,6 +56,40 @@
 					</div>
 				</div>
 
+				<!-- Credit Sale Return Notice -->
+				<div v-if="invoiceData.is_return && isCreditSaleReturn" class="bg-gradient-to-r rtl:bg-gradient-to-l from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+					<div class="flex flex-row-reverse items-start gap-3">
+						<div class="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center flex-shrink-0">
+							<svg class="w-4 h-4 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+							</svg>
+						</div>
+						<div class="text-end flex-1">
+							<h4 class="text-sm font-semibold text-blue-900">{{ __('Credit Sale Return') }}</h4>
+							<p class="text-xs text-blue-700 mt-1">
+								{{ __('This return was against a Pay on Account invoice. The accounts receivable balance has been reversed. No cash refund was processed.') }}
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Pay on Account Notice (for original credit sales) -->
+				<div v-else-if="!invoiceData.is_return && isCreditSale" class="bg-gradient-to-r rtl:bg-gradient-to-l from-amber-50 to-orange-50 rounded-lg p-4 border border-amber-200">
+					<div class="flex flex-row-reverse items-start gap-3">
+						<div class="w-8 h-8 rounded-full bg-amber-200 flex items-center justify-center flex-shrink-0">
+							<svg class="w-4 h-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+							</svg>
+						</div>
+						<div class="text-end flex-1">
+							<h4 class="text-sm font-semibold text-amber-900">{{ __('Pay on Account') }}</h4>
+							<p class="text-xs text-amber-700 mt-1">
+								{{ __('This invoice was sold on credit. The customer owes the full amount.') }}
+							</p>
+						</div>
+					</div>
+				</div>
+
 				<!-- Items Section -->
 				<div>
 					<h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
@@ -178,7 +212,13 @@
 								<span class="text-gray-600">{{ __('Paid Amount:') }}</span>
 								<span class="font-semibold text-green-600">{{ formatCurrency(invoiceData.paid_amount) }}</span>
 							</div>
-							<div v-if="invoiceData.outstanding_amount" class="flex justify-between text-sm">
+							<!-- For return invoices with negative outstanding (credit to customer) -->
+							<div v-if="invoiceData.is_return && invoiceData.outstanding_amount < 0" class="flex justify-between text-sm">
+								<span class="text-gray-600">{{ __('Customer Credit:') }}</span>
+								<span class="font-semibold text-blue-600">{{ formatCurrency(Math.abs(invoiceData.outstanding_amount)) }}</span>
+							</div>
+							<!-- For regular invoices with outstanding (customer owes) -->
+							<div v-else-if="invoiceData.outstanding_amount && invoiceData.outstanding_amount > 0" class="flex justify-between text-sm">
 								<span class="text-gray-600">{{ __('Outstanding:') }}</span>
 								<span class="font-semibold text-orange-600">{{ formatCurrency(invoiceData.outstanding_amount) }}</span>
 							</div>
@@ -224,7 +264,7 @@ import { formatCurrency as formatCurrencyUtil } from "@/utils/currency"
 import { getInvoiceStatusColor } from "@/utils/invoice"
 import { logger } from "@/utils/logger"
 import { Button, Dialog, call } from "frappe-ui"
-import { ref, watch, nextTick } from "vue"
+import { ref, watch, nextTick, computed } from "vue"
 
 const log = logger.create('InvoiceDetailDialog')
 const { formatDate, formatTime } = useFormatters()
@@ -248,6 +288,25 @@ const emit = defineEmits(["update:modelValue", "print-invoice"])
 const show = ref(props.modelValue)
 const loading = ref(false)
 const invoiceData = ref(null)
+
+// Computed: Check if this is a credit sale (Pay on Account - no payments, full outstanding)
+const isCreditSale = computed(() => {
+	if (!invoiceData.value) return false
+	const hasNoPayments = !invoiceData.value.payments || invoiceData.value.payments.length === 0
+	const totalPaid = invoiceData.value.payments?.reduce((sum, p) => sum + Math.abs(p.amount || 0), 0) || 0
+	const grandTotal = Math.abs(invoiceData.value.grand_total || 0)
+	const outstanding = Math.abs(invoiceData.value.outstanding_amount || 0)
+	// Credit sale if no payments and outstanding equals grand total
+	return hasNoPayments || (totalPaid < 0.01 && Math.abs(outstanding - grandTotal) < 0.01)
+})
+
+// Computed: Check if this is a credit sale return (return with no payments)
+const isCreditSaleReturn = computed(() => {
+	if (!invoiceData.value || !invoiceData.value.is_return) return false
+	const hasNoPayments = !invoiceData.value.payments || invoiceData.value.payments.length === 0
+	const totalPaid = invoiceData.value.payments?.reduce((sum, p) => sum + Math.abs(p.amount || 0), 0) || 0
+	return hasNoPayments || totalPaid < 0.01
+})
 
 watch(
 	() => props.modelValue,

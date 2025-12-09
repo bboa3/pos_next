@@ -72,9 +72,25 @@ export const useStockStore = defineStore('stock', () => {
 	// Update reservations from cart
 	const reserve = (cartItems) => {
 		reserved.value.clear()
-		cartItems?.forEach(cartItem => {
+
+		// Early return for empty or invalid cart
+		if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
+			return
+		}
+
+		cartItems.forEach(cartItem => {
+			// Skip items with missing item_code
+			if (!cartItem?.item_code) return
+
 			const quantity = Number(cartItem.quantity) || 0
-			if (quantity > 0) reserved.value.set(cartItem.item_code, quantity)
+			// Skip items with zero or negative quantity
+			if (quantity <= 0) return
+
+			const factor = Number(cartItem.conversion_factor) || 1
+			const itemCode = cartItem.item_code
+
+			const current = reserved.value.get(itemCode) || 0
+			reserved.value.set(itemCode, current + (quantity * factor))
 		})
 	}
 

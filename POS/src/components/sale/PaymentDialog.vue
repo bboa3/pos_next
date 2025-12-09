@@ -163,8 +163,8 @@
 								}}
 							</span>
 							<span v-if="selectedSalesPersons.length > 0" class="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-0.5 rounded">
-								{{ settingsStore.isSingleSalesPerson 
-									? __('1 selected') 
+								{{ settingsStore.isSingleSalesPerson
+									? __('1 selected')
 									: __('{0} selected', [selectedSalesPersons.length]) }}
 							</span>
 						</div>
@@ -922,27 +922,31 @@ async function loadPaymentMethods() {
 // Currency symbol for display
 const currencySymbol = computed(() => getCurrencySymbol(props.currency))
 
+// Helper to round to 2 decimal places (handles floating-point precision)
+const round2 = (val) => Number(Number(val).toFixed(2))
+
 const totalPaid = computed(() => {
-	return paymentEntries.value.reduce(
+	const sum = paymentEntries.value.reduce(
 		(sum, entry) => sum + (entry.amount || 0),
 		0,
 	)
+	return round2(sum)
 })
 
 const totalAvailableCredit = computed(() => {
 	// Use net_balance: negative means customer has credit, positive means they owe
 	// Return negative of net_balance so positive = credit available, negative = outstanding
-	return -customerBalance.value.net_balance
+	return round2(-customerBalance.value.net_balance)
 })
 
 const remainingAmount = computed(() => {
-	const remaining = props.grandTotal - totalPaid.value
-	return remaining > 0 ? remaining : 0
+	const remaining = round2(props.grandTotal) - totalPaid.value
+	return remaining > 0 ? round2(remaining) : 0
 })
 
 const changeAmount = computed(() => {
-	const change = totalPaid.value - props.grandTotal
-	return change > 0 ? change : 0
+	const change = totalPaid.value - round2(props.grandTotal)
+	return change > 0 ? round2(change) : 0
 })
 
 const canComplete = computed(() => {
@@ -951,18 +955,11 @@ const canComplete = computed(() => {
 		return totalPaid.value > 0 && paymentEntries.value.length > 0
 	}
 	// Otherwise require full payment
-	return totalPaid.value >= props.grandTotal && paymentEntries.value.length > 0
+	return remainingAmount.value === 0 && paymentEntries.value.length > 0
 })
 
 const paymentButtonText = computed(() => {
-	console.log('[PaymentDialog] Button text calculation:', {
-		totalPaid: totalPaid.value,
-		grandTotal: props.grandTotal,
-		allowPartialPayment: props.allowPartialPayment,
-		canComplete: canComplete.value
-	})
-
-	if (totalPaid.value >= props.grandTotal) {
+	if (remainingAmount.value === 0) {
 		return __("Complete Payment")
 	}
 	if (props.allowPartialPayment && totalPaid.value > 0) {
@@ -1287,7 +1284,7 @@ function handleAdditionalDiscountChange() {
 				localAdditionalDiscount.value = maxAmount
 				discountAmount = maxAmount
 				// Show warning toast
-				showWarning(__('Maximum allowed discount is {0}% ({1} {2})', 
+				showWarning(__('Maximum allowed discount is {0}% ({1} {2})',
 				[settingsStore.maxDiscountAllowed, props.currency, maxAmount.toFixed(2)]))
 			}
 		}

@@ -68,7 +68,11 @@
                         <!-- Inline Customer Search/Selection -->
                         <div ref="customerSearchContainer" class="relative">
                                 <div v-if="customer" class="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm">
-                                        <div class="flex items-center gap-2 min-w-0 flex-1">
+                                        <div
+                                                class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer"
+                                                @click.stop="editCustomer"
+                                                :title="__('Click to change customer')"
+                                        >
                                                 <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
                                                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -98,7 +102,7 @@
 						<!-- Remove Customer Button -->
 						<button
 							type="button"
-							@click="clearCustomer"
+							@click="removeCustomer"
 							class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg flex-shrink-0 transition-colors touch-manipulation"
 							:title="__('Remove customer')"
 						>
@@ -448,7 +452,7 @@
 								</div>
 								<button
 									type="button"
-									@click.stop="$emit('remove-item', item.item_code)"
+									@click.stop="$emit('remove-item', item.item_code, item.uom)"
 									class="text-gray-400 hover:text-red-600 active:text-red-700 transition-colors flex-shrink-0 p-0.5 -m-0.5 touch-manipulation active:scale-90"
 									:aria-label="__('Remove {0}', [item.item_name])"
 									:title="__('Remove item')"
@@ -704,7 +708,7 @@ import { isOffline } from "@/utils/offline"
 import { FeatherIcon } from "frappe-ui"
 import { offlineWorker } from "@/utils/offline/workerClient"
 import { createResource } from "frappe-ui"
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from "vue"
 import EditItemDialog from "./EditItemDialog.vue"
 
 /**
@@ -775,8 +779,8 @@ const props = defineProps({
  * Events emitted to parent component for cart operations
  */
 const emit = defineEmits([
-	"update-quantity",    // (itemCode, newQty) - Update item quantity
-	"remove-item",        // (itemCode) - Remove item from cart
+	"update-quantity",    // (itemCode, newQty, uom?) - Update item quantity
+	"remove-item",        // (itemCode, uom?) - Remove item from cart
 	"select-customer",    // (customer) - Select/change customer
 	"create-customer",    // (searchText) - Open create customer dialog
 	"proceed-to-payment", // () - Navigate to payment screen
@@ -807,6 +811,7 @@ const allCustomers = ref([])                // All customers loaded in memory fo
 const customersLoaded = ref(false)          // Flag indicating customers are ready
 const selectedIndex = ref(-1)               // Keyboard navigation index for search results
 const availableGiftCards = ref([])          // Available gift cards for current customer
+const previousCustomer = ref(null)          // Store previous customer for restore on blur
 
 // Edit item dialog state
 const showEditDialog = ref(false)           // Controls edit dialog visibility
@@ -1081,14 +1086,38 @@ function selectCustomer(cust) {
 	emit("select-customer", cust)
 	customerSearch.value = ""
 	selectedIndex.value = -1
+	previousCustomer.value = null
+}
+
+/**
+ * Switch to edit/search mode for customer.
+ * Saves current customer to allow restoring on blur.
+ */
+async function editCustomer() {
+	previousCustomer.value = props.customer
+	await clearCustomer()
+}
+
+/**
+ * Remove customer permanently.
+ * Does not save for restore.
+ */
+async function removeCustomer() {
+	previousCustomer.value = null
+	await clearCustomer()
 }
 
 /**
  * Clear the currently selected customer.
  * Emits select-customer with null to deselect.
  */
-function clearCustomer() {
+async function clearCustomer() {
 	emit("select-customer", null)
+	await nextTick()
+	const searchInput = document.getElementById("cart-customer-search")
+	if (searchInput) {
+		searchInput.focus()
+	}
 }
 
 /**
@@ -1181,7 +1210,7 @@ function getSmartStep(quantity) {
 function incrementQuantity(item) {
 	const step = getSmartStep(item.quantity)
 	const newQty = Math.round((item.quantity + step) * 10000) / 10000
-	emit("update-quantity", item.item_code, newQty)
+	emit("update-quantity", item.item_code, newQty, item.uom)
 }
 
 /**
@@ -1196,9 +1225,9 @@ function decrementQuantity(item) {
 
 	if (newQty <= 0) {
 		// If quantity would be 0 or negative, remove the item
-		emit("remove-item", item.item_code)
+		emit("remove-item", item.item_code, item.uom)
 	} else {
-		emit("update-quantity", item.item_code, newQty)
+		emit("update-quantity", item.item_code, newQty, item.uom)
 	}
 }
 
@@ -1213,7 +1242,7 @@ function updateQuantity(item, value) {
 	const qty = Number.parseFloat(value)
 	// Allow any positive number during typing (don't round yet)
 	if (!isNaN(qty) && qty > 0) {
-		emit("update-quantity", item.item_code, qty)
+		emit("update-quantity", item.item_code, qty, item.uom)
 	}
 }
 
@@ -1229,12 +1258,12 @@ function handleQuantityBlur(item) {
 	// When user leaves the input field, round and validate
 	if (!item.quantity || item.quantity <= 0) {
 		// If quantity is 0 or invalid, remove the item
-		emit("remove-item", item.item_code)
+		emit("remove-item", item.item_code, item.uom)
 	} else {
 		// Round to 4 decimal places for consistency
 		const roundedQty = Math.round(item.quantity * 10000) / 10000
 		if (roundedQty !== item.quantity) {
-			emit("update-quantity", item.item_code, roundedQty)
+			emit("update-quantity", item.item_code, roundedQty, item.uom)
 		}
 	}
 }
@@ -1327,6 +1356,12 @@ function handleOutsideClick(event) {
 		!customerSearchContainer.value.contains(target)
 	) {
 		customerSearch.value = ""
+
+		// Restore previous customer if set and no customer selected
+		if (previousCustomer.value && !props.customer) {
+			emit("select-customer", previousCustomer.value)
+			previousCustomer.value = null
+		}
 	}
 
 	// Close UOM dropdown if clicking outside

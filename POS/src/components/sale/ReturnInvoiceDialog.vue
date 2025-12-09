@@ -102,12 +102,12 @@
 							</div>
 						</div>
 						<div class="flex flex-col gap-2">
-							<div>
+							<div class="text-start">
 								<p class="text-xs text-gray-500">{{ __('Customer') }}</p>
 								<p class="text-sm font-semibold text-gray-900">{{ originalInvoice.customer_name }}</p>
 							</div>
 							<div class="flex items-center justify-between">
-								<div>
+								<div class="text-start">
 									<p class="text-xs text-gray-500">{{ __('Date') }}</p>
 									<p class="text-sm font-semibold text-gray-900">{{ formatDate(originalInvoice.posting_date) }}</p>
 								</div>
@@ -135,13 +135,13 @@
 									{{ __(originalInvoice.status) }}
 								</span>
 							</div>
-							<div class="mt-3 grid grid-cols-2 gap-3">
-								<div>
-									<p class="text-xs text-gray-500">{{ __('Customer') }}</p>
+							<div class="mt-3 grid grid-cols-2 gap-6">
+								<div class="text-start">
+									<p class="text-xs text-gray-500 mb-1">{{ __('Customer') }}</p>
 									<p class="text-sm font-semibold text-gray-900">{{ originalInvoice.customer_name }}</p>
 								</div>
-								<div>
-									<p class="text-xs text-gray-500">{{ __('Date') }}</p>
+								<div class="text-start">
+									<p class="text-xs text-gray-500 mb-1">{{ __('Date') }}</p>
 									<p class="text-sm font-semibold text-gray-900">{{ formatDate(originalInvoice.posting_date) }}</p>
 								</div>
 							</div>
@@ -158,10 +158,10 @@
 				<!-- Return Items -->
 				<div v-if="originalInvoice">
 								<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
-									<label class="text-sm font-medium text-gray-700">
+									<label class="text-sm font-medium text-gray-700 text-start">
 										{{ __('Select Items to Return') }}
 									</label>
-									<div class="flex gap-2 self-start sm:self-auto">
+									<div class="flex gap-2 self-end sm:self-auto">
 										<Button size="sm" variant="subtle" @click="selectAllItems">
 											<span class="text-xs whitespace-nowrap">{{ __('Select All') }}</span>
 										</Button>
@@ -193,20 +193,16 @@
 											/>
 
 											<!-- Item Info -->
-											<div class="flex-1 min-w-0">
-												<div class="flex items-start justify-between">
-													<div class="flex-1">
-														<h4 class="text-sm font-bold text-gray-900 truncate">
-															{{ item.item_name }}
-														</h4>
-														<p class="text-xs text-gray-500 mt-0.5">
-															{{ item.item_code }}
-														</p>
-														<p v-if="item.already_returned > 0" class="text-xs text-amber-600 mt-1">
-															{{ __('⚠️ {0} already returned', [item.already_returned]) }}
-														</p>
-													</div>
-												</div>
+											<div class="flex-1 min-w-0 text-start">
+												<h4 class="text-sm font-bold text-gray-900 truncate">
+													{{ item.item_name }}
+												</h4>
+												<p class="text-xs text-gray-500 mt-0.5">
+													{{ item.item_code }}
+												</p>
+												<p v-if="item.already_returned > 0" class="text-xs text-amber-600 mt-1">
+													{{ __('⚠️ {0} already returned', [item.already_returned]) }}
+												</p>
 											</div>
 
 											<!-- Quantity Controls -->
@@ -247,7 +243,7 @@
 											</div>
 
 											<!-- Rate & Amount -->
-											<div class="text-end min-w-[100px]">
+											<div class="text-start min-w-[100px]">
 												<p class="text-sm font-bold text-gray-900">
 													{{ formatCurrency(item.rate * item.return_qty) }}
 												</p>
@@ -265,7 +261,7 @@
 													@click.stop
 													class="h-5 w-5 mt-1 text-blue-600 rounded-md focus:ring-2 focus:ring-blue-500 cursor-pointer flex-shrink-0"
 												/>
-												<div class="flex-1 min-w-0">
+												<div class="flex-1 min-w-0 text-start">
 													<h4 class="text-sm font-semibold text-gray-900 leading-tight">
 														{{ item.item_name }}
 													</h4>
@@ -281,8 +277,8 @@
 											<!-- Quantity Controls -->
 											<div class="flex flex-col gap-2" @click.stop>
 												<div class="flex items-center justify-between">
-													<span class="text-xs font-medium text-gray-600">{{ __('Return Qty:') }}</span>
-													<span class="text-xs text-gray-500">{{ __('of {0}', [item.quantity], "item qty") }}</span>
+													<span class="text-xs font-medium text-gray-600 text-start">{{ __('Return Qty:') }}</span>
+													<span class="text-xs text-gray-500 text-end">{{ __('of {0}', [item.quantity], "item qty") }}</span>
 												</div>
 												<div class="flex items-center gap-2">
 													<button
@@ -315,7 +311,7 @@
 
 											<!-- Price -->
 											<div class="flex items-center justify-between px-1 pt-2 border-t border-gray-100">
-												<span class="text-xs text-gray-600">{{ __('Amount:') }}</span>
+												<span class="text-xs text-gray-600 text-start">{{ __('Amount:') }}</span>
 												<div class="text-end">
 													<p class="text-base font-bold text-gray-900">
 														{{ formatCurrency(item.rate * item.return_qty) }}
@@ -333,124 +329,134 @@
 
 							<!-- Payment Methods Selection -->
 							<div v-if="selectedItems.length > 0">
+								<!-- Credit Sale Return Notice -->
+								<div v-if="isOriginalCreditSale" class="bg-amber-50 rounded-xl p-4 border border-amber-200 mb-4 text-start">
+									<h4 class="text-sm font-bold text-amber-900 mb-1">{{ __('Credit Sale Return') }}</h4>
+									<p class="text-xs text-amber-800">
+										{{ __('This invoice was paid on account (credit sale). The return will reverse the accounts receivable balance. No cash refund will be processed.') }}
+									</p>
+								</div>
+
+								<!-- Partially Paid Invoice Notice -->
+								<div v-if="isPartiallyPaid && !isOriginalCreditSale" class="bg-blue-50 rounded-xl p-4 border border-blue-200 mb-4 text-start">
+									<h4 class="text-sm font-bold text-blue-900 mb-1">{{ __('Partially Paid Invoice') }}</h4>
+									<p class="text-xs text-blue-800 mb-2">
+										{{ __('This invoice was partially paid. The refund will be split proportionally.') }}
+									</p>
+									<div class="flex flex-col gap-1 text-xs">
+										<div class="flex justify-between items-center">
+											<span class="text-blue-700">{{ __('Cash Refund:') }}</span>
+											<span class="font-bold text-blue-900">{{ formatCurrency(maxRefundableAmount) }}</span>
+										</div>
+										<div v-if="creditAdjustmentAmount > 0" class="flex justify-between items-center">
+											<span class="text-blue-700">{{ __('Credit Adjustment:') }}</span>
+											<span class="font-bold text-blue-900">{{ formatCurrency(creditAdjustmentAmount) }}</span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Regular Payment Methods (only for non-credit sales) -->
+								<div v-if="!isOriginalCreditSale">
 								<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
-									<label class="text-sm font-medium text-gray-700">
+									<label class="text-sm font-medium text-gray-700 text-start">
 										{{ __('Refund Payment Methods') }}
 									</label>
-									<Button size="sm" variant="subtle" @click="addPaymentRow" class="self-start sm:self-auto">
+									<Button size="sm" variant="subtle" @click="addPaymentRow" class="self-end sm:self-auto">
 										<span class="text-xs">{{ __('+ Add Payment') }}</span>
 									</Button>
 								</div>
 
-								<div class="flex flex-col gap-2">
+								<div class="flex flex-col gap-3">
 									<div
 										v-for="(payment, index) in refundPayments"
 										:key="index"
-										class="bg-white border border-gray-200 rounded-lg p-3"
+										class="bg-white border border-gray-200 rounded-xl p-3 shadow-sm"
 									>
-										<!-- Mobile Layout -->
-										<div class="sm:hidden flex flex-col gap-3">
-											<!-- Payment Method Row -->
-											<div class="flex items-center gap-3">
-												<div class="flex-shrink-0 text-3xl">
+										<!-- Desktop: Single Row | Mobile: Two Rows -->
+										<div class="flex flex-col sm:flex-row sm:items-center gap-3">
+											<!-- Payment Method -->
+											<div class="flex items-center gap-2 flex-1">
+												<div class="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center text-xl border border-blue-200">
 													{{ payment.mode_of_payment ? getPaymentIcon(payment.mode_of_payment) : '💰' }}
 												</div>
 												<select
 													v-model="payment.mode_of_payment"
-													class="flex-1 px-3 py-3 border-2 border-gray-300 rounded-lg text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+													:style="paymentSelectStyle"
+													class="payment-select flex-1 py-2.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none cursor-pointer hover:border-gray-400 transition-colors ps-3 pe-10"
 												>
-													<option value="">{{ __('Select method...', null, 'payment') }}</option>
+													<option value="">{{ __('Select method...') }}</option>
 													<option v-for="method in paymentMethods" :key="method.mode_of_payment" :value="method.mode_of_payment">
 														{{ method.mode_of_payment }}
 													</option>
 												</select>
+											</div>
+											<!-- Amount with Counter -->
+											<div class="flex items-center gap-2 flex-1">
 												<button
-													v-if="refundPayments.length > 1"
-													@click="removePaymentRow(index)"
-													class="p-2.5 text-red-600 active:bg-red-50 rounded-lg transition-colors flex-shrink-0"
-												>
-													<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-													</svg>
-												</button>
-											</div>
-
-											<!-- Amount Input Row -->
-											<div class="flex items-center gap-3 ps-1">
-												<label class="text-sm font-medium text-gray-600 w-20 text-start">{{ __('Amount:') }}</label>
+													@click="payment.amount = Math.max(0, (payment.amount || 0) - 1)"
+													type="button"
+													class="flex-shrink-0 w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-bold text-xl transition-colors flex items-center justify-center border border-gray-300"
+												>−</button>
 												<input
-													v-model.number="payment.amount"
-													type="number"
-													step="1"
-													min="0"
-													:max="returnTotal"
-													placeholder="0.00"
-													class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg text-lg text-end font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
-												/>
-											</div>
-										</div>
-
-										<!-- Desktop Layout -->
-										<div class="hidden sm:flex items-center gap-3">
-											<!-- Payment Icon -->
-											<div class="flex-shrink-0 text-2xl">
-												{{ payment.mode_of_payment ? getPaymentIcon(payment.mode_of_payment) : '💰' }}
-											</div>
-											<!-- Payment Method Dropdown -->
-											<div class="flex-1 min-w-0">
-												<select
-													v-model="payment.mode_of_payment"
-													class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-												>
-													<option value="">{{ __('Select payment method...') }}</option>
-													<option v-for="method in paymentMethods" :key="method.mode_of_payment" :value="method.mode_of_payment">
-														{{ method.mode_of_payment }}
-													</option>
-												</select>
-											</div>
-											<!-- Amount Input -->
-											<div class="flex-1 min-w-0">
-												<input
-													v-model.number="payment.amount"
-													type="number"
-													step="1"
-													min="0"
-													:max="returnTotal"
+													:value="payment.amount"
+													@input="payment.amount = parseFloat($event.target.value) || 0"
+													@focus="$event.target.select()"
+													type="text"
+													inputmode="decimal"
 													:placeholder="__('Amount')"
-													class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-end focus:outline-none focus:ring-2 focus:ring-blue-500"
+													class="flex-1 min-w-0 px-3 py-2.5 text-base font-bold text-center border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-gray-400 transition-colors"
 												/>
+												<button
+													@click="payment.amount = (payment.amount || 0) + 1"
+													type="button"
+													class="flex-shrink-0 w-10 h-10 sm:w-9 sm:h-9 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-bold text-xl transition-colors flex items-center justify-center border border-gray-300"
+												>+</button>
 											</div>
+											<!-- Delete Button -->
 											<button
 												v-if="refundPayments.length > 1"
 												@click="removePaymentRow(index)"
-												class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+												class="hidden sm:flex flex-shrink-0 w-9 h-9 items-center justify-center text-red-500 hover:text-red-700 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors"
+												:title="__('Remove')"
 											>
 												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
 												</svg>
 											</button>
 										</div>
+										<!-- Mobile Delete Button -->
+										<button
+											v-if="refundPayments.length > 1"
+											@click="removePaymentRow(index)"
+											class="sm:hidden mt-2 w-full py-2 text-sm text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors flex items-center justify-center gap-1"
+										>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+											</svg>
+											{{ __('Remove') }}
+										</button>
 									</div>
 								</div>
 
 								<!-- Payment Summary -->
 								<div class="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
 									<div class="flex items-center justify-between text-sm">
-										<span class="text-gray-600">{{ __('Total Refund:') }}</span>
-										<span class="font-bold text-gray-900">{{ formatCurrency(returnTotal) }}</span>
+										<span class="text-gray-600">{{ isPartiallyPaid ? __('Refundable Amount:') : __('Total Refund:') }}</span>
+										<span class="font-bold text-gray-900">{{ formatCurrency(isPartiallyPaid ? maxRefundableAmount : returnTotal) }}</span>
 									</div>
 									<div class="flex items-center justify-between text-sm mt-1">
 										<span class="text-gray-600">{{ __('Payment Total:') }}</span>
 										<span :class="[
 											'font-bold',
-											totalPaymentAmount === returnTotal ? 'text-green-600' : 'text-red-600'
+											Math.abs(totalPaymentAmount - (isPartiallyPaid ? maxRefundableAmount : returnTotal)) < 0.01 ? 'text-green-600' : 'text-red-600'
 										]">
 											{{ formatCurrency(totalPaymentAmount) }}
 										</span>
 									</div>
-									<p v-if="totalPaymentAmount !== returnTotal" class="mt-2 text-xs text-amber-600">
-										{{ __('⚠️ Payment total must equal refund amount') }}
+									<p v-if="Math.abs(totalPaymentAmount - (isPartiallyPaid ? maxRefundableAmount : returnTotal)) >= 0.01" class="mt-2 text-xs text-amber-600 text-start">
+										{{ isPartiallyPaid ? __('⚠️ Payment total must equal refundable amount') : __('⚠️ Payment total must equal refund amount') }}
 									</p>
+								</div>
 								</div>
 							</div>
 
@@ -462,29 +468,35 @@
 									</svg>
 									<h3 class="text-sm font-bold text-gray-900">{{ __('Return Summary') }}</h3>
 								</div>
-								<div class="flex flex-col gap-3">
+								<div class="flex flex-col gap-2">
 									<div class="flex justify-between items-center">
 										<span class="text-sm text-gray-600">{{ __('Items to Return:') }}</span>
-										<span class="px-2 py-1 bg-white rounded-lg text-sm font-bold text-gray-900 border border-red-200">
-											{{ selectedItems.length }}
-										</span>
+										<span class="px-2 py-1 bg-white rounded-lg text-sm font-bold text-gray-900 border border-red-200">{{ selectedItems.length }}</span>
 									</div>
+									<!-- Breakdown for partially paid invoices -->
+									<template v-if="showPartialBreakdown">
+										<div class="flex justify-between items-center text-sm pt-2 border-t border-red-200">
+											<span class="text-gray-600">{{ __('Return Value:') }}</span>
+											<span class="font-medium text-gray-700">{{ formatCurrency(returnTotal) }}</span>
+										</div>
+										<div class="flex justify-between items-center text-sm">
+											<span class="text-gray-600">{{ __('Credit Adjustment:') }}</span>
+											<span class="font-medium text-gray-700">-{{ formatCurrency(creditAdjustmentAmount) }}</span>
+										</div>
+									</template>
+									<!-- Final refund amount -->
 									<div class="flex justify-between items-center pt-2 border-t border-red-200">
-										<span class="text-sm sm:text-base font-semibold text-gray-700">{{ __('Refund Amount:') }}</span>
-										<span class="text-xl sm:text-2xl font-bold text-red-600">
-											{{ formatCurrency(returnTotal) }}
-										</span>
+										<span class="text-sm sm:text-base font-semibold text-gray-700">{{ __(summaryRefundLabel) }}</span>
+										<span class="text-xl sm:text-2xl font-bold text-red-600">{{ formatCurrency(summaryRefundAmount) }}</span>
 									</div>
 								</div>
 							</div>
 
 							<!-- Return Reason -->
 							<div v-if="selectedItems.length > 0">
-								<TranslatedHTML 
-									:tag="'label'"
-									class="block text-sm font-medium text-gray-700 mb-2"
-									:inner="__('Return Reason &lt;span class=&quot;text-gray-400&quot;&gt;(optional)&lt;/span&gt;')"
-								/>
+								<label class="block text-sm font-medium text-gray-700 mb-2 text-start">
+									{{ __('Return Reason') }} <span class="text-gray-400">({{ __('optional') }})</span>
+								</label>
 								<textarea
 									v-model="returnReason"
 									rows="3"
@@ -586,6 +598,14 @@ const returnModal = reactive({
 	visible: false,
 })
 
+// Track if original invoice was a credit sale (Pay on Account)
+const isOriginalCreditSale = ref(false)
+
+// Track if original invoice was partially paid
+const isPartiallyPaid = ref(false)
+const originalPaidAmount = ref(0)
+const originalOutstandingAmount = ref(0)
+
 // Resource for loading recent invoices (only those with items available for return)
 const loadInvoicesResource = createResource({
 	url: "pos_next.api.invoices.get_returnable_invoices",
@@ -663,6 +683,22 @@ const fetchInvoiceResource = createResource({
 				original_qty: item.original_qty || item.qty, // Track original quantity
 			}))
 			returnItems.value.forEach(normalizeItemQty)
+
+			// Track payment amounts from original invoice
+			const totalPaidFromPayments = data.payments?.reduce((sum, p) => sum + Math.abs(p.amount || 0), 0) || 0
+			originalPaidAmount.value = data.paid_amount || totalPaidFromPayments || 0
+			originalOutstandingAmount.value = data.outstanding_amount || 0
+
+			// Detect if original invoice was a credit sale (Pay on Account)
+			// Credit sale indicators:
+			// 1. No payments in the payments array, OR
+			// 2. Outstanding amount equals grand total (nothing was paid)
+			const hasNoPayments = !data.payments || data.payments.length === 0
+			const isFullyUnpaid = Math.abs(data.outstanding_amount - data.grand_total) < 0.01
+			isOriginalCreditSale.value = hasNoPayments || (totalPaidFromPayments < 0.01 && isFullyUnpaid)
+
+			// Detect if invoice was partially paid (has both paid amount and outstanding)
+			isPartiallyPaid.value = originalPaidAmount.value > 0 && originalOutstandingAmount.value > 0
 
 			// Load payment methods if not already loaded
 			if (paymentMethods.value.length === 0 && props.posProfile) {
@@ -752,12 +788,10 @@ onMounted(() => {
 	if (props.posProfile) {
 		loadPaymentMethodsResource.reload()
 	}
-	// Add keyboard shortcut listener
 	document.addEventListener('keydown', handleKeyboardShortcuts)
 })
 
 onUnmounted(() => {
-	// Remove keyboard shortcut listener
 	document.removeEventListener('keydown', handleKeyboardShortcuts)
 })
 
@@ -801,6 +835,38 @@ const returnTotal = computed(() => {
 	}, 0)
 })
 
+// For partially paid invoices, calculate the proportional refundable amount
+const maxRefundableAmount = computed(() => {
+	if (!originalInvoice.value) return 0
+
+	// For fully paid invoices, refund up to return total
+	if (!isPartiallyPaid.value && !isOriginalCreditSale.value) {
+		return returnTotal.value
+	}
+
+	// For partially paid invoices, calculate proportional refund
+	// If return is 50% of grand total, refund 50% of paid amount
+	const grandTotal = Math.abs(originalInvoice.value.grand_total) || 1
+	const returnRatio = returnTotal.value / grandTotal
+	return Math.min(returnTotal.value, originalPaidAmount.value * returnRatio)
+})
+
+// Amount that will be adjusted from outstanding (credit adjustment)
+const creditAdjustmentAmount = computed(() => {
+	if (!isPartiallyPaid.value) return 0
+	return Math.max(0, returnTotal.value - maxRefundableAmount.value)
+})
+
+// Summary display values - shows breakdown for partially paid, simple for others
+const showPartialBreakdown = computed(() => isPartiallyPaid.value && !isOriginalCreditSale.value)
+const summaryRefundLabel = computed(() => showPartialBreakdown.value ? 'Cash Refund:' : 'Refund Amount:')
+const summaryRefundAmount = computed(() => showPartialBreakdown.value ? maxRefundableAmount.value : returnTotal.value)
+
+// RTL-aware style for payment select dropdown
+const paymentSelectStyle = computed(() => ({
+	backgroundPosition: document.documentElement.dir === 'rtl' ? 'left 12px center' : 'right 12px center'
+}))
+
 const totalPaymentAmount = computed(() => {
 	if (!refundPayments.value || !Array.isArray(refundPayments.value)) {
 		return 0
@@ -811,10 +877,31 @@ const totalPaymentAmount = computed(() => {
 })
 
 const canCreateReturn = computed(() => {
-	if (!selectedItems.value || !refundPayments.value) {
+	if (!selectedItems.value) {
 		return false
 	}
 	const hasSelectedItems = selectedItems.value.length > 0
+
+	// For credit sales (Pay on Account), no payment validation needed
+	// The return will simply reverse the A/R entry
+	if (isOriginalCreditSale.value) {
+		return hasSelectedItems
+	}
+
+	// For partially paid invoices, payment should match the refundable portion only
+	if (isPartiallyPaid.value) {
+		if (!refundPayments.value || refundPayments.value.length === 0) {
+			return hasSelectedItems // Allow if no refund needed (all credit adjustment)
+		}
+		const hasValidPayments = refundPayments.value.every(p => p.mode_of_payment && p.amount >= 0)
+		const paymentsMatchRefundable = Math.abs(totalPaymentAmount.value - maxRefundableAmount.value) < 0.01
+		return hasSelectedItems && hasValidPayments && paymentsMatchRefundable
+	}
+
+	// For regular fully paid sales, validate payment methods
+	if (!refundPayments.value) {
+		return false
+	}
 	const hasValidPayments = refundPayments.value.length > 0 &&
 		refundPayments.value.every(p => p.mode_of_payment && p.amount > 0)
 	const paymentsMatch = Math.abs(totalPaymentAmount.value - returnTotal.value) < 0.01
@@ -843,13 +930,23 @@ watch(returnTotal, (newTotal) => {
 		return
 	}
 
+	// For credit sales, no payment needed
+	if (isOriginalCreditSale.value) {
+		return
+	}
+
 	// Safety checks: ensure refundPayments exists and has exactly one row
 	if (refundPayments.value &&
 		Array.isArray(refundPayments.value) &&
 		refundPayments.value.length === 1 &&
 		refundPayments.value[0] &&
 		newTotal > 0) {
-		refundPayments.value[0].amount = newTotal
+		// For partially paid invoices, set the proportional refundable amount
+		if (isPartiallyPaid.value) {
+			refundPayments.value[0].amount = Number(maxRefundableAmount.value.toFixed(2))
+		} else {
+			refundPayments.value[0].amount = newTotal
+		}
 	}
 })
 
@@ -958,11 +1055,21 @@ function removePaymentRow(index) {
 }
 
 function initializePaymentsFromInvoice() {
+	// If original invoice was a credit sale (Pay on Account), no payment method needed
+	// The return will simply reverse the A/R entry
+	if (isOriginalCreditSale.value) {
+		// For credit sales, set empty payments - the return will reverse A/R only
+		refundPayments.value = []
+		return
+	}
+
 	// Initialize refund payments from original invoice payments
 	if (originalInvoice.value && originalInvoice.value.payments && originalInvoice.value.payments.length > 0) {
+		// For partially paid invoices, we'll set the amount to 0 initially
+		// It will be updated by the watcher when returnTotal changes
 		refundPayments.value = originalInvoice.value.payments.map(payment => ({
 			mode_of_payment: payment.mode_of_payment,
-			amount: Math.abs(payment.amount) // Use absolute value in case it's already negative
+			amount: isPartiallyPaid.value ? 0 : Math.abs(payment.amount)
 		}))
 	} else {
 		// Default to one empty row if no payments in invoice
@@ -990,6 +1097,10 @@ function closeReturnModal() {
 	returnReason.value = ""
 	refundPayments.value = []
 	submitError.value = ""
+	isOriginalCreditSale.value = false
+	isPartiallyPaid.value = false
+	originalPaidAmount.value = 0
+	originalOutstandingAmount.value = 0
 }
 
 function selectAllItems() {
@@ -1089,6 +1200,10 @@ function resetForm() {
 	returnModal.visible = false
 	errorDialog.visible = false
 	errorDialog.message = ""
+	isOriginalCreditSale.value = false
+	isPartiallyPaid.value = false
+	originalPaidAmount.value = 0
+	originalOutstandingAmount.value = 0
 }
 
 function formatDate(dateStr) {
@@ -1130,5 +1245,12 @@ function formatCurrency(amount) {
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
 	opacity: 1;
+}
+
+/* Payment select dropdown - arrow icon via background-image, position handled by inline style */
+.payment-select {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-size: 20px;
 }
 </style>

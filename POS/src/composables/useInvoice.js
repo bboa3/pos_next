@@ -151,8 +151,9 @@ export function useInvoice() {
 
 	// Actions
 	function addItem(item, quantity = 1) {
+		const itemUom = item.uom || item.stock_uom
 		const existingItem = invoiceItems.value.find(
-			(i) => i.item_code === item.item_code,
+			(i) => i.item_code === item.item_code && i.uom === itemUom,
 		)
 
 		if (existingItem) {
@@ -227,10 +228,22 @@ export function useInvoice() {
 		}
 	}
 
-	function removeItem(itemCode) {
-		const itemToRemove = invoiceItems.value.find(
-			(i) => i.item_code === itemCode,
-		)
+	/**
+	 * Removes an item from the invoice
+	 * @param {string} itemCode - The item code to remove
+	 * @param {string|null} uom - Optional UOM to match when same item exists with different UOMs.
+	 *                            If provided, only removes the item with matching item_code AND uom.
+	 *                            If null, removes the first item matching item_code.
+	 */
+	function removeItem(itemCode, uom = null) {
+		let itemToRemove
+		if (uom) {
+			itemToRemove = invoiceItems.value.find(
+				(i) => i.item_code === itemCode && i.uom === uom,
+			)
+		} else {
+			itemToRemove = invoiceItems.value.find((i) => i.item_code === itemCode)
+		}
 
 		if (itemToRemove) {
 			// Update cache incrementally (subtract removed item values)
@@ -246,13 +259,35 @@ export function useInvoice() {
 			}
 		}
 
-		invoiceItems.value = invoiceItems.value.filter(
-			(i) => i.item_code !== itemCode,
-		)
+		if (uom) {
+			invoiceItems.value = invoiceItems.value.filter(
+				(i) => !(i.item_code === itemCode && i.uom === uom),
+			)
+		} else {
+			invoiceItems.value = invoiceItems.value.filter(
+				(i) => i.item_code !== itemCode,
+			)
+		}
 	}
 
-	function updateItemQuantity(itemCode, quantity) {
-		const item = invoiceItems.value.find((i) => i.item_code === itemCode)
+	/**
+	 * Updates the quantity of an item in the invoice
+	 * @param {string} itemCode - The item code to update
+	 * @param {number} quantity - The new quantity value
+	 * @param {string|null} uom - Optional UOM to match when same item exists with different UOMs.
+	 *                            If provided, only updates the item with matching item_code AND uom.
+	 *                            If null, updates the first item matching item_code.
+	 */
+	function updateItemQuantity(itemCode, quantity, uom = null) {
+		let item
+		if (uom) {
+			item = invoiceItems.value.find(
+				(i) => i.item_code === itemCode && i.uom === uom,
+			)
+		} else {
+			item = invoiceItems.value.find((i) => i.item_code === itemCode)
+		}
+
 		if (item) {
 			// Store old values before update for incremental cache adjustment
 			// Use price_list_rate for subtotal calculations (before discount)

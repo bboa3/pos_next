@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.11.0] - 2025-12-07
+
+### Added
+- **Multi-UOM Cart Support**
+  - Support for adding same item with different Units of Measure (UOMs) to cart
+  - Each UOM line is tracked independently with its own quantity and rate
+  - Quantity input field in UOM selection dialog for faster item entry
+
+- **Enhanced Stock Display**
+  - Real-time available stock now subtracts cart quantities from displayed stock
+  - Stock display accounts for conversion factors when using different UOMs
+  - Defensive checks for stock reservation calculations
+
+- **Stock Lookup Across Warehouses**
+  - New stock lookup dialog for checking item availability across all warehouses
+  - Variant selection support in warehouse availability dialog
+
+- **Speed Enhancements**
+  - Clear customer search input field on click for faster customer selection
+  - Clear item search bar on click for faster item search
+  - Improved search UX for high-volume POS operations
+
+### Changed
+- **Subtotal Calculation**
+  - Fixed subtotal recalculation when UOM changes mid-transaction
+  - Cache rebuild after UOM change ensures accurate totals
+
+- **RTL/LTR Compatibility**
+  - Fixed contradicting RTL patterns in InvoiceDetailDialog
+  - Added text-start class for proper RTL text alignment in ReturnInvoiceDialog
+  - Removed manual RTL overrides that prevented natural mirroring
+
+- **Invoice Display**
+  - Show actual paid amount instead of grand total in invoice confirmation
+  - Enhanced InvoiceCart layout for improved alignment of financial summaries
+
+### Fixed
+- **Pay on Account & Partial Payment**
+  - Improved Pay on Account and Partial Payment handling in returns
+  - Fixed payment flow for credit sale returns
+
+- **Cart Operations with UOM**
+  - Remove item by UOM works correctly for multi-UOM carts
+  - Update quantity targets correct item line with same item_code but different UOM
+  - Quantity validation ensures positive integer values
+
+- **Customer Selection**
+  - Prevent auto-select when clearing customer search field
+
+- **Arabic Translations**
+  - Fixed truncated translation key for cart requirements message
+  - Keep POS Next brand name consistent across translations
+  - Fixed "Apply Coupon" and "serials" translations for clarity
+
 ## [1.10.0] - 2025-11-28
 
 ### Added
@@ -569,7 +623,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shift management
 - Stock tracking
 
-[Unreleased]: https://github.com/BrainWise-DEV/POSNext/compare/v1.10.0...HEAD
+[Unreleased]: https://github.com/BrainWise-DEV/POSNext/compare/v1.11.0...HEAD
+[1.11.0]: https://github.com/BrainWise-DEV/POSNext/compare/v1.10.0...v1.11.0
 [1.10.0]: https://github.com/BrainWise-DEV/POSNext/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/BrainWise-DEV/POSNext/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/BrainWise-DEV/POSNext/compare/v1.7.1...v1.8.0

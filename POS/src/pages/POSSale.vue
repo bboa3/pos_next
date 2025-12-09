@@ -218,7 +218,7 @@
 						:applied-offers="cartStore.appliedOffers"
 						:warehouses="profileWarehouses"
 						@update-quantity="cartStore.updateItemQuantity"
-						@remove-item="cartStore.removeItem"
+						@remove-item="(itemCode, uom) => cartStore.removeItem(itemCode, uom)"
 						@select-customer="handleCustomerSelected"
 						@create-customer="handleCreateCustomer"
 						@proceed-to-payment="handleProceedToPayment"
@@ -601,7 +601,7 @@
 						{{ __('Invoice {0} created successfully!', [uiStore.lastInvoiceName]) }}
 					</h3>
 					<p class="mt-2 text-sm text-gray-500">
-						{{ __('Total: {0}', [formatCurrency(uiStore.lastInvoiceTotal)]) }}
+						{{ __('Paid: {0}', [formatCurrency(uiStore.lastPaidAmount)]) }}
 					</p>
 				</div>
 			</template>
@@ -1517,6 +1517,9 @@ async function handlePaymentCompleted(paymentData) {
 			cartStore.salesTeam = []
 		}
 
+		// Delete draft if it exists (since we're submitting/saving invoice)
+		const draftIdToDelete = cartStore.currentDraftId
+
 		if (offlineStore.isOffline) {
 			const invoiceData = {
 				pos_profile: cartStore.posProfile,
@@ -1531,11 +1534,16 @@ async function handlePaymentCompleted(paymentData) {
 			}
 
 			await offlineStore.saveInvoiceOffline(invoiceData)
-			uiStore.showSuccess(`OFFLINE-${Date.now()}`, cartStore.grandTotal)
+			uiStore.showSuccess(`OFFLINE-${Date.now()}`, cartStore.grandTotal, paymentData.paid_amount)
 			uiStore.showPaymentDialog = false
 			cartStore.clearCart()
 			// Reset cart hash after successful payment
 			previousCartHash = ""
+
+			// Delete draft after successful save
+			if (draftIdToDelete) {
+				draftsStore.deleteDraft(draftIdToDelete)
+			}
 
 			showSuccess(__("Invoice saved offline. Will sync when online"))
 		} else {
@@ -1547,11 +1555,17 @@ async function handlePaymentCompleted(paymentData) {
 			if (result) {
 				const invoiceName = result.name || result.message?.name || __('Unknown')
 				const invoiceTotal = result.grand_total || result.total || 0
+				const paidAmount = paymentData.paid_amount || invoiceTotal
 
 				uiStore.showPaymentDialog = false
 				cartStore.clearCart()
 				// Reset cart hash after successful payment
 				previousCartHash = ""
+
+				// Delete draft after successful submission
+				if (draftIdToDelete) {
+					draftsStore.deleteDraft(draftIdToDelete)
+				}
 
 				// Refresh stock - Direct API (50-200ms), no Socket.IO lag!
 				await stockStore.refresh(soldItemCodes, shiftStore.profileWarehouse)
@@ -1565,7 +1579,7 @@ async function handlePaymentCompleted(paymentData) {
 						showWarning(__('Invoice {0} created but print failed', [invoiceName]))
 					}
 				} else {
-					uiStore.showSuccess(invoiceName, invoiceTotal)
+					uiStore.showSuccess(invoiceName, invoiceTotal, paidAmount)
 					showSuccess(__('Invoice {0} created successfully', [invoiceName]))
 				}
 			}
@@ -1632,11 +1646,12 @@ async function handleOptionSelected(option) {
 				}
 			}
 		} else if (option.type === "uom") {
+			const qty = option.quantity || cartStore.pendingItemQty
 			const itemDetails = await cartStore.getItemDetailsResource.submit({
 				item_code: cartStore.pendingItem.item_code,
 				pos_profile: cartStore.posProfile,
 				customer: cartStore.customer?.name || cartStore.customer,
-				qty: cartStore.pendingItemQty,
+				qty: qty,
 				uom: option.uom,
 			})
 
@@ -1649,12 +1664,12 @@ async function handleOptionSelected(option) {
 			}
 
 			if (itemToAdd.has_batch_no || itemToAdd.has_serial_no) {
-				cartStore.setPendingItem(itemToAdd, cartStore.pendingItemQty)
+				cartStore.setPendingItem(itemToAdd, qty)
 				uiStore.showItemSelectionDialog = false
 				uiStore.showBatchSerialDialog = true
 			} else {
 				try {
-					cartStore.addItem(itemToAdd, cartStore.pendingItemQty, false, shiftStore.currentProfile)
+					cartStore.addItem(itemToAdd, qty, false, shiftStore.currentProfile)
 					uiStore.showItemSelectionDialog = false
 					cartStore.clearPendingItem()
 					showSuccess(__('{0} ({1}) added to cart', [itemToAdd.item_name, option.uom]))
@@ -1694,13 +1709,14 @@ function logoutWithCloseShift() {
 }
 
 async function handleSaveDraft() {
-	const success = await draftsStore.saveDraftInvoice(
+	const savedDraft = await draftsStore.saveDraftInvoice(
 		cartStore.invoiceItems,
 		cartStore.customer,
 		cartStore.posProfile,
 		cartStore.appliedOffers,
+		cartStore.currentDraftId,
 	)
-	if (success) {
+	if (savedDraft) {
 		cartStore.clearCart()
 		// Reset cart hash when cart is saved as draft and cleared
 		previousCartHash = ""
@@ -1709,9 +1725,27 @@ async function handleSaveDraft() {
 
 async function handleLoadDraft(draft) {
 	try {
+		// If current cart has items, save it as draft before loading new one
+		if (!cartStore.isEmpty) {
+			const saved = await draftsStore.saveDraftInvoice(
+				cartStore.invoiceItems,
+				cartStore.customer,
+				cartStore.posProfile,
+				cartStore.appliedOffers,
+				cartStore.currentDraftId,
+			)
+
+			if (!saved) {
+				showError(__("Failed to save current cart. Draft loading cancelled to prevent data loss."))
+				return
+			}
+			// No need to clear here as we're about to overwrite cart contents
+		}
+
 		const draftData = await draftsStore.loadDraft(draft)
 		cartStore.invoiceItems = draftData.items
 		cartStore.setCustomer(draftData.customer)
+		cartStore.currentDraftId = draft.draft_id // Set current draft ID
 
 		// Rebuild incremental cache to recalculate totals
 		cartStore.rebuildIncrementalCache()
@@ -2078,6 +2112,8 @@ function handleManagementMenuClick(menuItem) {
 	} else if (menuItem === "invoices") {
 		// Load invoice history data before showing
 		loadInvoiceHistoryData()
+		// Load drafts data
+		draftsStore.loadDrafts()
 		showInvoiceManagement.value = true
 	} else if (menuItem === "products") {
 		// Open Stock Lookup dialog in search mode
@@ -2088,6 +2124,9 @@ function handleManagementMenuClick(menuItem) {
 // Load invoice history data
 async function loadInvoiceHistoryData() {
 	log.info("Loading invoice history data for profile:", shiftStore.profileName)
+
+	// Also reload drafts
+	await draftsStore.loadDrafts()
 
 	try {
 		// Use custom API from pos_next.api.invoices
