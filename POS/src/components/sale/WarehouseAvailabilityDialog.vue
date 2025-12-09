@@ -238,19 +238,6 @@
 										</span>
 									</div>
 								</div>
-
-								<!-- Stock & Price -->
-								<div class="text-end flex-shrink-0">
-									<div :class="[
-										'text-sm font-semibold',
-										(variant.actual_qty || 0) > 0 ? 'text-green-600' : 'text-red-500'
-									]">
-										{{ Math.floor(variant.actual_qty || 0) }} {{ variant.stock_uom || 'Nos' }}
-									</div>
-									<div v-if="variant.rate" class="text-xs text-gray-500 mt-0.5">
-										{{ formatPrice(variant.rate) }}
-									</div>
-								</div>
 							</div>
 						</button>
 					</div>
@@ -272,7 +259,7 @@
 									: 'bg-gray-300 text-gray-500 cursor-not-allowed'
 							]"
 						>
-							{{ __('Check Availability') }} ({{ selectedVariants.length }} {{ __('selected') }})
+							{{ __('Check Availability in All Wherehouses') }} ({{ selectedVariants.length }} {{ __('Selected') }})
 						</button>
 					</div>
 				</div>
@@ -375,6 +362,7 @@
 												<span v-if="warehouse.reserved_qty > 0" class="text-orange-600">
 													{{ __( '{0} reserved', [Math.floor(warehouse.reserved_qty)]) }}
 												</span>
+												<span v-if="warehouse.rate" class="text-gray-500">{{ formatPrice(warehouse.rate) }}</span>
 												<span v-else>{{ __('Available') }}</span>
 											</div>
 										</div>
