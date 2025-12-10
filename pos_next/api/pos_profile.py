@@ -5,7 +5,16 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-
+import iam
+import json
+import nexus.utils.iam.sanitize_iam as sanitize_iam
+from nexus.api.v1.pos_next import schemas
+from nexus.api.v1.pos_next import exceptions
+from nexus.api.v1.utilities.endpoints import check_user_company
+from nexus.api.v1.pos_next.services import _validate_pos_profile_access
+from nexus.api.v1.pos_next.services import _get_pos_profile_child_data
+from nexus.api.v1.pos_next.services import _parse_list_parameter
+from nexus.api.v1.pos_next.services import _validate_company_resources
 
 @frappe.whitelist()
 def get_pos_profiles():
@@ -312,3 +321,254 @@ def get_sales_persons(pos_profile=None):
 	except Exception as e:
 		frappe.log_error(frappe.get_traceback(), "Get Sales Persons Error")
 		return []
+
+
+def get_create_pos_profile(*args, **kwargs):
+	"""
+	Get selection data for creating POS Profile
+	
+	Returns:
+		- warehouses: Available warehouses for user's company
+		- customers: Available customers
+		- currencies: Available currencies
+		- payments: Available payment methods (Mode of Payment)
+		- write_off_accounts: Available accounts for write-off
+		- write_off_cost_centers: Available cost centers
+		- applicable_for_users: Available users
+		- posa_cash_mode_of_payment: Cash payment methods
+		- item_groups: Available item groups
+		- customer_groups: Available customer groups
+	"""
+	try:
+		warehouses = frappe.get_list(
+			"Warehouse",
+			filters={"disabled": 0, "is_group": 0},
+			fields=["name"],
+			order_by="name"
+		)
+		customers = frappe.get_list(
+			"Customer",
+			filters={"disabled": 0},
+		)
+		
+		currencies = frappe.get_list(
+			"Currency",
+			filters={"enabled": 1},
+			fields=["name", "currency_name", "symbol"],
+			order_by="currency_name"
+		)
+		
+		payments = frappe.get_list(
+			"Mode of Payment Account",
+			filters={'parenttype': 'Mode of Payment'},
+			parent_doctype="Mode of Payment",
+			fields=["parent as name",],
+		)
+		
+		posa_cash_mode_of_payment = payments
+	
+		write_off_accounts = frappe.get_list(
+			"Account",
+			filters={
+				"report_type": "Profit and Loss",
+				"disabled": 0,
+				"is_group": 0
+			},
+			fields=["name"],
+			order_by="name"
+		)
+
+		write_off_cost_centers = frappe.get_list(
+			"Cost Center",
+			filters={
+				"is_group": 0,
+				"disabled": 0
+			},
+			fields=["name"],
+			order_by="name"
+		)
+
+		applicable_for_users = frappe.get_list(
+			"User",
+			filters={
+				"enabled": 1,
+			},
+			fields=["name", "full_name"],
+			order_by="full_name"
+		)
+		item_groups = frappe.get_list(
+			"Item Group",
+			filters={"is_group": 0},
+			fields=["name"],
+			order_by="name"
+		)
+		
+		customer_groups = frappe.get_list(
+			"Customer Group",
+			filters={"is_group": 0},
+			fields=["name"],
+			order_by="name"
+		)
+		
+		data = {
+			"warehouses": warehouses,
+			"customers": customers,
+			"currencies": currencies,
+			"payments": payments,
+			"write_off_accounts": write_off_accounts,
+			"write_off_cost_centers": write_off_cost_centers,
+			"applicable_for_users": applicable_for_users,
+			"posa_cash_mode_of_payment": posa_cash_mode_of_payment,
+			"item_groups": item_groups,
+			"customer_groups": customer_groups,
+			"apply_discount_on_options": [
+				{"value": "Grand Total", "label": "Grand Total"},
+				{"value": "Net Total", "label": "Net Total"},
+			]
+		}
+		return data
+		
+	except Exception as e:
+		frappe.throw(_("Error getting create POS profile: {0}").format(str(e)))
+
+
+def create_pos_profile(*arg ,**parameters):
+	"""
+	Create a new POS Profile
+	
+	Required fields:
+		- __newname: POS Profile name
+		- currency: Currency code
+		- warehouse: Warehouse name
+		- payments: List of payment methods
+		- write_off_account: Account name for write-off
+		- write_off_cost_center: Cost center name
+		- write_off_limit: Write-off limit amount
+	
+	Optional fields:
+		- customer: Default customer
+		- applicable_for_users: List of users
+		- posa_cash_mode_of_payment: Cash payment method
+		- item_groups: List of item groups (filters)
+		- customer_groups: List of customer groups (filters)
+		- apply_discount_on: Discount application method
+	"""
+
+	try:
+
+
+		# Extract list parameters 
+		payments = parameters.pop("payments", [])
+		applicable_for_users = parameters.pop("applicable_for_users", [])
+		item_groups = parameters.pop("item_groups", [])
+		customer_groups = parameters.pop("customer_groups", [])
+		
+		# Handle payments as JSON string or list
+		payments = _parse_list_parameter(payments, "payments")
+		# Handle applicable_for_users as JSON string or list
+		applicable_for_users = _parse_list_parameter(applicable_for_users, "applicable_for_users")
+		
+		# Handle item_groups as JSON string or list
+		item_groups = _parse_list_parameter(item_groups, "item_groups")
+		
+		# Handle customer_groups as JSON string or list
+		customer_groups = _parse_list_parameter(customer_groups, "customer_groups")
+		
+
+		# Stopped here - Mostafa
+		
+		# Validate payments
+		if not payments or len(payments) == 0:
+			frappe.throw(_("At least one payment method is required"))
+		
+		# Get user's company
+		user_company_data = check_user_company(is_function=True)
+		user_company = user_company_data.get("company")
+		
+		if not user_company:
+			frappe.throw(_("User must have a company assigned"))
+
+		
+		# Validate warehouse belongs to company
+		warehouse = parameters.get("warehouse")
+		if warehouse:
+			warehouse_company = frappe.db.get_value("Warehouse", warehouse, "company")
+			if warehouse_company != user_company:
+				frappe.throw(_("Warehouse {0} does not belong to your company").format(warehouse))
+		
+		# Validate write-off account belongs to company
+		write_off_account = parameters.get("write_off_account")
+		if write_off_account:
+			account_company = frappe.db.get_value("Account", write_off_account, "company")
+			if account_company != user_company:
+				frappe.throw(_("Account {0} does not belong to your company").format(write_off_account))
+		
+		# Validate write-off cost center belongs to company
+		write_off_cost_center = parameters.get("write_off_cost_center")
+		if write_off_cost_center:
+			cost_center_company = frappe.db.get_value("Cost Center", write_off_cost_center, "company")
+			if cost_center_company != user_company:
+				frappe.throw(_("Cost Center {0} does not belong to your company").format(write_off_cost_center))
+		
+		# Create POS Profile document
+		pos_profile = frappe.new_doc("POS Profile")
+		pos_profile.company = user_company
+		pos_profile.currency = parameters.get("currency")
+		pos_profile.warehouse = parameters.get("warehouse")
+		pos_profile.customer = parameters.get("customer")
+		pos_profile.write_off_account = write_off_account
+		pos_profile.write_off_cost_center = write_off_cost_center
+		pos_profile.write_off_limit = parameters.get("write_off_limit", 0)
+		pos_profile.apply_discount_on = parameters.get("apply_discount_on", "Grand Total")
+		
+		# Handle payments (child table: POS Payment Method)
+		for payment in payments:
+			if isinstance(payment, dict):
+				pos_profile.append("payments", {
+					"mode_of_payment": payment.get("mode_of_payment") or payment.get("name"),
+					"default": payment.get("default", 0),
+					"allow_in_returns": payment.get("allow_in_returns", 0)
+				})
+			elif isinstance(payment, str):
+				pos_profile.append("payments", {"mode_of_payment": payment})
+		
+		# Handle applicable_for_users (child table: POS Profile User)
+		if isinstance(applicable_for_users, list):
+			for user in applicable_for_users:
+				if isinstance(user, dict):
+					pos_profile.append("applicable_for_users", {
+						"user": user.get("user") or user.get("name"),
+						"default": user.get("default", 0)
+					})
+				elif isinstance(user, str):
+					pos_profile.append("applicable_for_users", {"user": user})
+		
+		# Handle posa_cash_mode_of_payment
+		posa_cash_mode = parameters.get("posa_cash_mode_of_payment")
+		if posa_cash_mode:
+			if isinstance(posa_cash_mode, dict):
+				pos_profile.posa_cash_mode_of_payment = posa_cash_mode.get("name") or posa_cash_mode.get("mode_of_payment")
+			elif isinstance(posa_cash_mode, str):
+				pos_profile.posa_cash_mode_of_payment = posa_cash_mode
+		
+		# Handle item_groups (child table: POS Profile Item Group)
+		if isinstance(item_groups, list):
+			for item_group in item_groups:
+				item_group_name = item_group if isinstance(item_group, str) else item_group.get("item_group") or item_group.get("name")
+				pos_profile.append("item_groups", {"item_group": item_group_name})
+		
+		# Handle customer_groups (child table: POS Profile Customer Group)
+		if isinstance(customer_groups, list):
+			for customer_group in customer_groups:
+				customer_group_name = customer_group if isinstance(customer_group, str) else customer_group.get("customer_group") or customer_group.get("name")
+				pos_profile.append("customer_groups", {"customer_group": customer_group_name})
+		
+		profile_name = parameters.get("__newname")
+		if profile_name:
+			pos_profile.name = profile_name
+		
+		# Save the document
+		pos_profile.insert()
+	except Exception as e:
+		frappe.throw(_("Error creating POS profile: {0}").format(str(e)))
+
