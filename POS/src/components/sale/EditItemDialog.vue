@@ -1,8 +1,5 @@
 <template>
 	<Dialog v-model="show" :options="{ title: __('Edit Item Details'), size: 'md' }">
-		<template #body-title>
-			<span class="sr-only">{{ __('Edit item quantity, UOM, warehouse, and discount') }}</span>
-		</template>
 		<template #body-content>
 			<div v-if="localItem" class="flex flex-col gap-4">
 				<!-- Item Header -->
@@ -110,43 +107,13 @@
 						<!-- UOM Selector -->
 						<div>
 							<label class="block text-sm font-medium text-gray-700 mb-2 text-start">{{ __('UOM') }}</label>
-							<select
-								v-model="localUom"
-								@change="handleUomChange"
-								class="w-full h-10 border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-							>
-								<option :value="localItem.stock_uom">{{ localItem.stock_uom }}</option>
-								<option
-									v-if="availableUoms.length > 0"
-									v-for="uomData in availableUoms"
-									:key="uomData.uom"
-									:value="uomData.uom"
-								>
-									{{ uomData.uom }}
-								</option>
-							</select>
+							<SelectInput v-model="localUom" :options="uomOptions" @change="handleUomChange" />
 						</div>
 
 						<!-- Warehouse Selector -->
 						<div>
 							<label class="block text-sm font-medium text-gray-700 mb-2 text-start">{{ __('Warehouse') }}</label>
-							<select
-								v-model="localWarehouse"
-								@change="handleWarehouseChange"
-								class="w-full h-10 border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-							>
-								<option
-									v-if="warehouses.length > 0"
-									v-for="warehouse in warehouses"
-									:key="warehouse.name"
-									:value="warehouse.name"
-								>
-									{{ warehouse.warehouse || warehouse.name }}
-								</option>
-								<option v-else :value="localWarehouse">
-									{{ localWarehouse || __('Default') }}
-								</option>
-							</select>
+							<SelectInput v-model="localWarehouse" :options="warehouseOptions" @change="handleWarehouseChange" />
 						</div>
 					</div>
 				</div>
@@ -195,14 +162,7 @@
 						<!-- Discount Type -->
 						<div>
 							<label class="block text-xs text-gray-600 mb-1 text-start">{{ __('Discount Type') }}</label>
-							<select
-								v-model="discountType"
-								@change="handleDiscountTypeChange"
-								class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							>
-								<option value="percentage">{{ __('Percentage (%)') }}</option>
-								<option value="amount">{{ __('Amount') }}</option>
-							</select>
+							<SelectInput v-model="discountType" :options="discountTypeOptions" @change="handleDiscountTypeChange" />
 						</div>
 						<!-- Discount Value -->
 						<div>
@@ -214,7 +174,7 @@
 									min="0"
 									:max="discountType === 'percentage' ? 100 : undefined"
 									step="0.01"
-									class="w-full border border-gray-300 rounded-lg px-3 py-2 pe-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+									class="w-full h-10 border border-gray-300 rounded-lg px-3 pe-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 									@input="calculateDiscount"
 								/>
 								<span class="absolute inset-y-0 end-0 pe-3 flex items-center text-gray-500 text-sm">
@@ -268,6 +228,7 @@ import { getItemStock } from "@/utils/stockValidator"
 import { formatCurrency as formatCurrencyUtil, getCurrencySymbol } from "@/utils/currency"
 import { Button, Dialog } from "frappe-ui"
 import { computed, ref, watch } from "vue"
+import SelectInput from "@/components/common/SelectInput.vue"
 
 const { showSuccess, showError, showWarning } = useToast()
 const settingsStore = usePOSSettingsStore()
@@ -318,6 +279,33 @@ const availableUoms = computed(() => {
 })
 
 const currencySymbol = computed(() => getCurrencySymbol(props.currency))
+
+// Options for SelectInput components
+const uomOptions = computed(() => {
+	if (!localItem.value) return []
+	const options = [{ value: localItem.value.stock_uom, label: localItem.value.stock_uom }]
+	if (availableUoms.value.length > 0) {
+		availableUoms.value.forEach(uomData => {
+			options.push({ value: uomData.uom, label: uomData.uom })
+		})
+	}
+	return options
+})
+
+const warehouseOptions = computed(() => {
+	if (props.warehouses.length > 0) {
+		return props.warehouses.map(w => ({
+			value: w.name,
+			label: w.warehouse || w.name
+		}))
+	}
+	return [{ value: localWarehouse.value, label: localWarehouse.value || __('Default') }]
+})
+
+const discountTypeOptions = computed(() => [
+	{ value: 'percentage', label: __('Percentage (%)') },
+	{ value: 'amount', label: __('Amount') }
+])
 
 // Initialize local state when item changes
 watch(
@@ -566,26 +554,16 @@ function cancel() {
 </script>
 
 <style scoped>
-.sr-only {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	white-space: nowrap;
-	border-width: 0;
-}
-
 /* Hide number input spinners */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
+	appearance: none;
 	-webkit-appearance: none;
 	margin: 0;
 }
 
 input[type="number"] {
+	appearance: textfield;
 	-moz-appearance: textfield;
 }
 </style>

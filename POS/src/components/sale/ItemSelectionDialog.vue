@@ -15,7 +15,7 @@
 							<p class="text-xs text-gray-500">{{ item.item_code }}</p>
 						</div>
 					</div>
-					<p class="text-xs text-gray-600 mb-3">{{ dialogDescription }}</p>
+					<p class="text-xs text-gray-600 mb-3 text-start">{{ dialogDescription }}</p>
 				</div>
 
 				<!-- Loading State -->
@@ -463,7 +463,7 @@ function buildUomOptions() {
 				uom: uomData.uom,
 				conversion_factor: uomData.conversion_factor,
 				label: uomData.uom,
-				description: `1 ${uomData.uom} = ${uomData.conversion_factor} ${props.item.stock_uom}`,
+				description: __('1 {0} = {1} {2}', [uomData.uom, uomData.conversion_factor, props.item.stock_uom]),
 				rate: getUomPrice(uomData.uom, uomData.conversion_factor),
 				priceLabel: __('per {0}', [uomData.uom]),
 			})
