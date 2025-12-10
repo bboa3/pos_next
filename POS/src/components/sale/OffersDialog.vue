@@ -68,11 +68,11 @@
 						</div>
 
 						<!-- Offer Header -->
-						<div class="mb-3">
-							<h4 class="text-base font-bold text-gray-900">
+						<div class="mb-3 me-28">
+							<h4 class="text-base font-bold text-gray-900 text-start">
 								{{ offer.title || offer.name }}
 							</h4>
-							<p v-if="offer.description" class="text-xs text-gray-600 mt-1">
+							<p v-if="offer.description" class="text-xs text-gray-600 mt-1 text-start">
 								{{ offer.description }}
 							</p>
 						</div>
