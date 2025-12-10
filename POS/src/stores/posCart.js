@@ -573,32 +573,105 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		}
 	}
 
-	async function changeItemUOM(itemCode, newUom) {
+	/**
+	 * Find a cart item by item_code and optionally by UOM
+	 * @param {string} itemCode - Item code to find
+	 * @param {string|null} uom - Optional UOM to match
+	 * @returns {Object|undefined} Cart item or undefined
+	 */
+	function findCartItem(itemCode, uom = null) {
+		return invoiceItems.value.find((item) =>
+			item.item_code === itemCode && (!uom || item.uom === uom)
+		)
+	}
+
+	/**
+	 * Find an existing cart item with target UOM (for merge detection)
+	 * @param {string} itemCode - Item code
+	 * @param {string} targetUom - Target UOM to find
+	 * @param {Object} excludeItem - Item to exclude from search
+	 * @returns {Object|undefined} Existing item or undefined
+	 */
+	function findItemWithUom(itemCode, targetUom, excludeItem = null) {
+		return invoiceItems.value.find((item) =>
+			item.item_code === itemCode &&
+			item.uom === targetUom &&
+			item !== excludeItem
+		)
+	}
+
+	/**
+	 * Remove an item from the cart
+	 * @param {Object} cartItem - Item to remove
+	 */
+	function removeCartItem(cartItem) {
+		const index = invoiceItems.value.indexOf(cartItem)
+		if (index > -1) {
+			invoiceItems.value.splice(index, 1)
+		}
+	}
+
+	/**
+	 * Merge source item into target item
+	 * @param {Object} sourceItem - Item to merge from (will be removed)
+	 * @param {Object} targetItem - Item to merge into
+	 * @param {number} quantity - Quantity to add to target
+	 * @returns {number} New total quantity
+	 */
+	function mergeItems(sourceItem, targetItem, quantity) {
+		targetItem.quantity += quantity
+		recalculateItem(targetItem)
+		removeCartItem(sourceItem)
+		rebuildIncrementalCache()
+		return targetItem.quantity
+	}
+
+	/**
+	 * Fetch and apply UOM details from server
+	 * @param {Object} cartItem - Cart item to update
+	 * @param {string} newUom - New UOM
+	 * @param {number} qty - Quantity for pricing
+	 */
+	async function applyUomChange(cartItem, newUom, qty) {
+		const itemDetails = await getItemDetailsResource.submit({
+			item_code: cartItem.item_code,
+			pos_profile: posProfile.value,
+			customer: customer.value?.name || customer.value,
+			qty,
+			uom: newUom,
+		})
+
+		const uomData = cartItem.item_uoms?.find((u) => u.uom === newUom)
+
+		cartItem.uom = newUom
+		cartItem.conversion_factor = uomData?.conversion_factor || itemDetails.conversion_factor || 1
+		cartItem.rate = itemDetails.price_list_rate || itemDetails.rate
+		cartItem.price_list_rate = itemDetails.price_list_rate
+	}
+
+	/**
+	 * Change item UOM - merges if target UOM already exists
+	 * @param {string} itemCode - Item code
+	 * @param {string} newUom - New UOM to change to
+	 * @param {string|null} currentUom - Current UOM (required when same item has multiple UOMs)
+	 */
+	async function changeItemUOM(itemCode, newUom, currentUom = null) {
 		try {
-			const cartItem = invoiceItems.value.find((i) => i.item_code === itemCode)
-			if (!cartItem) return
+			const cartItem = findCartItem(itemCode, currentUom)
+			if (!cartItem || cartItem.uom === newUom) return
 
-			const itemDetails = await getItemDetailsResource.submit({
-				item_code: itemCode,
-				pos_profile: posProfile.value,
-				customer: customer.value?.name || customer.value,
-				qty: cartItem.quantity,
-				uom: newUom,
-			})
+			// Check for existing item to merge with
+			const existingItem = findItemWithUom(itemCode, newUom, cartItem)
+			if (existingItem) {
+				const totalQty = mergeItems(cartItem, existingItem, cartItem.quantity)
+				showSuccess(__('Merged into {0} (Total: {1})', [newUom, totalQty]))
+				return
+			}
 
-			const uomData = cartItem.item_uoms?.find((u) => u.uom === newUom)
-
-			cartItem.uom = newUom
-			cartItem.conversion_factor =
-				uomData?.conversion_factor || itemDetails.conversion_factor || 1
-			cartItem.rate = itemDetails.price_list_rate || itemDetails.rate
-			cartItem.price_list_rate = itemDetails.price_list_rate
-
+			// Apply UOM change
+			await applyUomChange(cartItem, newUom, cartItem.quantity)
 			recalculateItem(cartItem)
-
-			// Rebuild cache after item update to ensure totals are accurate
 			rebuildIncrementalCache()
-
 			showSuccess(__('Unit changed to {0}', [newUom]))
 		} catch (error) {
 			console.error("Error changing UOM:", error)
@@ -606,82 +679,53 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		}
 	}
 
-	async function updateItemDetails(itemCode, updatedDetails) {
+	/**
+	 * Update item details - handles UOM changes with merging
+	 * @param {string} itemCode - Item code
+	 * @param {Object} updates - Updated details
+	 * @param {string|null} currentUom - Current UOM (required when same item has multiple UOMs)
+	 */
+	async function updateItemDetails(itemCode, updates, currentUom = null) {
 		try {
-			const cartItem = invoiceItems.value.find((i) => i.item_code === itemCode)
+			const cartItem = findCartItem(itemCode, currentUom)
 			if (!cartItem) {
 				throw new Error("Item not found in cart")
 			}
 
-			// If UOM changed, fetch new rate from server
-			if (updatedDetails.uom && updatedDetails.uom !== cartItem.uom) {
+			// Handle UOM change with potential merge
+			if (updates.uom && updates.uom !== cartItem.uom) {
+				const existingItem = findItemWithUom(itemCode, updates.uom, cartItem)
+				if (existingItem) {
+					const qtyToMerge = updates.quantity ?? cartItem.quantity
+					const totalQty = mergeItems(cartItem, existingItem, qtyToMerge)
+					showSuccess(__('Merged into {0} (Total: {1})', [updates.uom, totalQty]))
+					return true
+				}
+
+				// Apply UOM change with new rate
 				try {
-					const itemDetails = await getItemDetailsResource.submit({
-						item_code: itemCode,
-						pos_profile: posProfile.value,
-						customer: customer.value?.name || customer.value,
-						qty: updatedDetails.quantity || cartItem.quantity,
-						uom: updatedDetails.uom,
-					})
-
-					const uomData = cartItem.item_uoms?.find(
-						(u) => u.uom === updatedDetails.uom,
-					)
-
-					// Update with server response
-					cartItem.uom = updatedDetails.uom
-					cartItem.conversion_factor =
-						uomData?.conversion_factor || itemDetails.conversion_factor || 1
-					cartItem.rate = itemDetails.price_list_rate || itemDetails.rate
-					cartItem.price_list_rate = itemDetails.price_list_rate
-				} catch (error) {
-					console.warn(
-						"Failed to fetch UOM details, using provided rate:",
-						error,
-					)
-					// Fall back to using the provided rate
-					cartItem.uom = updatedDetails.uom
+					await applyUomChange(cartItem, updates.uom, updates.quantity ?? cartItem.quantity)
+				} catch {
+					// Fallback: just change UOM without rate update
+					cartItem.uom = updates.uom
 				}
 			}
 
-			// Update all provided details
-			if (updatedDetails.quantity !== undefined) {
-				cartItem.quantity = updatedDetails.quantity
-			}
-			// Don't update rate directly - let recalculateItem compute it from price_list_rate and discount
-			// if (updatedDetails.rate !== undefined) {
-			// 	cartItem.rate = updatedDetails.rate
-			// }
-			if (updatedDetails.warehouse !== undefined) {
-				cartItem.warehouse = updatedDetails.warehouse
-			}
-			if (updatedDetails.discount_percentage !== undefined) {
-				cartItem.discount_percentage = updatedDetails.discount_percentage
-			}
-			if (updatedDetails.discount_amount !== undefined) {
-				cartItem.discount_amount = updatedDetails.discount_amount
-			}
-			// Update price_list_rate if provided (for UOM changes)
-			if (updatedDetails.price_list_rate !== undefined) {
-				cartItem.price_list_rate = updatedDetails.price_list_rate
-			}
-			// Update serial numbers if provided
-			if (updatedDetails.serial_no !== undefined) {
-				cartItem.serial_no = updatedDetails.serial_no
-			}
+			// Apply other updates
+			if (updates.quantity !== undefined) cartItem.quantity = updates.quantity
+			if (updates.warehouse !== undefined) cartItem.warehouse = updates.warehouse
+			if (updates.discount_percentage !== undefined) cartItem.discount_percentage = updates.discount_percentage
+			if (updates.discount_amount !== undefined) cartItem.discount_amount = updates.discount_amount
+			if (updates.price_list_rate !== undefined) cartItem.price_list_rate = updates.price_list_rate
+			if (updates.serial_no !== undefined) cartItem.serial_no = updates.serial_no
 
-			// Recalculate item totals (this will compute the correct rate from price_list_rate and discount)
 			recalculateItem(cartItem)
-
-			// Rebuild cache after item update to ensure totals are accurate
 			rebuildIncrementalCache()
-
-			showSuccess(__('{0} updated successfully', [cartItem.item_name]))
-
+			showSuccess(__('{0} updated', [cartItem.item_name]))
 			return true
 		} catch (error) {
-			console.error("Error updating item details:", error)
-			showError(parseError(error) || __("Failed to update item. Please try again."))
+			console.error("Error updating item:", error)
+			showError(parseError(error) || __("Failed to update item."))
 			return false
 		}
 	}

@@ -500,15 +500,13 @@
 											</svg>
 										</button>
 										<input
-											:value="item.quantity"
+											:value="formatQuantity(item.quantity)"
 											@input="updateQuantity(item, $event.target.value)"
 											@blur="handleQuantityBlur(item)"
 											@keydown.enter="$event.target.blur()"
-											type="number"
-											min="0.0001"
-											step="any"
+											type="text"
 											inputmode="decimal"
-											class="w-10 sm:w-12 h-6 sm:h-7 text-center bg-white border-0 text-xs sm:text-sm font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+											class="w-14 sm:w-16 h-6 sm:h-7 text-center bg-white border-0 text-xs sm:text-sm font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
 											:aria-label="__('Quantity')"
 										/>
 										<button
@@ -528,7 +526,7 @@
 									<div class="relative group/uom">
 										<button
 											type="button"
-											@click="toggleUomDropdown(item.item_code)"
+											@click="toggleUomDropdown(item.item_code, item.uom)"
 											:disabled="!item.item_uoms || item.item_uoms.length === 0"
 											:class="[
 												'h-6 sm:h-7 text-[10px] sm:text-xs font-bold rounded ps-2 pe-5 transition-all touch-manipulation flex items-center justify-center min-w-[45px]',
@@ -543,7 +541,7 @@
 										<svg
 											:class="[
 												'absolute end-1.5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 pointer-events-none transition-transform',
-												openUomDropdown === item.item_code ? 'rotate-180' : '',
+												openUomDropdown === `${item.item_code}-${item.uom}` ? 'rotate-180' : '',
 												item.item_uoms && item.item_uoms.length > 0 ? 'text-white' : 'text-gray-400'
 											]"
 											fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -551,7 +549,7 @@
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
 										</svg>
 										<div
-											v-if="openUomDropdown === item.item_code && item.item_uoms && item.item_uoms.length > 0"
+											v-if="openUomDropdown === `${item.item_code}-${item.uom}` && item.item_uoms && item.item_uoms.length > 0"
 											class="absolute top-full start-0 mt-0.5 bg-white border border-blue-300 rounded shadow-xl z-50 min-w-full overflow-hidden"
 										>
 											<button
@@ -1273,37 +1271,28 @@ function handleQuantityBlur(item) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Change item's unit of measure.
- * Updates via cart store and closes dropdown.
- *
- * @param {Object} item - Cart item to update
- * @param {String} newUom - New unit of measure (e.g., "Kg", "Box")
- */
-async function handleUomChange(item, newUom) {
-	await cartStore.changeItemUOM(item.item_code, newUom)
-	openUomDropdown.value = null // Close dropdown after selection
-	// Also emit for parent component compatibility
-	emit("update-uom", item.item_code, newUom)
-}
-
-/**
  * Toggle UOM dropdown visibility for an item.
- * Only one dropdown can be open at a time.
- *
- * @param {String} itemCode - Item code to toggle dropdown for
+ * Uses unique key combining item_code + uom to handle same item with different UOMs.
  */
-function toggleUomDropdown(itemCode) {
-	openUomDropdown.value = openUomDropdown.value === itemCode ? null : itemCode
+function toggleUomDropdown(itemCode, uom) {
+	const key = `${itemCode}-${uom}`
+	openUomDropdown.value = openUomDropdown.value === key ? null : key
 }
 
 /**
- * Select a UOM from dropdown (convenience wrapper).
- *
- * @param {Object} item - Cart item
- * @param {String} uom - Selected UOM
+ * Select a UOM from dropdown - changes UOM and closes dropdown
+ * Handles merging if target UOM already exists in cart
  */
-function selectUom(item, uom) {
-	handleUomChange(item, uom)
+async function selectUom(item, newUom) {
+	if (item.uom === newUom) {
+		openUomDropdown.value = null
+		return
+	}
+
+	const currentUom = item.uom || item.stock_uom
+	await cartStore.changeItemUOM(item.item_code, newUom, currentUom)
+	openUomDropdown.value = null
+	emit("update-uom", item.item_code, newUom)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1329,8 +1318,10 @@ function openEditDialog(item) {
  * @param {Object} updatedItem - Updated item data from dialog
  */
 async function handleUpdateItem(updatedItem) {
-	// Use store method to update item
-	await cartStore.updateItemDetails(updatedItem.item_code, updatedItem)
+	// Get the original UOM from selectedItem (before any changes)
+	const originalUom = selectedItem.value?.uom || selectedItem.value?.stock_uom
+	// Use store method to update item, passing original UOM to identify correct item
+	await cartStore.updateItemDetails(updatedItem.item_code, updatedItem, originalUom)
 	// Also emit for parent component compatibility
 	emit("edit-item", updatedItem)
 }

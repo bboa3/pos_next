@@ -15,13 +15,14 @@ function formatCurrency(amount) {
 
 /**
  * Format quantity values with smart decimal handling
- * Removes trailing zeros for cleaner display
+ * Rounds to 4 decimal places and removes trailing zeros
  * @param {number} quantity - The quantity to format
  * @returns {string} Formatted quantity
  */
 function formatQuantity(quantity) {
 	if (quantity === null || quantity === undefined) return "0"
 	const num = Number.parseFloat(quantity)
+	if (isNaN(num)) return "0"
 	// Round to 4 decimal places and remove trailing zeros
 	return num.toFixed(4).replace(/\.?0+$/, '')
 }
