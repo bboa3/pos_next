@@ -5,16 +5,9 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-import iam
-import json
-import nexus.utils.iam.sanitize_iam as sanitize_iam
-from nexus.api.v1.pos_next import schemas
-from nexus.api.v1.pos_next import exceptions
 from nexus.api.v1.utilities.endpoints import check_user_company
-from nexus.api.v1.pos_next.services import _validate_pos_profile_access
-from nexus.api.v1.pos_next.services import _get_pos_profile_child_data
 from pos_next.api.utilities import _parse_list_parameter
-from nexus.api.v1.pos_next.services import _validate_company_resources
+
 
 @frappe.whitelist()
 def get_pos_profiles():
