@@ -495,3 +495,119 @@ def create_pos_profile(*arg ,**parameters):
 	pos_profile.insert()
 	return pos_profile
 		
+def update_pos_profile(*args, **parameters):
+	"""
+		Update an existing POS Profile
+		
+		Args:
+			pos_profile: POS Profile name
+			parameters: Update parameters (all optional)
+	"""
+	# Extract child table parameters BEFORE prepare_query_parameters filters them
+	payments = parameters.pop("payments", None)
+	applicable_for_users = parameters.pop("applicable_for_users", None)
+	item_groups = parameters.pop("item_groups", None)
+	customer_groups = parameters.pop("customer_groups", None)
+	
+	# parse list parameters
+	payments = _parse_list_parameter(payments, "payments")
+	applicable_for_users = _parse_list_parameter(applicable_for_users, "applicable_for_users")
+	item_groups = _parse_list_parameter(item_groups, "item_groups")
+	customer_groups = _parse_list_parameter(customer_groups, "customer_groups")
+	
+	# Get user's company
+	user_company_data = check_user_company(is_function=True)
+	user_company = user_company_data.get("company")
+
+	if not user_company:
+		frappe.throw(_("User must have a company assigned"))
+
+	pos_profile = frappe.get_doc("POS Profile", pos_profile)
+	
+	# Update main fields
+	if parameters:
+		pos_profile.update(parameters)
+
+		if payments is not None:
+			existing_payments_map = {
+				payment.mode_of_payment: payment 
+				for payment in pos_profile.payments
+			}
+			
+			for payment in payments:
+				if isinstance(payment, dict):
+					mode_of_payment = payment.get("mode_of_payment")
+					if mode_of_payment in existing_payments_map:
+						existing_payment = existing_payments_map[mode_of_payment]
+						existing_payment.default = payment.get("default", existing_payment.default)
+						existing_payment.allow_in_returns = payment.get("allow_in_returns", existing_payment.allow_in_returns)
+					else:
+						# Append new payment
+						pos_profile.append("payments", {
+							"mode_of_payment": mode_of_payment,
+							"default": payment.get("default", 0),
+							"allow_in_returns": payment.get("allow_in_returns", 0)
+						})
+				elif isinstance(payment, str):
+					if payment not in existing_payments_map:
+						# Append new payment
+						pos_profile.append("payments", {"mode_of_payment": payment})
+						
+		
+		if applicable_for_users is not None:
+			existing_users_map = {
+				user.user: user 
+				for user in pos_profile.applicable_for_users
+			}
+			
+			for user in applicable_for_users:
+				if isinstance(user, dict):
+					user_name = user.get("user") or user.get("name")
+					if user_name in existing_users_map:
+						existing_user = existing_users_map[user_name]
+						existing_user.default = user.get("default", existing_user.default)
+					else:
+						pos_profile.append("applicable_for_users", {
+							"user": user_name,
+							"default": user.get("default", 0)
+						})
+				elif isinstance(user, str):
+					if user not in existing_users_map:
+						pos_profile.append("applicable_for_users", {"user": user, "default": 0})
+		
+		if item_groups is not None:
+
+			existing_item_groups = {
+				item_group.item_group 
+				for item_group in pos_profile.item_groups
+			}
+
+			for item_group in item_groups:
+				item_group_name = item_group if isinstance(item_group, str) else item_group.get("item_group") or item_group.get("name")
+				if item_group_name and item_group_name not in existing_item_groups:
+					pos_profile.append("item_groups", {"item_group": item_group_name})
+
+		
+		if customer_groups is not None:
+			existing_customer_groups = {
+				customer_group.customer_group 
+				for customer_group in pos_profile.customer_groups
+			}
+			
+			for customer_group in customer_groups:
+				customer_group_name = customer_group if isinstance(customer_group, str) else customer_group.get("customer_group") or customer_group.get("name")
+				if customer_group_name and customer_group_name not in existing_customer_groups:
+					pos_profile.append("customer_groups", {"customer_group": customer_group_name})
+		
+		pos_profile.save()
+	
+
+def delete_pos_profile(pos_profile):
+	"""
+		Delete a POS Profile
+		
+		Args:
+			pos_profile: POS Profile name
+	"""
+	pos_profile = frappe.get_doc("POS Profile", pos_profile)
+	pos_profile.delete()
