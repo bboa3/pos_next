@@ -4,7 +4,8 @@
 
 from __future__ import unicode_literals
 import frappe
-
+import json
+from frappe import _
 
 @frappe.whitelist()
 def get_csrf_token():
@@ -41,3 +42,27 @@ def get_csrf_token():
 		"csrf_token": csrf_token,
 		"session_id": frappe.session.sid
 	}
+
+
+def _parse_list_parameter(value, param_name):
+	"""
+	Parse a list parameter that may come as JSON string or list.
+	
+	Args:
+		value: Value to parse (string or list)
+		param_name: Name of parameter for error messages
+		
+	Returns:
+		list: Parsed list value
+	"""
+	if isinstance(value, str):
+		try:
+			value = value.strip()
+			return json.loads(value) if value else []
+		except json.JSONDecodeError as json_err:
+			frappe.throw(_("Could not parse '{0}' as JSON: {1}").format(param_name, str(json_err)))
+	
+	if not isinstance(value, list):
+		return []
+	
+	return value
