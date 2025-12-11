@@ -11,12 +11,6 @@
 					<p class="mt-3 text-sm text-gray-500">{{ __('Loading offers...') }}</p>
 				</div>
 
-				<!-- Applying State -->
-				<div v-else-if="applyingOffer" class="py-8 text-center">
-					<div class="animate-spin rounded-full h-10 w-10 border-b-2 border-green-500 mx-auto"></div>
-					<p class="mt-3 text-sm text-gray-500">{{ __('Applying offer...') }}</p>
-				</div>
-
 				<!-- Empty State -->
 				<div v-else-if="eligibleOffers.length === 0" class="py-12 text-center">
 					<div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-gray-100">
@@ -168,21 +162,27 @@
 							</p>
 						</div>
 
-						<!-- Apply Button -->
-						<button
-							type="button"
-							@click.prevent="handleApplyOffer(offer)"
-							:disabled="applyingOffer"
-							:class="[
-								'mt-3 w-full py-2 px-4 rounded-lg font-semibold text-sm transition-all',
-								isOfferApplied(offer)
-									? 'bg-red-600 hover:bg-red-700 text-white'
-									: 'bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg',
-								applyingOffer ? 'opacity-70 cursor-not-allowed' : ''
-							]"
-						>
-							{{ isOfferApplied(offer) ? __('Remove Offer') : __('Apply Offer') }}
-						</button>
+						<!-- Offer Status - Auto-applied/removed based on cart -->
+						<div class="mt-3">
+							<div
+								v-if="isOfferApplied(offer)"
+								class="w-full py-2 px-4 rounded-lg font-semibold text-sm bg-green-100 text-green-800 border border-green-300 flex items-center justify-center gap-2"
+							>
+								<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+								</svg>
+								{{ __('Applied') }}
+							</div>
+							<div
+								v-else
+								class="w-full py-2 px-4 rounded-lg font-semibold text-sm bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center gap-2"
+							>
+								<svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+								</svg>
+								{{ __('Will apply when eligible') }}
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -228,10 +228,9 @@ const props = defineProps({
 	},
 })
 
-const emit = defineEmits(["update:modelValue", "apply-offer", "remove-offer"])
+const emit = defineEmits(["update:modelValue"])
 
 const show = ref(props.modelValue)
-const applyingOffer = ref(false)
 const appliedOfferCodes = computed(() => {
 	return new Set(
 		(props.appliedOffers || []).map((entry) => entry?.code).filter(Boolean),
@@ -256,49 +255,7 @@ watch(
 
 watch(show, (val) => {
 	emit("update:modelValue", val)
-	// Reset applying state when dialog closes
-	if (!val) {
-		applyingOffer.value = false
-	}
 })
-
-async function handleApplyOffer(offer) {
-	if (applyingOffer.value) {
-		return
-	}
-
-	// Toggle offer - if already applied, remove it
-	if (isOfferApplied(offer)) {
-		applyingOffer.value = true
-		try {
-			emit("remove-offer", offer)
-			// Close dialog after successful removal
-			await new Promise((resolve) => setTimeout(resolve, 500))
-			show.value = false
-		} finally {
-			applyingOffer.value = false
-		}
-		return
-	}
-
-	applyingOffer.value = true
-	try {
-		// Emit event to parent to handle the actual API call
-		emit("apply-offer", offer)
-		// Don't close dialog yet - parent will close it after successful application
-	} catch (error) {
-		console.error("Error in handleApplyOffer:", error)
-		applyingOffer.value = false
-	}
-}
-
-// Expose method for parent to reset applying state
-function resetApplyingState() {
-	applyingOffer.value = false
-}
-
-// Expose for parent component
-defineExpose({ resetApplyingState })
 
 function isOfferApplied(offer) {
 	return appliedOfferCodes.value.has(offer?.name)

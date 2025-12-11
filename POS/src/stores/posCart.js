@@ -509,7 +509,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 
 				// Show warning about removed offers
 				const offerNames = invalidOffers.map(o => o.name).join(', ')
-				showWarning(`Offer removed: ${offerNames}. Cart no longer meets requirements.`)
+				showWarning(__('Offer removed: {0}. Cart no longer meets requirements.', [offerNames]))
 
 				if (validOfferCodes.length === 0) {
 					// All offers invalid - clear everything
@@ -551,6 +551,94 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			}
 		} catch (error) {
 			console.error("Error validating offers:", error)
+		}
+	}
+
+	/**
+	 * Automatically applies ALL eligible offers when cart changes
+	 * This function is called after cart updates to apply any new eligible offers
+	 * @param {Object} currentProfile - Current POS profile
+	 */
+	async function autoApplyEligibleOffers(currentProfile) {
+		// Skip if cart is empty or no offers available
+		if (invoiceItems.value.length === 0 || !offersStore.hasFetched) {
+			return
+		}
+
+		// Skip if suppressed
+		if (suppressOfferReapply.value) {
+			return
+		}
+
+		try {
+			// Build current cart snapshot
+			const cartSnapshot = buildCartSnapshot()
+			offersStore.updateCartSnapshot(cartSnapshot)
+
+			// Get ALL eligible offers (not just auto-offers)
+			const allEligibleOffers = offersStore.allEligibleOffers
+
+			if (allEligibleOffers.length === 0) {
+				return
+			}
+
+			// Find offers that are not yet applied
+			const appliedOfferCodes = new Set(appliedOffers.value.map(o => o.code))
+			const newOffers = allEligibleOffers.filter(offer =>
+				!appliedOfferCodes.has(offer.name)
+			)
+
+			if (newOffers.length === 0) {
+				return
+			}
+
+			// Apply all new eligible offers in a single batch
+			const existingCodes = appliedOffers.value.map(entry => entry.code)
+			const newOfferCodes = newOffers.map(offer => offer.name)
+			const allCodes = [...existingCodes, ...newOfferCodes]
+
+			const invoiceData = buildInvoiceDataForOffers(currentProfile)
+
+			const response = await applyOffersResource.submit({
+				invoice_data: invoiceData,
+				selected_offers: allCodes,
+			})
+
+			const { items: responseItems, freeItems, appliedRules } =
+				parseOfferResponse(response, allCodes)
+
+			suppressOfferReapply.value = true
+			applyServerDiscounts(responseItems)
+			processFreeItems(freeItems)
+			filterActiveOffers(appliedRules)
+
+			// Add newly applied offers to the list
+			for (const offer of newOffers) {
+				const offerCode = offer.name
+				// Check if the offer was actually applied by ERPNext
+				if (!appliedRules.includes(offerCode)) {
+					continue
+				}
+
+				const offerRuleCodes = appliedRules.filter(ruleName => ruleName === offerCode)
+				appliedOffers.value.push({
+					name: offer.title || offer.name,
+					code: offerCode,
+					offer, // Store full offer object for validation
+					source: "auto",
+					applied: true,
+					rules: offerRuleCodes,
+					min_qty: offer.min_qty,
+					max_qty: offer.max_qty,
+					min_amt: offer.min_amt,
+					max_amt: offer.max_amt,
+				})
+
+				// Show success notification for auto-applied offer
+				showSuccess(__('Offer applied: {0}', [(offer.title || offer.name)]))
+			}
+		} catch (error) {
+			console.error("Error auto-applying offers:", error)
 		}
 	}
 
@@ -789,8 +877,8 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			// Update offer snapshot for eligibility checking
 			syncOfferSnapshot()
 
-			// Validate applied offers - remove any that no longer meet requirements
-			if (appliedOffers.value.length > 0 && posProfile.value) {
+			// Only process offers if we have a POS profile
+			if (posProfile.value) {
 				// Get current profile from posProfile
 				const currentProfile = {
 					customer: customer.value?.name || customer.value,
@@ -799,8 +887,13 @@ export const usePOSCartStore = defineStore("posCart", () => {
 					currency: posProfile.value.currency,
 				}
 
-				// Validate and auto-remove invalid offers
-				await reapplyOffer(currentProfile)
+				// Validate and auto-remove invalid offers (if any are applied)
+				if (appliedOffers.value.length > 0) {
+					await reapplyOffer(currentProfile)
+				}
+
+				// Auto-apply eligible offers (always check for new eligible offers)
+				await autoApplyEligibleOffers(currentProfile)
 			}
 		},
 		{ immediate: true, flush: "post" },
@@ -849,6 +942,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		applyOffer,
 		removeOffer,
 		reapplyOffer,
+		autoApplyEligibleOffers,
 		changeItemUOM,
 		updateItemDetails,
 		getItemDetailsResource,
