@@ -508,21 +508,14 @@ def update_pos_profile(*args, **parameters):
 	applicable_for_users = parameters.pop("applicable_for_users", None)
 	item_groups = parameters.pop("item_groups", None)
 	customer_groups = parameters.pop("customer_groups", None)
-	
+	pos_profile_name = parameters.pop("pos_profile_name", None)
 	# parse list parameters
 	payments = _parse_list_parameter(payments, "payments")
 	applicable_for_users = _parse_list_parameter(applicable_for_users, "applicable_for_users")
 	item_groups = _parse_list_parameter(item_groups, "item_groups")
 	customer_groups = _parse_list_parameter(customer_groups, "customer_groups")
 	
-	# Get user's company
-	user_company_data = check_user_company(is_function=True)
-	user_company = user_company_data.get("company")
-
-	if not user_company:
-		frappe.throw(_("User must have a company assigned"))
-
-	pos_profile = frappe.get_doc("POS Profile", pos_profile)
+	pos_profile = frappe.get_doc("POS Profile", pos_profile_name)
 	
 	# Update main fields
 	if parameters:
