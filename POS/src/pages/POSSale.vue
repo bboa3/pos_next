@@ -1829,6 +1829,28 @@ async function handlePaymentCompleted(paymentData) {
 			// Delete draft after successful save
 			if (draftIdToDelete) {
 				draftsStore.deleteDraft(draftIdToDelete);
+			}
+
+			showSuccess(__("Invoice saved offline. Will sync when online"));
+		} else {
+			// Get item codes from cart before clearing
+			const soldItemCodes = cartStore.invoiceItems.map((item) => item.item_code);
+
+			const result = await cartStore.submitInvoice();
+
+			if (result) {
+				const invoiceName = result.name || result.message?.name || __("Unknown");
+				const invoiceTotal = result.grand_total || result.total || 0;
+				const paidAmount = paymentData.paid_amount || invoiceTotal;
+
+				uiStore.showPaymentDialog = false;
+				cartStore.clearCart();
+				// Reset cart hash after successful payment
+				previousCartHash = "";
+
+				// Delete draft after successful submission
+				if (draftIdToDelete) {
+					draftsStore.deleteDraft(draftIdToDelete);
 				}
 
 				// Refresh stock - Direct API (50-200ms), no Socket.IO lag!
