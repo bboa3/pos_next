@@ -1,17 +1,9 @@
 # -*- coding: utf-8 -*-
-<<<<<<< HEAD
 # Copyright (c) 2024, POS MZ and contributors
 # For license information, please see license.txt
 
 """
 Real-time event handlers for POS MZ.
-=======
-# Copyright (c) 2024, POS Next and contributors
-# For license information, please see license.txt
-
-"""
-Real-time event handlers for POS Next.
->>>>>>> upstream/develop
 Emits Socket.IO events when stock-affecting transactions occur.
 """
 
