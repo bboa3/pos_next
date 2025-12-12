@@ -1217,62 +1217,6 @@
 					>
 						<svg
 							class="w-4 h-4 me-1.5"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							stroke-width="2"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-							/>
-						</svg>
-						<span>{{
-							cartStore.targetDoctype === "Sales Order"
-								? __("Sales Order")
-								: __("Sales Invoice")
-						}}</span>
-						<svg
-							class="w-3 h-3 ms-1"
-							:class="{ 'rotate-180': showDocTypeDropdown }"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M19 9l-7 7-7-7"
-							/>
-						</svg>
-					</button>
-					<div
-						v-if="showDocTypeDropdown"
-						class="absolute bottom-full mb-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden"
-					>
-						<button
-							type="button"
-							@click="selectDocType('Sales Invoice')"
-							class="w-full text-start px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-						>
-							{{ __("Sales Invoice") }}
-						</button>
-						<button
-							type="button"
-							@click="selectDocType('Sales Order')"
-							class="w-full text-start px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-						>
-							{{ __("Sales Order") }}
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- Edit Item Dialog -->
-		<EditItemDialog
 			v-model="showEditDialog"
 			:item="selectedItem"
 			:warehouses="warehouses"

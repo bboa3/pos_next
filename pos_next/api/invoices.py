@@ -349,12 +349,13 @@ def update_invoice(data):
 
         if company and invoice_doc.get("payments"):
             for payment in invoice_doc.payments:
-                if payment.mode_of_payment and not payment.get("account"):
+                mode_of_payment = payment.get("mode_of_payment")
+                if mode_of_payment and not payment.get("account"):
                     try:
                         account_info = get_payment_account(
-                            payment.mode_of_payment, company
+                            mode_of_payment, company
                         )
-                        payment.account = account_info.get("account")
+                        payment["account"] = account_info.get("account")
                     except Exception:
                         pass  # Will be handled during save
 
