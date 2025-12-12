@@ -215,6 +215,52 @@
 								/>
 							</svg>
 						</button>
+
+						<!-- Sales Order Dropdown -->
+						<div v-if="settingsStore.allowSalesOrder" class="relative">
+							<button
+								type="button"
+								@click="toggleDocTypeDropdown"
+								class="flex items-center justify-center w-10 h-10 bg-white border border-gray-200 hover:bg-gray-50 active:bg-gray-100 rounded-xl text-gray-700 transition-colors shadow-sm hover:shadow touch-manipulation flex-shrink-0"
+								:title="__('Select Document Type')"
+							>
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+								</svg>
+								<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[8px] text-white font-bold">
+									{{ cartStore.targetDoctype === 'Sales Order' ? 'SO' : 'SI' }}
+								</div>
+							</button>
+
+							<!-- Dropdown Menu -->
+							<div
+								v-if="showDocTypeDropdown"
+								class="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden"
+							>
+								<button
+									type="button"
+									@click="selectDocType('Sales Invoice')"
+									class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center justify-between"
+									:class="{'bg-blue-50 text-blue-700': cartStore.targetDoctype === 'Sales Invoice'}"
+								>
+									<span>{{ __('Sales Invoice') }}</span>
+									<svg v-if="cartStore.targetDoctype === 'Sales Invoice'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+									</svg>
+								</button>
+								<button
+									type="button"
+									@click="selectDocType('Sales Order')"
+									class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center justify-between"
+									:class="{'bg-blue-50 text-blue-700': cartStore.targetDoctype === 'Sales Order'}"
+								>
+									<span>{{ __('Sales Order') }}</span>
+									<svg v-if="cartStore.targetDoctype === 'Sales Order'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+									</svg>
+								</button>
+							</div>
+						</div>
 					</div>
 
 					<!-- Customer Dropdown -->
@@ -595,19 +641,34 @@
 									d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
 								/>
 							</svg>
-						</div>
-						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{
-							__("Create Customer")
-						}}</span>
-					</button>
+```html
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+						/>
+					</svg>
+				</div>
+				<p class="text-xs sm:text-sm font-semibold text-gray-900 mb-1">
+					{{ __("Your cart is empty") }}
+				</p>
+				<p class="text-[10px] sm:text-xs text-gray-500 mb-5 sm:mb-6">
+					{{ __("Select items to start or choose a quick action") }}
+				</p>
 
-					<!-- Create Sales Order -->
+				<!-- Quick Actions Grid -->
+				<div class="grid grid-cols-2 gap-2 sm:gap-2.5 w-full max-w-lg">
+					<!-- View Shift -->
 					<button
 						type="button"
-						v-if="settingsStore.allowSalesOrder"
-						@click="$emit('create-sales-order')"
+						@click="$emit('view-shift')"
 						class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100 transition-colors shadow-sm hover:shadow touch-manipulation group"
-						:title="__('Create Sales Order')"
+						:title="__('View current shift details')"
 					>
 						<div
 							class="w-9 h-9 sm:w-10 sm:h-10 bg-blue-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-blue-100 transition-colors"
@@ -622,12 +683,163 @@
 									stroke-linecap="round"
 									stroke-linejoin="round"
 									stroke-width="2"
-									d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+									d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+								/>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
 								/>
 							</svg>
 						</div>
 						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{
-							__("Sales Order")
+							__("View Shift")
+						}}</span>
+					</button>
+
+					<!-- Draft Invoices -->
+					<button
+						type="button"
+						@click="$emit('show-drafts')"
+						class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 active:bg-purple-100 transition-colors shadow-sm hover:shadow touch-manipulation group"
+						:title="__('View draft invoices')"
+					>
+						<div
+							class="w-9 h-9 sm:w-10 sm:h-10 bg-purple-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-purple-100 transition-colors"
+						>
+							<svg
+								class="w-5 h-5 text-purple-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+								/>
+							</svg>
+						</div>
+						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{
+							__("Draft Invoices")
+						}}</span>
+					</button>
+
+					<!-- Invoice History -->
+					<button
+						type="button"
+						@click="$emit('show-history')"
+						class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100 transition-colors shadow-sm hover:shadow touch-manipulation group"
+						:title="__('View invoice history')"
+					>
+						<div
+							class="w-9 h-9 sm:w-10 sm:h-10 bg-gray-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-gray-100 transition-colors"
+						>
+							<svg
+								class="w-5 h-5 text-gray-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+						</div>
+						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{
+							__("Invoice History")
+						}}</span>
+					</button>
+
+					<!-- Return Invoice -->
+					<button
+						type="button"
+						@click="$emit('show-return')"
+						class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:border-red-300 hover:bg-red-50 active:bg-red-100 transition-colors shadow-sm hover:shadow touch-manipulation group"
+						:title="__('Process return invoice')"
+					>
+						<div
+							class="w-9 h-9 sm:w-10 sm:h-10 bg-red-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-red-100 transition-colors"
+						>
+							<svg
+								class="w-5 h-5 text-red-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+								/>
+							</svg>
+						</div>
+						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{
+							__("Return Invoice")
+						}}</span>
+					</button>
+
+					<!-- Close Shift -->
+					<button
+						type="button"
+						@click="$emit('close-shift')"
+						class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:border-orange-300 hover:bg-orange-50 active:bg-orange-100 transition-colors shadow-sm hover:shadow touch-manipulation group"
+						:title="__('Close current shift')"
+					>
+						<div
+							class="w-9 h-9 sm:w-10 sm:h-10 bg-orange-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-orange-100 transition-colors"
+						>
+							<svg
+								class="w-5 h-5 text-orange-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+								/>
+							</svg>
+						</div>
+						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{
+							__("Close Shift")
+						}}</span>
+					</button>
+
+					<!-- Create Customer -->
+					<button
+						type="button"
+						@click="$emit('create-customer', '')"
+						class="flex flex-col items-center justify-center p-3 sm:p-4 bg-white border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 active:bg-green-100 transition-colors shadow-sm hover:shadow touch-manipulation group"
+						:title="__('Create new customer')"
+					>
+						<div
+							class="w-9 h-9 sm:w-10 sm:h-10 bg-green-50 rounded-full flex items-center justify-center mb-2 group-hover:bg-green-100 transition-colors"
+						>
+							<svg
+								class="w-5 h-5 text-green-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+								/>
+							</svg>
+						</div>
+						<span class="text-[11px] sm:text-xs font-semibold text-gray-700">{{
+							__("Create Customer")
 						}}</span>
 					</button>
 				</div>
@@ -1059,53 +1271,63 @@
 					<span>{{ __("Checkout") }}</span>
 				</button>
 
-				<!-- Hold Order Button (Secondary - 50% width) -->
-				<button
-					type="button"
-					v-if="items.length > 0"
-					@click="$emit('save-draft')"
-					class="flex-1 py-2.5 px-2 rounded-lg font-semibold text-xs text-orange-700 bg-orange-50 hover:bg-orange-100 active:bg-orange-200 transition-all touch-manipulation active:scale-[0.98] flex items-center justify-center"
-					:aria-label="__('Hold order as draft')"
-				>
-					<svg
-						class="w-4 h-4 me-1.5"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-						stroke-width="2"
+				<!-- Document Type Dropdown -->
+				<div class="relative flex-1" v-if="items.length > 0">
+					<button
+						type="button"
+						@click="toggleDocTypeDropdown"
+						class="w-full py-2.5 px-2 rounded-lg font-semibold text-xs text-gray-700 bg-gray-50 hover:bg-gray-100 active:bg-gray-200 transition-all touch-manipulation active:scale-[0.98] flex items-center justify-center"
+						:aria-label="__('Select document type')"
 					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-						/>
-					</svg>
-					<span>{{ __("Hold", null, "order") }}</span>
-				</button>
-
-				<!-- Create Sales Order Button -->
-				<button
-					type="button"
-					v-if="items.length > 0 && settingsStore.allowSalesOrder"
-					@click="$emit('create-sales-order')"
-					class="flex-1 py-2.5 px-2 rounded-lg font-semibold text-xs text-blue-700 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 transition-all touch-manipulation active:scale-[0.98] flex items-center justify-center"
-					:aria-label="__('Create Sales Order')"
-				>
-					<svg
-						class="w-4 h-4 me-1.5"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-						stroke-width="2"
+						<svg
+							class="w-4 h-4 me-1.5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+							stroke-width="2"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
+							/>
+						</svg>
+						<span>{{ cartStore.targetDoctype === 'Sales Order' ? __('Sales Order') : __('Sales Invoice') }}</span>
+						<svg
+							class="w-3 h-3 ms-1"
+							:class="{ 'rotate-180': showDocTypeDropdown }"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M19 9l-7 7-7-7"
+							/>
+						</svg>
+					</button>
+					<div
+						v-if="showDocTypeDropdown"
+						class="absolute bottom-full mb-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden"
 					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-						/>
-					</svg>
-					<span>{{ __("Sales Order") }}</span>
-				</button>
+						<button
+							type="button"
+							@click="selectDocType('Sales Invoice')"
+							class="w-full text-start px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+						>
+							{{ __('Sales Invoice') }}
+						</button>
+						<button
+							type="button"
+							@click="selectDocType('Sales Order')"
+							class="w-full text-start px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+						>
+							{{ __('Sales Order') }}
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -1225,7 +1447,7 @@ const emit = defineEmits([
 	"show-history", // () - Show invoice history
 	"show-return", // () - Open return invoice dialog
 	"close-shift", // () - Close current shift
-	"create-sales-order", // () - Create Sales Order
+	// "create-sales-order", // () - Create Sales Order // Removed as per instruction
 ]);
 
 /**
@@ -1755,10 +1977,22 @@ async function handleUpdateItem(updatedItem) {
 // Event Handlers & Lifecycle
 // ─────────────────────────────────────────────────────────────────────────────
 
+const showDocTypeDropdown = ref(false)
+
+function toggleDocTypeDropdown() {
+	showDocTypeDropdown.value = !showDocTypeDropdown.value
+}
+
+function selectDocType(type) {
+	cartStore.setTargetDoctype(type)
+	showDocTypeDropdown.value = false
+}
+
 /**
  * Handle clicks outside interactive elements.
  * - Closes customer search dropdown when clicking outside
  * - Closes UOM dropdown when clicking outside
+ * - Closes DocType dropdown when clicking outside
  *
  * @param {MouseEvent} event - Click event
  */
@@ -1789,6 +2023,15 @@ function handleOutsideClick(event) {
 			openUomDropdown.value = null;
 		}
 	}
+
+	// Close DocType dropdown if clicking outside
+	if (showDocTypeDropdown.value) {
+		const clickedInsideDocTypeDropdown =
+			target instanceof Element && target.closest(".relative.flex-1"); // Assuming the dropdown is within this container
+		if (!clickedInsideDocTypeDropdown) {
+			showDocTypeDropdown.value = false;
+		}
+	}
 }
 
 /**
@@ -1809,3 +2052,4 @@ onBeforeUnmount(() => {
 	document.removeEventListener("click", handleOutsideClick);
 });
 </script>
+```

@@ -348,7 +348,6 @@
 								@show-history="uiStore.showHistoryDialog = true"
 								@show-return="uiStore.showReturnDialog = true"
 								@close-shift="handleCloseShift()"
-								@create-sales-order="handleCreateSalesOrder"
 							/>
 						</div>
 					</keep-alive>

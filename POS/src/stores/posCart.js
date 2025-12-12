@@ -53,6 +53,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 	const selectionMode = ref("uom") // 'uom' or 'variant'
 	const suppressOfferReapply = ref(false)
 	const currentDraftId = ref(null)
+	const targetDoctype = ref("Sales Invoice")
 
 	// Toast composable
 	const { showSuccess, showError, showWarning } = useToast()
@@ -113,6 +114,18 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		appliedOffers.value = []
 		appliedCoupon.value = null
 		currentDraftId.value = null
+		targetDoctype.value = "Sales Invoice"
+	}
+
+	function setTargetDoctype(doctype) {
+		targetDoctype.value = doctype
+	}
+
+	async function submitInvoice() {
+		if (targetDoctype.value === "Sales Order") {
+			return await createSalesOrder()
+		}
+		return await useInvoice().submitInvoice()
 	}
 
 	async function createSalesOrder() {
@@ -127,8 +140,9 @@ export const usePOSCartStore = defineStore("posCart", () => {
 
 		try {
 			const result = await saveDraft("Sales Order")
-			showSuccess(__("Sales Order created successfully"))
-			clearCart()
+			// We don't clear cart here because submitInvoice caller expects to handle success
+			// showSuccess(__("Sales Order created successfully"))
+			// clearCart()
 			return result
 		} catch (error) {
 			console.error("Failed to create Sales Order:", error)
@@ -961,19 +975,6 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		setTaxInclusive,
 		submitInvoice,
 		applyDiscountToCart,
-		removeDiscountFromCart,
-		applyOffer,
-		removeOffer,
-		reapplyOffer,
-		autoApplyEligibleOffers,
-		changeItemUOM,
-		updateItemDetails,
-		createSalesOrder,
-		saveDraft,
-		getItemDetailsResource,
-		recalculateItem,
-		rebuildIncrementalCache,
-		applyOffersResource,
 		buildInvoiceDataForOffers,
 	}
 })
