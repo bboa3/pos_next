@@ -2,10 +2,12 @@ import { createResource } from "frappe-ui"
 import { computed, ref, toRaw } from "vue"
 import { isOffline } from "@/utils/offline"
 import { useSerialNumberStore } from "@/stores/serialNumber"
+import { usePOSCartStore } from "@/stores/posCart"
 
 export function useInvoice() {
 	// Serial Number Store for returning serials when items are removed
 	const serialStore = useSerialNumberStore()
+	const cartStore = usePOSCartStore()
 	// State
 	const invoiceItems = ref([])
 	const customer = ref(null)
