@@ -138,18 +138,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		return await submitInvoice()
 	}
 
-		try {
-			const result = await saveDraft("Sales Order")
-			// We don't clear cart here because submitInvoice caller expects to handle success
-			// showSuccess(__("Sales Order created successfully"))
-			// clearCart()
-			return result
-		} catch (error) {
-			console.error("Failed to create Sales Order:", error)
-			showError(__("Failed to create Sales Order"))
-			throw error
-		}
-	}
+
 
 	function setCustomer(selectedCustomer) {
 		customer.value = selectedCustomer
