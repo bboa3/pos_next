@@ -1,0 +1,2883 @@
+% Percent,% Percentagem
+(FREE),(GRÁTIS)
+(Max Discount: {0}),(Desc Máx: {0})
+(Min: {0}),(Mín: {0})
++ Add / Remove Columns,+ Adicionar / Remover Colunas
++ Add a Filter,+ Adicionar um Filtro
++ Add Payment,+ Adicionar Pagamento
++ Create New Customer,+ Criar Novo Cliente
++ Free Item,+ Item Grátis
++{0} FREE,+{0} GRÁTIS
++{0} more,+{0} mais
+-- No Campaign --,-- Sem Campanha --
+-- Select --,-- Selecionar --
+-- Select Brand --,-- Selecionar Marca --
+-- Select Item Group --,-- Sel. Grupo de Itens --
+1 selected,1 selecionado
+<strong>Company:<strong>,<strong>Empresa:<strong>
+<strong>Items Tracked:<strong> {0},<strong>Itens Rastreados:<strong> {0}
+<strong>Last Sync:<strong> Never,<strong>Última Sinc:<strong> Nunca
+<strong>Last Sync:<strong> {0},<strong>Última Sinc:<strong> {0}
+"<strong>Note:<strong> When enabled, the system will allow sales even when stock quantity is zero or negative. This is useful for handling stock sync delays or backorders. All transactions are tracked in the stock ledger.","<strong>Nota:<strong> Se activo, permite vendas com stock zero ou negativo. Útil para atrasos de sinc. ou encomendas. Tudo é registado no razão de stock."
+<strong>Opened:</strong> {0},<strong>Aberto:</strong> {0}
+<strong>Opened:<strong>,<strong>Aberto:<strong>
+<strong>POS Profile:</strong> {0},<strong>Perfil POS:</strong> {0}
+<strong>POS Profile:<strong> {0},<strong>Perfil POS:<strong> {0}
+<strong>Status:<strong> Running,<strong>Estado:<strong> Em execução
+<strong>Status:<strong> Stopped,<strong>Estado:<strong> Parado
+<strong>Warehouse:<strong> {0},<strong>Armazém:<strong> {0}
+<strong>{0}</strong> of <strong>{1}</strong> invoice(s),<strong>{0}</strong> de <strong>{1}</strong> factura(s)
+"\{0}\"" cannot be added to cart. Bundle is out of stock. Allow Negative Stock is disabled.""","\{0}\"" não pode ser adicionado. Pacote esgotado. Permitir Stock Negativo desactivado."""
+"\{0}\"" cannot be added to cart. Item is out of stock. Allow Negative Stock is disabled.""","\{0}\"" não pode ser adicionado. Item esgotado. Permitir Stock Negativo desactivado."""
+"\{0}\"" is not available in warehouse \""{1}\"". Please select another warehouse.""","\{0}\"" indisponível no armazém \""{1}\"". Selecione outro."""
+About,Sobre
+Accepted,Aceito
+Access your point of sale system,Aceda ao seu ponto de venda
+Account,Conta
+Accounting Report,Relatório de Contabilidade
+Accounts Manager,Gerente de Contas
+Accounts Payable,Contas a Pagar
+Accounts Receivable,Contas a Receber
+Accounts User,Usuário de Contas
+Acknowledge the error to resume scanning.,Reconheça o erro para retomar o escaneamento.
+across 1 warehouse,em 1 armazém
+across {0} warehouses,em {0} armazéns
+Action,Ação
+Action / Route,Ação / Rota
+Action Timeout (Seconds),Tempo Limite de Ação (Segundos)
+Actions,Ações
+Active,Activo
+Active Domains,Domínios ativos
+Active Only,Apenas Activos
+Active Shift Detected,Turno Activo Detectado
+Active Warehouse,Armazém Activo
+Activity,Atividade
+Actual Amount *,Valor Real *
+Actual Stock,Stock Real
+Actual Stock:,Stock Real:
+add,adicionar
+Add,Adicionar
+Add Child,Adicionar Sub-item
+Add Container,Adicionar recipiente
+Add Day-wise Dates,Adicionar Datas por Dia
+Add Discount,Adicionar Desconto
+Add Gray Background,Adicionar fundo cinza
+Add Item,Adicionar Item
+Add items to the cart before applying an offer.,Adicione itens ao carrinho antes de aplicar oferta.
+Add items to your cart to see eligible offers,Adicione itens para ver ofertas elegíveis
+Add Multiple,Adicionar Múltiplos
+Add New Address,Adicionar Novo Endereço
+Add Participants,Adicione Participantes
+Add Payment,Adicionar Pagamento
+Add Split,Adicionar Divisão
+Add to Cart,Adicionar
+Add to Quote,Adicionar à Cotação
+Add Total Row,Adicionar Linha de Total
+Add Translate Data,Adicionar Dados Traduzidos
+Add Unsubscribe Link,Adicionar link para cancelar inscrição
+Add {0} more to unlock,Adicione mais {0} para desbloquear
+Added,Adicionado
+Added {0} ({1}),Adicionado {0} ({1})
+Additional Discount,Desconto Adicional
+Additional Information,Informação Adicional
+Additional Permissions,Permissões Adicionais
+Additional Salary,Salário Adicional
+Address,Endereço
+Address and other legal information you may want to put in the footer.,Endereço e outras informações legais que você pode querer colocar no rodapé.
+Address Title,Título do Endereço
+Adjust return quantities before submitting.\n\n{0},Ajuste as quantidades antes de submeter.\n\n{0}
+Adjust the quantity or enable negative stock to continue.,Ajuste a quantidade ou ative stock negativo para continuar.
+Administrative Assistant,Assistente Administrativo
+Administrator,Administrador
+Advanced Filters,Filtros Avançados
+Advanced Settings,Configurações avançadas
+After Cancel,Após Cancelar
+After Delete,Após Excluir
+After Save,Após salvar
+After Save (Submitted Document),Após salvar (documento enviado)
+After Submit,Após o envio
+Against: {0},Contra: {0}
+Aggregate Function Based On,Função agregada com base em
+Alert,Alerta
+Align Labels to the Right,Alinhar etiquetas à direita
+Align Right,Alinhar à direita
+All,Todos
+ALL,Tudo
+All ({0}),Todos ({0})
+All cached data has been cleared successfully,Todos os dados em cache foram limpos com sucesso
+All Caught Up!,Tudo Em Dia!
+All Day,Dia Inteiro
+All Invoices,Todas as Facturas
+All invoices are either fully paid or unpaid,Todas as facturas estão pagas ou não pagas
+All invoices are fully paid,Todas as facturas estão pagas
+All invoices are synchronized,Todas as faturas estão sincronizadas
+All Items,Todos os Itens
+All items from this invoice have already been returned,Todos os itens desta factura já foram devolvidos
+All items loaded,Todos os itens carregados
+All items removed from cart,Todos os itens removidos do carrinho
+All Status,Todos os Estados
+All stock operations will use this warehouse. Stock quantities will refresh after saving.,Todas as operações usarão este armazém. Quantidades actualizadas após guardar.
+All Synchronized,Tudo Sincronizado
+All Territories,Todos os Territórios
+All Types,Todos os Tipos
+Allocated To,Atribuído a
+Allow Additional Discount,Permitir Desconto Adicional
+Allow approval for creator of the document,Permitir aprovação para o criador do documento
+Allow Auto Repeat,Permitir repetição automática
+Allow Bulk Edit,Permitir edição em massa
+Allow Credit Sale,Permitir Venda a Crédito
+Allow events in timeline,Permitir eventos na linha do tempo
+Allow Guest,Permitir convidado
+Allow Guest to View,Permitir visualização de convidado
+Allow in Quick Entry,Permitir na entrada rápida
+Allow Item Discount,Permitir Desconto no Item
+Allow Leave Application After (Working Days),Permitir Solicitação de Licença Após (Dias Úteis)
+Allow Login using User Name,Permitir Login usando o nome de usuário
+Allow Modules,Permitir Módulos
+Allow Negative Stock,Permitir Stock Negativo
+Allow on Submit,Permitir ao Enviar
+Allow only one session per user,Permitir apenas uma sessão por usuário
+Allow Over Allocation,Permitir Alocação Excedente
+Allow Partial Payment,Permitir Pagamento Parcial
+Allow Print for Cancelled,Permitir impressão para cancelado
+Allow Read On All Link Options,Permitir leitura em todas as opções de link
+Allow Rename,Permitir Renomear
+Allow Return,Permitir Devolução
+Allow Roles,Permitir Funções
+Allow saving if mandatory fields are not filled,Permitir salvar se os campos obrigatórios não são preenchidas
+Allow Self Approval,Permitir auto-aprovação
+Allow Write Off Change,Permitir Ajuste de Troco
+Allowed,Permitido
+Allowed In Mentions,Permitido nas menções
+Allows allocating more leaves than the number of days in the allocation period.,Permite alocar mais licenças do que o número de dias no período de alocação.
+"Always add ""Draft"" Heading for printing draft documents","Sempre adicionar ""Rascunho"" no cabeçalho para impressão de documentos não enviados"
+Amend,Corrigir
+Amount,Valor
+Amount in {0},Valor em {0}
+Amount of expense,Valor da despesa
+Amount owed by customer,Valor em dívida pelo cliente
+An error occurred,Ocorreu um erro
+An unexpected error occurred,Ocorreu um erro inesperado
+An unexpected error occurred.,Ocorreu um erro inesperado.
+Analytics,Análise
+and,e
+Annual,Anual
+API Access,Acesso API
+API Key,Chave da API
+API Method,Método API
+API Secret,Segredo da API
+App,Aplicativo
+App information,Informações do aplicativo
+Appearance,Aparência
+Append To,Acrescente Para
+Applicant Rating,Classificação do Candidato
+Application Logo,Logo do aplicativo
+Application Name,Nome da Aplicação
+Application Version,Versão do aplicativo
+Applied,Aplicado
+APPLIED,APLICADO
+Applied On,Aplicado em
+Apply,Aplicar
+Apply Coupon,Aplicar Cupão
+Apply coupon code,Aplicar código de cupão
+Apply Credit,Aplicar Crédito
+Apply Discount On,Aplicar Desconto Em
+Apply Filter,Aplicar Filtro
+Apply Offer,Aplicar Oferta
+Apply Offers,Aplicar Ofertas
+Apply On,Aplicar Em
+Apply Strict User Permissions,Aplicar permissões de usuário estrito
+Apply this rule if the User is the Owner,Aplicar esta regra se o usuário é o proprietário
+Applying offer...,A aplicar oferta...
+Appointment,Agendamento
+Appointment Letter,Carta de Nomeação
+Appointment Letter Template,Modelo de Carta de Nomeação
+Approval Pending,Aprovação Pendente
+Approved,Aprovado
+Apps,Aplicativos
+Archive,Arquivar
+Are you sure you want to close? All entered data will be lost.,Tem certeza de que deseja fechar? Todos os dados inseridos serão perdidos.
+"Are you sure you want to delete <strong>""{0}""<strong>?","Tem a certeza que deseja eliminar <strong>""{0}""<strong>?"
+Are you sure you want to delete this offline invoice?,Tem a certeza que quer apagar esta factura offline?
+Are you sure you want to sign out of POS MZ?,Tem a certeza que deseja sair do POS MZ?
+Are you sure you want to sign out of POS Next?,Tem a certeza que deseja sair do POS Next?
+Are you sure?,Tem a certeza?
+Ascending,Ascendente
+Asset Activity,Atividade do Ativo
+Asset Capitalization,Capitalização de Ativo
+Assign Condition,Atribuir condição
+Assign To Users,Atribuir aos usuários
+Assigned,Atribuído
+Assigned By Full Name,Atribuído por Nome completo
+Assigned To,Atribuído A
+Assignment Completed,Atribuição Concluída
+Assignment Days,Dias de atribuição
+Assignment Rules,Regras de Atribuição
+At least {0} items required,Pelo menos {0} itens necessários
+Attach Image,Anexar Imagem
+Attach Print,Anexar cópia
+Attached File,Arquivo anexo
+Attached To Field,Relacionado ao campo
+Attached To Name,Anexado Para Nome
+Attachment,Anexo
+Attachment Limit (MB),Limite de Anexo (MB)
+Attachment Link,Link de Anexo
+Attachment Removed,Anexo Removido
+Attachments,Anexos
+Attendance,Assiduidade
+Attendance Count,Contagem de Assiduidade
+Attendance Request,Pedido de Assiduidade
+"Attendance & Leaves","Assiduidade e Licenças"
+Auth URL Data,Dados de URL de autenticação
+Author,Autor
+Authorization Code,Código de autorização
+Authorize API Indexing  Access,Autorizar acesso de indexação de API
+Authorize Google Calendar Access,Autorizar acesso ao Google Agenda
+Authorize Google Contacts Access,Autorizar o acesso dos Contatos do Google
+Authorize URL,Autorizar URL
+Authorized,Autorizado
+Auto,Auto
+Auto Name,Nome Automático
+Auto Reply Message,Resposta Automática
+Auto Sync,Sincronização Automática
+Auto-Add ON - Type or scan barcode,Auto-Add LIG - Digite ou digitalize
+Auto-Add: OFF - Click to enable automatic cart addition on Enter,Auto-Adicionar: DESL - Clique para activar
+Auto-Add: ON - Press Enter to add items to cart,Auto-Adicionar: LIG - Enter adiciona ao carrinho
+Auto-generated if empty,Gerado automaticamente se vazio
+Auto-Sync:,Sinc. Auto:
+Automatically update Last Sync of Checkin,Actualizar automaticamente a Última Sincronização de Registo de Entrada
+Available,Disponível
+Available Credit,Crédito Disponível
+Available Offers,Ofertas Disponíveis
+Available QTY,Quantidade Disponível
+Available:,Disponível:
+Average Transaction,Transacção Média
+Awaiting password,Aguardando Senha
+Awaiting Password,Aguardando Senha
+Awesome,Incrível
+Back,Voltar
+Back to Login,Voltar ao início de sessão
+Background Color,Cor de Fundo
+Background Stock Sync,Sincronização de Stock em Segundo Plano
+Background Workers,Trabalhadores em Segundo Plano
+BALANCE DUE:,SALDO EM DÍVIDA:
+Balance will be updated when connection is restored,O saldo será atualizado quando a conexão for restaurada
+Bank Transfer,Transferência Bancária
+Banner,Faixa
+Banner HTML,Faixa HTML
+Barcode,Código de Barras
+Barcode Scanner: OFF (Click to enable),Leitor Código Barras: DESLIGADO (Clique p/ ligar)
+Barcode Scanner: ON (Click to disable),Leitor Código Barras: LIGADO (Clique p/ desligar)
+Base & Variable,Base e Variável
+Base Distinguished Name (DN),Base de dados de nome distinto (DN)
+Base URL,URL Base
+Based On,Baseado Em
+Based on Field,Com base no campo
+Based on Permissions For User,Com base em permissões para o usuário
+Basic,Básico
+Basic Information,Informação Básica
+Batch,Lote
+Batch Information,Informações do Lote
+BCC,CCO
+Before Cancel,Antes de Cancelar
+Before Delete,Antes de excluir
+Before Insert,Antes da inserção
+Before Save,Antes de salvar
+Before Save (Submitted Document),Antes de salvar (documento enviado)
+Before Submit,Antes de enviar
+Before tax,Antes de imposto
+Benefits,Benefícios
+Billing,Faturamento
+Birth Date,Data de nascimento
+Block Modules,Bloquear Módulos
+Blocked,Bloqueado
+blue,azul
+Blue,Azul
+Bold,Negrito
+Both login and password required,É obrigatório indicar o utilizador e a palavra-passe
+Bottom,Inferior
+Brake Oil,Óleo de Travões
+Brake Pad,Pastilha de Travão
+Brand,Marca
+Brand HTML,Marca HTML
+Brand Image,Imagem da Marca
+Brands,Marcas
+Breakdown,Detalhamento
+Browser Version,Versão do navegador
+Brute Force Security,Segurança da força bruta
+Build Time:,Tempo de Compilação:
+Built with Frappe,Desenvolvido com Frappe
+Bulk Salary Structure Assignment,Atribuição em Massa de Estruturas Salariais
+Bundle,Pacote
+Bundle Items,Itens do Pacote
+Business Analyst,Analista de Negócios
+Button,Botão
+Button Gradients,Gradientes de botão
+Button Rounded Corners,Botão Cantos Arredondados
+Button Shadows,Sombras de botão
+Bypass restricted IP Address check If Two Factor Auth Enabled,Ignorar verificação de endereço IP restrito se dois fatores de autenticação habilitados
+Bypass Restricted IP Address Check If Two Factor Auth Enabled,"Ignorar endereço IP restrito, verificar se a autenticação de dois fatores estiver habilitada"
+Cache,Cache
+Cache cleared successfully,Cache limpo com sucesso
+Cache empty,Cache vazia
+Cache ready,Cache pronta
+Cache syncing,Cache a sincronizar
+Cache Usage,Uso de Cache
+cache used,cache utilizado
+Calculating totals and reconciliation...,A calcular totais e reconciliação...
+Calculating...,Calculando...
+Calendar Name,Nome do calendário
+Call To Action,Apelo à ação
+Call To Action URL,URL de apelo à ação
+Callback Message,Mensagem de retorno
+Callback Title,Título de retorno
+Calls,Chamadas
+Camera Access Required,Acesso à Câmara Necessário
+Camera access was aborted. Please try again.,O acesso à câmara foi abortado. Por favor tente novamente.
+Campaign,Campanha
+Campaign,Campanha
+Campaign Efficiency,Eficiência da Campanha
+Cancel,Cancelar
+Cancel Payment,Cancelar Pagamento
+Cancel Sale,Cancelar Venda
+Cancel Sale ?,Cancelar Venda?
+Cancelled,Cancelado
+Cannot change language - same language selected,Não é possível alterar o idioma - mesmo idioma selecionado
+Cannot clear cache while offline,Não é possível limpar cache offline
+Cannot create return against a return invoice,Não pode criar devolução de uma devolução
+Cannot delete coupon as it has been used {0} times,Não pode apagar cupão já usado {0} vezes
+Cannot remove last serial,Não pode remover último serial
+Cannot save an empty cart as draft,Não é possível guardar carrinho vazio como rascunho
+Cannot sync while offline,Não é possível sincronizar enquanto offline
+Card,Cartão
+Card Sales,Vendas Cartão
+Cards,Postais
+Cart,Carrinho
+Cart does not contain eligible items for this offer,Carrinho não contém itens elegíveis para esta oferta
+Cart does not contain items from eligible groups,Carrinho não contém itens de grupos elegíveis
+Cart Items,Itens do Carrinho
+Cart subtotal BEFORE tax - used for discount calculations,Subtotal ANTES de imposto - usado para descontos
+Cash,Numerário
+Cash in Hand,Dinheiro em Caixa
+Cash Over,Excesso de Caixa
+Cash Sales,Vendas a Dinheiro
+Cash Short,Falta de Caixa
+Cashier,Caixa
+Casual Leave,Licença Ocasional
+Category,Categoria
+Category Description,Descrição da Categoria
+Category Name,Nome da Categoria
+CC,Cc
+Center,Centro
+Change,Troco
+Change interface language,Alterar idioma da interface
+Change Label (via Custom Translation),Alterar etiqueta (via tradução personalizada)
+Change Language,Alterar Idioma
+Change language: {0},Alterar idioma: {0}
+Change Password,Alterar Palavra-passe
+Change Price,Alterar Preço
+Change Profile,Alterar Perfil
+Change:,Troco:
+Channel,Canal
+Chart,Gráfico
+Chart Configuration,Configuração de Gráfico
+Chart Name,Nome do gráfico
+Chart Options,Opções de gráfico
+Chart Source,Fonte do gráfico
+Charts,Gráficos
+Check,Verifica
+Check availability in other warehouses,Verificar disponibilidade noutros armazéns
+Check cache and performance,Verificar cache e desempenho
+Check Other Warehouses,Ver Outros Armazéns
+Check this if you want to force the user to select a series before saving. There will be no default if you check this.,Marque esta opção se você deseja forçar o usuário a selecionar uma série antes de salvar. Não haverá nenhum padrão se você marcar isso.
+Check warehouse availability,Verificar disponibilidade de armazém
+Check-out,Finalizar Venda
+Checking Stock...,A Verificar Stock...
+Checking warehouse availability...,A verificar disponibilidade...
+Checkout,Finalizar Compra
+Chief Executive Officer,Director Executivo
+Chief Financial Officer,Director Financeiro
+Chief Operating Officer,Director de Operações
+Chief Technology Officer,Director de Tecnologia
+"Choose a coupon from the list to view and edit, or create a new one to get started",Escolha um cupão ou crie um novo
+"Choose a promotion from the list to view and edit, or create a new one to get started","Escolha uma promoção para ver e editar, ou crie uma nova"
+Choose authentication method to be used by all users,Escolha o método de autenticação a ser usado por todos os usuários
+Choose your preferred language for the POS interface,Escolha seu idioma preferido para a interface POS
+City,Cidade
+City/Town,Cidade/Município
+Clear,Limpar
+Clear All,Limpar Tudo
+Clear all,Limpar tudo
+Clear All Data,Limpar Tudo
+Clear all items,Limpar todos os itens
+Clear Cache,Limpar Cache
+Clear Cache?,Limpar Cache?
+Clear Cart,Limpar Carrinho
+Clear Cart?,Limpar Carrinho?
+Clear search,Limpar pesquisa
+Clear selection,Limpar seleção
+Cleared,Validado
+Clearing Cache...,A Limpar Cache...
+Clearing local cache...,Limpando cache local...
+Clearing...,A limpar...
+Click on the button to log in to {0},Clique no botão para iniciar sessão no {0}
+Click to add email / phone,Clique para adicionar email / telefone
+Click to change unit,Clique para mudar unidade
+Click to edit serials,Clique para editar séries
+Click to refresh,Clique para atualizar
+Click to view availability in other warehouses,Clique para ver noutros armazéns
+Clicked,Clicado
+Client,Cliente
+Client Code,Código do cliente
+Client CPU Lag:,Atraso do CPU do Cliente:
+Client Credentials,Credenciais no cliente
+Client ID,ID do Cliente
+Client Information,Informação ao cliente
+Client Memory Usage:,Uso de Memória do Cliente:
+Client Metrics,Métricas do Cliente
+Client Secret,Segredo do cliente
+Close,Fechar
+Close & Open New,Fechar e Abrir Novo
+Close (shows again next session),Fechar (mostra na próxima sessão)
+Close Condition,Fechar Condição
+Close current shift,Fechar turno actual
+Close Dialog,Fechar Diálogo
+Close dialog,Fechar diálogo
+Close POS Shift,Fechar Turno POS
+Close Shift,Fechar Turno
+Close Shift & Sign Out,Fechar Turno e Sair
+Close your shift first to save all transactions properly,Feche o seu turno primeiro para guardar todas as transacções
+Closed,Fechado
+Closes On,Fecha Em
+Closing Amount,Valor de Fecho
+Closing POS Shift,Fechamento do Turno POS
+Closing Shift...,A Fechar Turno...
+Clutch Plate,Disco de Embraiagem
+Code,Código
+Code is case-insensitive,O código não distingue maiúsculas
+Code scanned successfully,Código escaneado com sucesso
+Collapse,Recolher
+Collapse All,Recolher Todos
+Collapse Bundle,Recolher Pacote
+Collapsible,Desmontável
+Collapsible Depends On,Depende dobrável
+Column Break,Quebra de coluna
+Column Width,Largura da Coluna
+Columns,Colunas
+Columns / Fields,Colunas / Campos
+Comment By,Comentário por
+Comments,Comentários
+Comments and Communications will be associated with this linked document,Comentários e comunicações serão associados com este documento relacionado
+Commission: {0}%,Comissão: {0}%
+Commit,Comprometer
+Communication,Comunicação
+Compact Mode,Modo Compacto
+Company,Empresa
+Company Introduction,Introdução da Empresa
+Company Name,Nome da Empresa
+Company Tax ID,NUIT da Empresa
+Compensatory Leave Request,Pedido de Licença Compensatória
+Compensatory Off,Folga Compensatória
+Complete,Concluído
+Complete Order,Concluir Venda
+Complete Payment,Concluir Pagamento
+Complete Sale,Concluir Venda
+Completed,Concluído
+"Configure pricing, discounts, and sales operations","Configurar preços, descontos e operações"
+Configure warehouse and inventory settings,Configurar armazém e inventário
+Confirm,Confirmar
+Confirm Action,Confirmar Acção
+Confirm Clear Cache,Confirmar Limpeza de Cache
+Confirm Close,Confirmar Fecho
+Confirm Delete,Confirmar Eliminação
+Confirm Mobile Number,Confirmar Número de Telemóvel
+Confirm Password,Confirmar Palavra-passe
+Confirm Sign Out,Confirmar Saída
+Connected,Ligado
+Connection Error,Erro de Ligação
+Connections:,Conexões:
+Contact,Contacto
+Contact Details,Detalhes do Contato
+Contact Numbers,Números de contato
+Contact Us,Contacte-nos
+Contacts,Contatos
+Context,Contexto
+Continue,Continuar
+Continue Anyway,Continuar Mesmo Assim
+Continue Editing,Continuar Editando
+Continue Shopping,Continuar a Comprar
+Contract,Contrato
+Contributed,Contribuído
+Contribution Document Name,Nome do documento de contribuição
+Copy,Copiar
+Copy Link,Copiar Link
+Copyright,Direitos autorais
+Could not fetch latest balance from server,Não foi possível obter o saldo mais recente do servidor
+Count & enter,Contar e inserir
+Counter,Contador
+Country,País
+Country Name,Nome do País
+County,Distrito
+Coupon,Cupão
+Coupon Applied,Cupão Aplicado
+Coupon Applied Successfully!,Cupão Aplicado com Sucesso!
+Coupon Code,Código do Cupão
+Coupon created successfully,Cupão criado com sucesso
+Coupon deleted successfully,Cupão eliminado com sucesso
+Coupon Details,Detalhes do Cupão
+Coupon Name,Nome do Cupão
+Coupon Status & Info,Estado e Info do Cupão
+Coupon status updated successfully,Estado do cupão actualizado com sucesso
+Coupon Type,Tipo de Cupão
+Coupon updated successfully,Cupão actualizado com sucesso
+Coupons,Cupões
+CPU Cores:,Núcleos do CPU:
+CPU Load,Carga do CPU
+Create,Criar
+Create Customer,Criar Cliente
+Create Entry,Criar entrada
+Create New Coupon,Criar Novo Cupão
+Create New Customer,Criar Novo Cliente
+Create new customer,Criar novo cliente
+Create new customer: {0},Criar novo cliente: {0}
+Create New Promotion,Criar Nova Promoção
+Create permission required,Permissão de criação necessária
+Create POS Opening Shift,Criar Abertura de Turno POS
+Create Return,Criar Devolução
+Create Return Invoice,Criar Factura de Devolução
+Create your first customer to get started,Crie o seu primeiro cliente para começar
+Created On,Criado Em
+Creating return for invoice {0},A criar devolução para factura {0}
+Credit can be applied to invoice,Crédito pode ser aplicado à factura
+Credit Exceeded,Crédito Excedido
+Credit Limit,Limite de Crédito
+Credit Note,Nota de Crédito
+Credit Note Issued,Nota de Crédito Emitida
+Credit Sale,Venda a Crédito
+Credit Used,Crédito Usado
+CRM Settings,Configurações de CRM
+Cron Format,Formato Cron
+CSS Class,Classe CSS
+Currency,Moeda
+Currency Name,Nome da Moeda
+Currency Precision,Precisão de moeda
+Current Discount:,Desconto Actual:
+Current Employer,Empregador Actual
+Current Event Loop Lag:,Atraso Atual do Event Loop:
+Current Job Title,Cargo Actual
+Current Status,Estado Actual
+Current Time,Hora Actual
+Current User,Utilizador Atual
+Custom amount,Valor personalizado
+Custom Configuration,Configuração Personalizada
+Custom CSS,CSS Personalizado
+Custom Due Days,Dias de Vencimento Personalizados
+Custom Format,Formato Personalizado
+Custom HTML Help,Ajuda HTML Personalizado
+Custom Options,Opções Personalizadas
+Custom Overrides,Substituições personalizadas
+Custom Price,Preço Personalizado
+Custom Range,Intervalo Personalizado
+Custom Report,Relatório Personalizado
+Custom SCSS,SCSS personalizado
+Customer,Cliente
+Customer Account,Conta de Cliente
+Customer already selected,Cliente já selecionado
+Customer Balance,Saldo do Cliente
+Customer balance unavailable offline,Saldo do cliente indisponível offline
+Customer created successfully.,Cliente criado com sucesso.
+Customer creation failed.,Falha ao criar cliente.
+Customer Credit,Crédito do Cliente
+Customer Credit Available,Crédito Disponível do Cliente
+Customer Error,Erro de Cliente
+Customer Group,Grupo de Clientes
+Customer group is required,Grupo de cliente é obrigatório
+Customer ID or Name,ID ou Nome do Cliente
+Customer Ledger Summary,Resumo do Razão de Clientes
+Customer Name,Nome do Cliente
+Customer Name is required,Nome do Cliente é obrigatório
+Customer Outstanding Balance,Saldo em Dívida do Cliente
+Customer saved offline,Cliente guardado offline
+Customer Service Representative,Representante de Apoio ao Cliente
+Customer territory is required,Território do cliente é obrigatório
+Customer updated successfully.,Cliente atualizado com sucesso.
+Customer {0} created successfully,Cliente {0} criado com sucesso
+Customer:,Cliente:
+Customer: {0},Cliente: {0}
+Daily,Diário
+Daily Long,Diário Longo
+Daily Work Summary,Resumo Diário de Trabalho
+Daily Work Summary Group,Grupo de Resumos Diários de Trabalho
+Daily Work Summary Replies,Respostas de Resumos Diários de Trabalho
+Danger,Perigo
+Dark Color,Cor Escura
+Dark Mode,Modo Escuro
+Dashboard,Painel
+Dashboard View,Vista de Painel
+Data,Dados
+Data is ready for offline use,Dados prontos para uso offline
+Database Health,Saúde da Base de Dados
+Database health affects overall system speed and reliability.,A saúde da base de dados afeta a velocidade e confiabilidade geral do sistema.
+Database Info,Informações da Base de Dados
+Date,Data
+Date & Time,Data e Hora
+Date and Number Format,Data e Formato de número
+Date Format,Formato de Data
+Date:,Data:
+Datetime,Data e Hora
+Day,Dia
+Day of Week,Dia da Semana
+Days,Dias
+Days After,Dias Após
+Days Before,Dias Antes
+Days Before or After,Dias Antes ou Após
+dd/mm/yyyy,dd/mm/aaaa
+Dear,Caro
+"Dear System Manager,","Caro Administrador de Sistema,"
+Debit Note,Nota de Débito
+Decrease quantity,Diminuir quantidade
+Default,Padrão
+Default Letter Head,Papel Timbrado Padrão
+Default Portal Home,Página inicial do portal padrão
+Default Print Format,Formato de impressão padrão
+Default Print Language,Idioma de impressão padrão
+Default Printer,Impressora Padrão
+Default Redirect URI,Padrão de redirecionamento URI
+Default Role at Time of Signup,Função padrão no momento da inscrição
+Default Sort Field,Campo de classificação padrão
+Default Sort Order,Ordem de classificação padrão
+Default Value,Valor padrão
+"Default: ""Contact Us""","Padrão: ""Fale Conosco"""
+Defaults,Padrões
+Delayed Tasks Summary,Resumo de Tarefas Atrasadas
+Delete,Eliminar
+"Delete ""{0}""?","Eliminar ""{0}""?"
+Delete Coupon,Eliminar Cupão
+Delete draft,Eliminar rascunho
+Delete Invoice,Eliminar Factura
+Delete Order,Eliminar Pedido
+Delete Promotion,Eliminar Promoção
+Deleted Name,Nome Excluído
+Delivery Information,Informações de Entrega
+Delivery Manager,Gestor de Entrega
+Delivery Note,Guia de Remessa
+Delivery User,Utilizador de Entrega
+Department,Departamento
+Department,Departamento
+Department Wise Openings,Vagas por Departamento
+Depends On,Depende de
+Descending,Descendente
+Description,Descrição
+Deselect All,Desmarcar Todos
+Designation,Designação
+Desk Access,Acesso ao Ambiente de Trabalho
+Detecting formats:,Detectando formatos:
+Device Memory:,Memória do Dispositivo:
+Difference,Diferença
+Difference:,Diferença:
+Digits,Dígitos
+Disable Auto Refresh,Desativar atualização automática
+Disable auto-add,Desactivar auto-adicionar
+Disable barcode scanner,Desactivar leitor
+Disable Count,Desativar Contagem
+Disable offline mode,Desativar modo offline
+Disable Rounded Total,Desactivar Arredondamento
+Disable Sidebar Stats,Desativar Estatísticas da Barra Lateral
+Disable SMTP server authentication,Desativar autenticação do servidor SMTP
+Disabled,Desactivado
+Disabled Only,Apenas Desactivados
+Disconnected,Desligado
+Discount,Desconto
+Discount %,% Desconto
+Discount (%),Desconto (%)
+discount ({0}),desconto ({0})
+Discount Amount,Valor do Desconto
+Discount Applied,Desconto Aplicado
+Discount Configuration,Configuração de Desconto
+Discount Details,Detalhes do Desconto
+Discount has been removed,O desconto foi removido
+Discount has been removed from cart,Desconto removido do carrinho
+Discount settings changed. Cart recalculated.,Definições de desconto alteradas. Carrinho recalculado.
+Discount Type,Tipo de Desconto
+Discount:,Desconto:
+Dismiss,Dispensar
+Display Depends On,Visualização depende
+Document,Documento
+Document Actions,Ações do Documento
+Document Link,Link do Documento
+Document Links,Links de documentos
+Document Name,Nome do Documento
+Document Share,Partilha de Documentos
+Document States,Documento Unidos
+Document Tag,Etiqueta de Documento
+Document Title,Título do documento
+Documentation,Documentação
+Documentation Link,Link da documentação
+Documentation URL,URL de documentação
+Domains HTML,Domínios HTML
+Don't have an account?,Não tem uma conta?
+Done,Concluído
+Donut,Rosquinha
+Download,Descarregar
+Download PDF,Descarregar PDF
+Download Receipt,Descarregar Recibo
+Download Template,Baixar Modelo
+Draft,Rascunho
+Draft invoice deleted,Factura em rascunho eliminada
+Draft invoice loaded successfully,Factura em rascunho carregada com sucesso
+Draft Invoices,Facturas em Rascunho
+Drafts,Rascunhos
+Due Date,Data de Vencimento
+Due Date Based On,Data de vencimento baseada em
+Dunning,Cobrança de Inadimplentes
+Duplicate,Duplicar
+Duplicate Entry,Entrada Duplicada
+Duration,Duração
+Duties,Direitos
+Duties and Taxes,Direitos e Impostos
+Dynamic Filters,Filtros Dinâmicos
+Dynamic Filters JSON,Filtros dinâmicos JSON
+Dynamic Filters Section,Seção de Filtros Dinâmicos
+Dynamic Report Filters,Filtros dinâmicos de relatórios
+Dynamic Route,Rota Dinâmica
+Dynamic Template,Modelo dinâmico
+e.g. pop.gmail.com / imap.gmail.com,ex: pop.gmail.com / imap.gmail.com
+e.g. smtp.gmail.com,ex: smtp.gmail.com
+"e.g., 20",ex: 20
+"e.g., Summer Sale 2025",ex: Saldos de Verão 2025
+"e.g., Summer Sale Coupon 2025",ex: Cupão de Verão 2025
+Earnings & Deductions,Rendimentos e Deduções
+Edit,Editar
+Edit Cart,Editar Carrinho
+Edit Details,Editar Detalhes
+Edit Full Form,Editar Formulário Completo
+Edit Invoice,Editar Factura
+Edit Item Details,Editar Detalhes do Item
+"Edit item quantity, UOM, warehouse, and discount","Editar qtd, UM, armazém e desconto"
+Edit Order,Editar Pedido
+Edit Promotion,Editar Promoção
+Edit serials,Editar séries
+Edited,Editado
+Email,Email
+Email Address,Endereço de e-mail
+Email Address (Will be your login ID),Endereço de Email (será o seu ID de acesso)
+Email Campaign,Campanha de Email
+Email Group,Grupo de Emails
+Email Inbox,Caixa de Entrada
+Email Invoice,Enviar Factura por Email
+Email Receipt,Enviar Recibo por Email
+Email Sent At,E-mail enviado em
+Employee,Funcionário
+Employee Advance Summary,Resumo de Adiantamentos de Trabalhador
+Employee Attendance Tool,Ferramenta de Assiduidade do Trabalhador
+Employee Benefit Application,Candidatura a Benefício do Trabalhador
+Employee Benefit Claim,Requisição de Benefício do Trabalhador
+Employee Benefits,Benefícios do Funcionário
+Employee Checkin,Registo de Entrada do Trabalhador
+Employee Exit,Saída do Trabalhador
+Employee Exits,Saídas de Trabalhadores
+Employee Grade,Grau do Funcionário
+Employee Grievance,Reclamação de Trabalhador
+Employee Hours Utilization Based On Timesheet,Utilização de Horas do Trabalhador com Base no Timesheet
+Employee Incentive,Incentivo do Trabalhador
+Employee Onboarding,Integração de Trabalhador
+Employee Onboarding Template,Modelo de Integração de Trabalhador
+Employee Referral,Recomendação de Trabalhador
+Employee Referral,Recomendação de Funcionário
+Employee Separation,Desligamento de Trabalhador
+Employee Skill Map,Mapa de Competências do Trabalhador
+Employee Tax Exemption Category,Categoria de Isenção Fiscal do Trabalhador
+Employee Tax Exemption Declaration,Declaração de Isenção Fiscal do Trabalhador
+Employee Tax Exemption Proof Submission,Submissão de Comprovativo de Isenção Fiscal do Trabalhador
+Employee Tax Exemption Sub Category,Subcategoria de Isenção Fiscal do Trabalhador
+Employees working on a holiday,Trabalhadores a Trabalhar em Feriado
+Empty,Vazio
+Enable,Activar
+Enable Auto Reply,Ativar resposta automática
+Enable auto-add,Activar auto-adicionar
+Enable Automatic Linking in Documents,Ativar Vinculação Automática em Documentos
+Enable Automatic Stock Sync,Activar Sincronização Automática
+Enable barcode scanner,Activar leitor
+Enable Comments,Ativação de comentários
+Enable Early Exit Marking,Activar Marcação de Saída Antecipada
+Enable invoice-level discount,Activar desconto na factura
+Enable item-level discount in edit dialog,Activar desconto de item na edição
+Enable Late Entry Marking,Activar Marcação de Entrada Tardia
+Enable partial payment for invoices,Activar pagamento parcial
+Enable Password Policy,Ativar política de senha
+Enable Print Server,Ativar servidor de impressão
+Enable product returns,Activar devoluções de produtos
+Enable Raw Printing,Ativar impressão bruta
+Enable sales on credit,Activar vendas a crédito
+Enable Scheduled Jobs,Ativar Tarefas Agendadas
+Enable Security,Ativar segurança
+Enable selling items even when stock reaches zero or below. Integrates with ERPNext stock settings.,Permite venda mesmo com stock zero ou abaixo. Integra com ERPNext.
+Enable Social Login,Ativar Login Social
+Enabled,Activado
+End current session,Finalizar sessão atual
+End Date,Data de Fim
+End Date Field,Campo de data final
+Ends on,Termina em
+Energy Point,Ponto de energia
+Engine Oil,Óleo do Motor
+Enter,Entrar
+Enter actual amount for {0},Insira o valor real para {0}
+Enter Code displayed in OTP App.,Introduza o código mostrado na App OTP.
+Enter customer name,Insira o nome do cliente
+Enter email address,Insira o endereço de email
+Enter phone number,Insira o número de telefone
+Enter Quantity,Inserir Quantidade
+"Enter reason for return (e.g., defective product, wrong item, customer request)...","Insira o motivo (ex: defeito, engano)..."
+Enter serial numbers...,Insira números de série...
+Enter Value,Digite o Valor
+Enter your password,Insira a sua palavra-passe
+Enter your promotional or gift card code below,Insira o seu código promocional ou cartão presente
+Enter your username or email,Insira utilizador ou email
+ENTER-CODE-HERE,INSIRA-CODIGO-AQUI
+Entire Transaction,Transacção Inteira
+Error,Erro
+Error accessing camera:,Erro ao aceder à câmara:
+Error adding offer to items,Erro ao adicionar oferta aos artigos
+Error Closing Shift,Erro ao Fechar Turno
+Error deleting offer from items,Erro ao eliminar oferta dos artigos
+Error fetching customer balance,Erro ao obter saldo do cliente
+Error loading currencies,Erro ao carregar moedas
+Error Loading Data,Erro ao Carregar Dados
+Error processing payment,Erro ao processar pagamento
+Error removing price offer,Erro ao remover oferta de preço
+Error Report - POS MZ,Relatório de Erro - POS MZ
+Error Report - POS Next,Relatório de Erro - POS Next
+Error searching invoices,Erro ao procurar faturas
+Error submitting invoice:,Erro ao submeter fatura:
+Error submitting invoice: No response from server,Erro ao submeter fatura: Sem resposta do servidor
+Error toggling item details,Erro ao alternar detalhes do artigo
+Error updating item details,Erro ao atualizar detalhes do artigo
+Esc,Esc
+Event Category,Categoria do Evento
+Event-loop lag measures how busy your browser is. Lower is better.,O atraso do event-loop mede o quão ocupado está o seu navegador. Menor é melhor.
+Example,Exemplo
+Example: #Tree/Account,Exemplo: # árvore / conta
+Example: 00001,Exemplo: 00001
+Exception,Exceção
+Exception: {0},Excepção: {0}
+Exchange,Troca
+Exchanges,Trocas
+Executive Assistant,Assistente Executivo
+Exemption,Isenção
+Exhausted,Esgotado
+Existing Shift Found,Turno Existente Encontrado
+Exit Full Screen,Sair do Ecrã Inteiro
+Exits (This Month),Desligamentos (Este Mês)
+Exp: {0},Val: {0}
+Expand,Expandir
+Expand All,Expandir Todos
+Expand Bundle,Expandir Pacote
+Expected,Esperado
+Expected Amount,Valor Esperado
+Expected Average Rating,Classificação Média Esperada
+Expected By,Esperado Por
+Expected Compensation,Remuneração Esperada
+Expected Skillset,Conjunto de Competências Esperado
+"Expected: <span class=""font-medium"">{0}</span>","Esperado: <span class=""font-medium"">{0}</span>"
+Expense Claim Type,Tipo de Reembolso de Despesa
+Expert,Especialista
+Expiration time,Data de validade
+Expired,Expirado
+Expired Only,Apenas Expirados
+Expires In,Expira em
+Expires On,Expira Em
+Expiry time of QR Code Image Page,Tempo de expiração da página de imagem de código QR
+Export,Exportar
+Export Data,Exportar Dados
+Export From,Exportar de
+Expose Recipients,Mostrar Destinatários
+"Expression, Optional","Expressão, Opcional"
+Extend Reservation,Estender Reserva
+Failed,Falhou
+Failed to add payment,Falha ao adicionar pagamento
+Failed to apply coupon. Please try again.,Falha ao aplicar cupão. Tente novamente.
+Failed to apply offer. Please try again.,Falha ao aplicar oferta. Tente novamente.
+Failed to apply offers,Falha ao aplicar ofertas
+Failed to change language,Falha ao alterar o idioma
+Failed to clear cache,Falha ao limpar cache
+Failed to clear cache. Please try again.,Falha ao limpar cache. Tente novamente.
+Failed to create coupon,Falha ao criar cupão
+Failed to create customer,Falha ao criar cliente
+Failed to create promotion,Falha ao criar promoção
+Failed to create return invoice,Falha ao criar factura de devolução
+Failed to delete coupon,Falha ao eliminar cupão
+Failed to delete draft invoice,Falha ao eliminar rascunho
+Failed to delete offline invoice,Falha ao eliminar factura offline
+Failed to delete promotion,Falha ao eliminar promoção
+Failed to load brands,Falha ao carregar marcas
+Failed to load coupon details,Falha ao carregar detalhes do cupão
+Failed to load coupons,Falha ao carregar cupões
+Failed to load draft,Falha ao carregar rascunho
+Failed to load invoice details,Falha ao carregar detalhes da factura
+Failed to load invoices,Falha ao carregar facturas
+Failed to load item groups,Falha ao carregar grupos de itens
+Failed to load items. Please try again.,Falha ao carregar artigos. Por favor tente novamente.
+Failed to load partial payments,Falha ao carregar pagamentos parciais
+Failed to load promotion details,Falha ao carregar detalhes da promoção
+Failed to load recent invoices,Falha ao carregar facturas recentes
+Failed to load settings,Falha ao carregar definições
+Failed to Load Shift Data,Falha ao Carregar Dados do Turno
+Failed to load unpaid invoices,Falha ao carregar facturas por pagar
+Failed to load warehouse availability,Falha ao carregar disponibilidade
+Failed to process selection. Please try again.,Falha ao processar seleção. Tente novamente.
+Failed to reload invoice from server,Falha ao recarregar fatura do servidor
+Failed to save draft,Falha ao guardar rascunho
+Failed to save settings,Falha ao guardar definições
+Failed to Send,Falha ao Enviar
+Failed to toggle coupon status,Falha ao alternar estado do cupão
+Failed to update cart after removing offer.,Falha ao actualizar carrinho após remover oferta.
+Failed to update coupon,Falha ao actualizar cupão
+Failed to update item. Please try again.,Falha ao actualizar item. Tente novamente.
+Failed to update promotion,Falha ao actualizar promoção
+Failed to update promotion status,Falha ao actualizar estado da promoção
+Failed to update UOM. Please try again.,Falha ao actualizar UM. Tente novamente.
+Faster access and offline support,Acesso mais rápido e suporte offline
+Feedback,Feedback
+Female,Feminino
+Fetch From,Buscar de
+Fetch Items Directly from Server,Buscar Artigos Diretamente do Servidor
+Field Description,Descrição do Campo
+Field to Track,Campo para rastrear
+File Information,Informações do arquivo
+File Name,Nome do arquivo
+File Size,Tamanho do arquivo
+File URL,URL do arquivo
+Fill in the details to create a new coupon,Preencha os detalhes para criar um cupão
+Fill in the details to create a new promotional scheme,Preencha os detalhes para criar um novo esquema
+Filter,Filtrar
+Filter by Date,Filtrar por Data
+Filter by Status,Filtrar por Estado
+Filter Data,Filtrar dados
+Filter Meta,Filtrar Meta
+Filter Values,Valores de filtro
+Filters,Filtros
+Filters Configuration,Configuração de Filtros
+Filters Display,Exibição dos Filtros
+Filters JSON,Filtros JSON
+Filters Section,Seção de Filtros
+Final Amount,Valor Final
+Finance Manager,Gestor Financeiro
+Financial Reports,Relatórios Financeiros
+Financial Year Begins On,Início do Ano Fiscal
+Finish,Terminar
+Finished,Acabado
+First,Primeira
+First Response Time for Opportunity,Tempo da Primeira Resposta para Oportunidade
+First Success Message,Primeira mensagem de sucesso
+Fixed Amount,Valor Fixo
+Fixing payment amounts for return invoice...,Corrigindo valores de pagamento para fatura de devolução...
+Flag,Bandeira
+Flash Off,Flash Desligado
+Float Precision,Precisão de Casas Decimais
+Fold,Dobrar
+Folder,Pasta
+Font Properties,Propriedades da fonte
+Font Size,Tamanho da Fonte
+Fonts,Fontes
+Food,Alimentação
+Footer,Rodapé
+Footer HTML,HTML de rodapé
+Footer Items,Itens do Rodapé
+Footer Logo,Logotipo do rodapé
+Footer Template,Modelo de rodapé
+Footer Template Values,Valores de modelo de rodapé
+Footer will display correctly only in PDF,Rodapé será exibido corretamente somente em PDF
+For example: {} Open,Por exemplo: {} Abra
+For Value,Por valor
+Force,Força
+Force Show,Forçar Exibição
+Force User to Reset Password,Forçar usuário a redefinir a senha
+Forgot Password,Esqueceu a palavra-passe
+Forgot Password?,Esqueceu a Palavra-passe?
+Form Settings,Configurações de formulário
+Form URL-Encoded,Codificado em URL do formulário
+Format Data,Formato de dados
+Fraction,Fração
+Fraction Units,Unidades Fracionadas
+Free Item,Item Grátis
+Free Items Added,Itens Grátis Adicionados
+Free Quantity,Quantidade Grátis
+From,De
+From Date,Data de Início
+From Date Field,Do campo de data
+From Full Name,De nome completo
+From {0},De {0}
+Full,Cheio
+Full Mode,Modo Completo
+Full Name,Nome Completo
+Full Screen,Ecrã Inteiro
+Full Width,Largura completa
+Gallery,Galeria
+General,Geral
+General Ledger,Razão Geral
+Generate,Gerar
+Generate Keys,Gerar Chaves
+Geolocation,Geolocalização
+Get Contacts,Obter contatos
+Get Items,Obter Itens
+Get Job Requisitions,Obter Requisições de Emprego
+Get Payments,Obter Pagamentos
+Get your globally recognized avatar from Gravatar.com,Obtenha seu avatar globalmente reconhecido de Gravatar.com
+Gift,Presente
+Gift Card,Cartão Presente
+Global Unsubscribe,Cancelar Inscrição Global
+GMail,Gmail
+Go Offline,Desconectar
+Go Online,Conectar
+Go to first page,Ir para a primeira página
+Go to last page,Ir para a última página
+Go to next page,Ir para a próxima página
+Go to Page,Vá para página
+Go to page {0},Ir para a página {0}
+Go to previous page,Ir para a página anterior
+Google Analytics ID,ID do Google Analytics
+Google Calendar Event ID,ID do evento do Google Agenda
+Google Calendar ID,ID da Agenda do Google
+Grand Total,Total Geral
+Grand Total:,Total Geral:
+green,verde
+Green,Verde
+Grid View,Vista de Grelha
+Grievance,Reclamação
+Grievance Type,Tipo de Reclamação
+Gross Pay (Company Currency),Salário Bruto (Moeda da Empresa)
+Gross Year To Date,Bruto Anual Acumulado
+Gross Year To Date(Company Currency),Bruto Anual Acumulado (Moeda da Empresa)
+Group,Grupo
+Group By,Agrupar Por
+Group By Based On,Agrupar por Com base em
+Group By Type,Agrupar por tipo
+Group Node,Grupo de Nós
+Half,Metade
+Hardware,Hardware
+Have a coupon code?,Tem um código de cupão?
+Header,Cabeçalho
+Header HTML,HTML de cabeçalho
+Headers,Cabeçalhos
+Heatmap,Mapa de calor
+"Hello,","Olá,"
+Help,Ajuda
+Help Articles,Artigos de Ajuda
+Help HTML,Ajuda HTML
+HH:mm,HH: mm
+Hide,Ocultar
+Hide Block,Esconder o Bloco
+Hide Border,Ocultar borda
+Hide Copy,Ocultar Cópia
+Hide Days,Ocultar dias
+Hide password,Ocultar palavra-passe
+Hide Seconds,Ocultar segundos
+High,Alto
+Higher priority rule will be applied first,Regra de prioridade mais alta será aplicada primeiro
+Highlight,Realçar
+Hold,Suspender
+Hold Invoice,Suspender Factura
+Hold order as draft,Suspender como rascunho
+Home,Início
+Home Page,Pagina inicial
+Home Settings,Configurações iniciais
+Hour,Hora
+Hourly,De hora em hora
+Hourly Long,Por hora
+Hourly rate limit for generating password reset links,Limite de taxa por hora para gerar links de redefinição de senha
+Hours,Horas
+How often to check server for stock updates (minimum 10 seconds),Frequência de verificação (mínimo 10 segundos)
+"How should this currency be formatted? If not set, will use system defaults","Como essa moeda deve ser formatada? Se não for definido, serão usados os padrões do sistema"
+Hr,Hr
+HTML Editor,Editor de HTML
+HTML for header section. Optional,HTML para a seção de cabeçalho. opcional
+HTML Page,Página HTML
+icon,ícone
+Icon will appear on the button,O ícone aparecerá no botão
+Identity Details,Detalhes da identidade
+"If checked, all other workflows become inactive.","Se marcada, todos os outros fluxos de trabalho tornam-se inativos."
+"If disabled, this role will be removed from all users.",Se esta função for desativada será removida em todos os usuários.
+"If enabled, auto attendance will be marked on holidays if Employee Checkins exist","Se activado, a assiduidade automática será marcada nos feriados se existirem Registos de Entrada do Funcionário"
+"If enabled, changes to the document are tracked and shown in timeline","Se ativado, as alterações no documento são rastreadas e mostradas na linha do tempo"
+If non standard port (e.g. 587),"Se não for a porta padrão (por exemplo, 587)"
+"If not set, the currency precision will depend on number format","Se não for definido, a precisão da moeda dependerá do formato de número"
+"If set, the job opening will be closed automatically after this date","Se definido, a vaga de emprego será fechada automaticamente após esta data"
+If user is the owner,Se o usuário é o proprietário
+Ignore attachments over this size,Ignorar anexos maiores que este tamanho
+Ignore XSS Filter,Ignorar Filtro XSS
+Ignored Apps,Aplicativos ignorados
+Image,Imagem
+Image Field,Campo de Imagem
+Image Link,Link da Imagem
+Implicit,Implícito
+Import,Importar
+Import File,Importar arquivo
+Import File Errors and Warnings,Erros e avisos de importação de arquivos
+Import from Google Sheets,Importar do Planilhas Google
+Import Log Preview,Visualização do registro de importação
+Import Preview,Visualização de importação
+Import Warnings,Avisos de importação
+in 1 warehouse,em 1 armazém
+In Days,Em dias
+In Filter,No Filtro da Lista
+In Global Search,Na Busca Global
+In points. Default is 9.,Em pontos. O padrão é 9.
+In Preview,Na pré-visualização
+In Progress,Em Progresso
+In Reply To,Em resposta a
+In seconds,Em segundos
+In Standard Filter,Em Filtro Padrão
+In Stock,Em Stock
+in {0} warehouses,em {0} armazéns
+Inactive,Inactivo
+Inactive Customers,Clientes Inativos
+Incentives,Incentivos
+Include Barcode,Incluir Código de Barras
+Include Logo,Incluir Logótipo
+Include QR Code,Incluir Código QR
+Include Search in Top Bar,Incluem a busca no Top Bar
+Income Tax Computation,Cálculo do Imposto sobre o Rendimento (IRPS)
+Income Tax Deductions,Deduções do Imposto sobre o Rendimento (IRPS)
+Income Tax Slab,Tabela de IRPS
+Incoming,Entrada
+Increase quantity,Aumentar quantidade
+IndexedDB,IndexedDB
+Indicator,Indicador
+Individual,Individual
+Info,Informações
+Information,Informação
+Initial Sync Count,Contagem de sincronização inicial
+Initialize your shift with opening balances,Inicialize o seu turno com saldos de abertura
+Insert New Records,Inserir novos registros
+Insert Style,Inserir Estilo
+Install,Instalar
+Install POS MZ,Instalar POS MZ
+Install POSNext,Instalar POSNext
+Installed Applications,Aplicativos Instalados
+Instructions Emailed,Instruções enviadas por e‑mail
+Insufficient Stock,Stock Insuficiente
+Insufficient stock for {0},Stock insuficiente para {0}
+Int,Inteiro
+Interview,Entrevista
+Interview Feedback,Feedback da Entrevista
+Interview Round,Ronda de Entrevista
+Interview Summary,Resumo da Entrevista
+Interview Type,Tipo de Entrevista
+Interviewers,Entrevistadores
+Interviews,Entrevistas
+Interviews (This Week),Entrevistas (Esta Semana)
+Introduce your company to the website visitor.,Apresente sua empresa para o visitante do site.
+Introductory information for the Contact Us Page,Informação introdutória para a página Fale Conosco
+Invalid Barcode,Código de Barras Inválido
+Invalid closing amount,Valor de fecho inválido
+Invalid Credentials,Credenciais Inválidas
+Invalid Login. Try again.,Início de sessão inválido. Tente novamente.
+Invalid quantity,Quantidade inválida
+Invalid URL,URL inválida
+Inverse,Inverso
+Invoice,Fatura
+Invoice #:,Factura #:
+Invoice - {0},Factura - {0}
+Invoice Created Successfully,Factura Criada com Sucesso
+Invoice Details,Detalhes da Factura
+Invoice History,Histórico de Facturas
+Invoice ID: {0},ID Factura: {0}
+Invoice loaded to cart for editing,Factura carregada no carrinho para edição
+Invoice Management,Gestão de Facturas
+Invoice must be submitted to create a return,A factura deve estar submetida para criar devolução
+Invoice Number,Número da Factura
+Invoice saved as draft successfully,Factura guardada como rascunho com sucesso
+Invoice saved offline,Fatura guardada offline
+Invoice saved offline. Will sync when online,Factura guardada offline. Sincronizará quando online
+Invoice {0} created and sent to printer,Factura {0} criada e enviada para a impressora
+Invoice {0} created but print failed,Factura {0} criada mas a impressão falhou
+Invoice {0} created successfully,Factura {0} criada com sucesso
+Invoice {0} created successfully!,Factura {0} criada com sucesso!
+Invoices,Faturas
+Invoices saved as POS Invoices,Faturas guardadas como Faturas POS
+IP Address,Endereço de IP
+Is Active,É Ativo
+Is Applicable for Referral Bonus,É Aplicável para Bónus de Recomendação
+Is Attachments Folder,É Pasta de Anexos
+Is Complete,Está completo
+Is Completed,Está completo
+Is Custom Field,É campo personalizado
+Is Folder,É Pasta
+Is Mandatory Field,É campo obrigatório
+Is Optional State,É estado opcional
+Is Primary,É primário
+Is Primary Contact,É o contato principal
+Is Primary Mobile,É o Telemóvel principal
+Is Primary Phone,É o telefone principal
+Is Private,É privada
+Is Public,É público
+Is Published Field,É Publicado campo
+Is Rejected Warehouse,É Armazém de Rejeitados
+Is Return,É Devolução
+Is Skipped,É pulado
+Is Standard,É Padrão
+Is Table,É Tabela
+Is Tree,É árvore
+Is Unique,É único
+Item,Artigo
+Item added to cart,Item adicionado ao carrinho
+Item Cart,Carrinho de Artigos
+Item Category,Categoria de Artigos
+Item Code,Código do Artigo
+Item Discount,Desconto do Item
+Item Group,Grupo de Artigos
+Item Groups,Grupos de Itens
+Item Name,Nome do Artigo
+Item not found,Artigo não encontrado
+Item Not Found: No item found with barcode: {0},Item Não Encontrado: Nenhum item com código: {0}
+Item order updated,Ordem do artigo atualizada
+Item Price,Preço do Artigo
+Item Price List,Lista de Preços de Artigos
+Item price updated,Preço do artigo atualizado
+Item removed from cart,Item removido do carrinho
+Item Scanned,Item Digitalizado
+Item Selector Settings,Configurações do Seletor de Artigos
+Item Tax Template,Modelo de Imposto do Artigo
+Item: {0},Item: {0}
+Items,Artigos
+Items added to invoice,Artigos adicionados à fatura
+Items Sold,Itens Vendidos
+Items to Return:,Itens a Devolver:
+Items:,Itens:
+Javascript is disabled on your browser,O JavaScript está desativado no seu navegador
+Job Applicant,Candidato a Emprego
+Job Description,Descrição da Função
+Job Offer,Oferta de Emprego
+Job Offer Term Template,Modelo de Termos de Oferta de Emprego
+Job Opening,Vaga de Emprego
+Job Position,Cargo
+Job Requisition,Requisição de Emprego
+Jobs,Empregos
+JSON Request Body,Corpo da solicitação JSON
+Just now,Agora mesmo
+Kanban Board,Painel Kanban
+Kanban View,Vista Kanban
+Key,Chave
+Keyboard Shortcuts,Atalhos de Teclado
+Label and Type,Etiqueta e Tipo
+Label Help,Ajuda sobre Etiquetas
+Landing Page,Página de chegada
+Language,Idioma
+Language changed successfully! Reloading...,Idioma alterado com sucesso! Recarregando...
+Language Code,Código do Idioma
+Language Name,Nome do Idioma
+Language will be changed to,O idioma será alterado para
+Last,Última
+Last 30 Days,Últimos 30 Dias
+Last 7 Days,Últimos 7 Dias
+Last Active,Ativo pela última vez
+Last Execution,Última Execução
+Last IP,Último IP
+Last Known Successful Sync of Employee Checkin. Reset this only if you are sure that all Logs are synced from all the locations. Please don't modify this if you are unsure.,"Última Sincronização Bem-sucedida Conhecida do Registo de Entrada. Redefina isto apenas se tiver a certeza de que todos os Registos estão sincronizados de todos os locais. Por favor, não modifique se não tiver a certeza."
+Last Known Versions,Últimas versões conhecidas
+Last Login,Último Login
+Last Modified,Última Alteração
+Last Month,Mês Passado
+Last Password Reset Date,Data da última redefinição de senha
+Last Quarter,Ultimo quarto
+Last Sync,Última Sincronização
+Last Sync On,Última sincronização em
+Last Sync:,Última Sinc.:
+Last Synced On,Última sincronização em
+Last User,Último usuário
+Last Week,Semana Passada
+Last Year,Ano Passado
+Late Entry & Early Exit Settings for Auto Attendance,Definições de Entrada Tardia e Saída Antecipada para Assiduidade Automática
+Later,Mais Tarde
+LDAP First Name Field,Campo Primeiro Nome do LDAP
+LDAP Group,Grupo LDAP
+LDAP Group Field,Campo do Grupo LDAP
+LDAP Group Mappings,Mapeamentos de grupo LDAP
+LDAP Last Name Field,Campo Sobrenome LDAP
+LDAP Middle Name Field,Campo de nome do meio LDAP
+LDAP Mobile Field,Campo Móvel LDAP
+LDAP Phone Field,Campo de telefone LDAP
+LDAP Search String,Palavra de Busca do LDAP
+LDAP Security,Segurança LDAP
+LDAP User Creation and Mapping,Criação e Mapeamento de Usuários LDAP
+LDAP Username Field,Campo Nome de Usuário do LDAP
+Lead,Lead
+Lead Details,Detalhes da Lead
+Lead Owner Efficiency,Eficiência do Responsável pela Lead
+Lead Source,Origem da Lead
+Leave Allocation,Atribuição de Licença
+Leave Application,Pedido de Licença
+Leave blank to repeat always,Deixe em branco para repetir sempre
+Leave Control Panel,Painel de Controlo de Licenças
+Leave Encashment,Conversão de Licença em Dinheiro
+Leave Period,Período de Licença
+Leave Policy,Política de Licenças
+Leave Policy Assignment,Atribuição de Política de Licenças
+Leave Type,Tipo de Licença
+Leave Without Pay,Licença Sem Vencimento
+Leaves,Licenças / Férias
+Leaves per Year,Licenças por Ano
+Ledger,Livro Razão
+Less,Menos
+Let's set up your account,Vamos preparar a sua conta
+Letter,Carta
+Letter Head,Papel Timbrado
+Letter Head Based On,Papel Timbrado Baseado em
+Letter Head Image,Imagem do Papel Timbrado
+Letter Head in HTML,Papel Timbrado em HTML
+Letter Head Name,Nome do Papel Timbrado
+License,Licença
+Light Color,Cor clara
+Likes,Gostos
+Limit,Limite
+Line,Linha
+Link Cards,Cartões de ligação
+Link Copied,Link Copiado
+Link Fieldname,Nome do campo do link
+Link Name,Nome do Link
+Link Title,Título do Link
+Link To,Link para
+Link to the page you want to open. Leave blank if you want to make it a group parent.,Link para a página que você deseja abrir. Deixe em branco se você quiser torná-lo um pai grupo.
+Linked,Relacionado
+List,Lista
+List View,Vista de Lista
+List View,Vista de Lista
+Load Balancing,Balanceamento de carga
+Load Drafts,Carregar Rascunhos
+Load More,Carregar Mais
+Load more ({0} remaining),Carregar mais ({0} restantes)
+Load More Invoices,Carregar Mais Faturas
+Load previously saved invoices,Carregar faturas previamente guardadas
+Load Sales Invoice,Carregar Fatura de Venda
+Loading cache...,Carregando cache...
+Loading customers for offline use...,A carregar clientes para uso offline...
+Loading customers...,A carregar clientes...
+Loading data...,A carregar dados...
+Loading database stats...,Carregando estatísticas da base de dados...
+Loading details...,Carregando detalhes...
+Loading invoice details...,A carregar detalhes da factura...
+Loading invoices...,A carregar facturas...
+Loading items...,A carregar itens...
+Loading more items...,A carregar mais itens...
+Loading offers...,A carregar ofertas...
+Loading sales persons...,A carregar vendedores...
+Loading serial numbers...,A carregar números de série...
+Loading server CPU/memory usage...,Carregando uso de CPU/memória do servidor...
+Loading settings...,A carregar definições...
+Loading shift data...,A carregar dados do turno...
+Loading warehouses...,A carregar armazéns...
+Loading...,A carregar...
+localStorage,Armazenamento Local
+Location,Localização
+Log,Registo
+Log In To {0},Iniciar sessão no {0}
+Login,Entrar
+Login Failed,Entrada Falhou
+Login link sent to your email,Ligação de acesso enviada para o seu e‑mail
+Login to {0},Iniciar sessão no {0}
+Login To {0},Iniciar sessão no {0}
+Login with Email Link,Iniciar sessão com ligação por e-mail
+Login with Frappe Cloud,Iniciar sessão com Frappe Cloud
+Login with LDAP,Iniciar sessão com LDAP
+Login with {0},Iniciar sessão com {0}
+Logout,Sair
+Logout All Sessions on Password Reset,Sair de todas as sessões ao redefinir a senha
+Logout From All Devices After Changing Password,Saia de todos os dispositivos após alterar a senha
+Long Text,Texto Longo
+Low,Baixo
+Low Stock,Stock Baixo
+Low Stock Warning,Aviso de Stock Baixo
+Lower Range,Limite Inferior
+Loyalty Point Offer Applied,Oferta de Pontos de Lealdade Aplicada
+Loyalty Points,Pontos de Fidelidade
+Madam,Senhora
+Main Section,Seção Principal
+Main Section (HTML),Seção Principal (HTML)
+Main Section (Markdown),Seção Principal (Remarcação)
+Maintenance,Manutenção
+Maintenance Manager,Gerente de Manutenção
+Maintenance Schedule,Plano de Manutenção
+Maintenance User,Usuário da Manutenção
+Maintenance Visit,Visita de Manutenção
+Male,Masculino
+Manage all your invoices in one place,Gerir todas as suas facturas num só lugar
+Manage and synchronize your offline transactions,Gerir e sincronizar as suas transações offline
+Manage Invoices,Gerir Facturas
+Manage invoices with pending payments,Gerir facturas com pagamentos pendentes
+Manage promotional schemes and coupons,Gerir esquemas promocionais e cupões
+Manager,Gestor
+Managing Director,Director Geral
+Mandatory,Obrigatório
+Mandatory Depends On,Obrigatório Depende
+Manual or Hardware Scanner Input,Entrada Manual ou de Scanner de Hardware
+Manual Sync,Sincronização Manual
+Map route parameters into form variables. Example <code>/project/&lt;name&gt;</code>,Mapeie os parâmetros da rota em variáveis de formulário. Exemplo <code>/project/&lt;name&gt;</code>
+Mark as Paid,Marcar como Pago
+Mark as Unpaid,Marcar como Não Pago
+Mark Auto Attendance on Holidays,Marcar Assiduidade Automática em Feriados
+Markdown Editor,Editor de Markdown
+Marketing Manager,Gestor de Marketing
+Marketing Specialist,Especialista de Marketing
+Master,Cadastro
+Masters,Tabelas
+Masters & Reports,Tabelas & Relatórios
+Max Attachments,Máx. de Anexos
+Max Discount (%),Desconto Máx (%)
+Max Length,Comprimento máximo
+Max Value,Max Valor
+Maximum,Máximo
+Maximum allowed discount is {0}%,Desconto máximo permitido é {0}%
+Maximum allowed discount is {0}% ({1} {2}),Desconto máximo permitido é {0}% ({1} {2})
+Maximum Amount ({0}),Valor Máximo ({0})
+Maximum annual taxable income eligible for full tax relief. No tax is applied if income does not exceed this limit,Rendimento tributável anual máximo elegível para isenção total de imposto. Nenhum imposto é aplicado se o rendimento não exceder este limite
+Maximum cart value exceeded ({0}),Valor máximo de carrinho excedido ({0})
+Maximum Consecutive Leaves Allowed,Máximo de Licenças Consecutivas Permitidas
+Maximum Discount Amount,Valor Máximo de Desconto
+Maximum discount per Artigo,Desconto máximo por Artigo
+Maximum discount per item,Desconto máximo por item
+Maximum Leave Allocation Allowed per Leave Period,Alocação Máxima de Licença Permitida por Período
+Maximum length is {0} characters,O comprimento máximo é de {0} caracteres
+Maximum Number of Fields,Número Máximo de Campos
+Maximum Quantity,Quantidade Máxima
+Maximum Use,Uso Máximo
+Maximum {0} items allowed for this offer,Máximo de {0} itens permitidos para esta oferta
+Medical,Médico
+Medium,Médio
+Mention,Menção
+Mentions,Menções
+Menu,Menu
+Merge with existing,Mesclar com existente
+Message Examples,Exemplos de Mensagens
+Message ID,ID da Mensagem
+Message Parameter,Parâmetro da mensagem
+Message Sent,Mensagem Enviada
+Message: {0},Mensagem: {0}
+Method,Método
+Middle Name,Nome do Meio
+Min,Min
+Min Purchase,Compra Mín
+Min Quantity,Qtd Mínima
+Minimum,Mínimo
+Minimum Amount ({0}),Valor Mínimo ({0})
+Minimum Cart Amount,Valor Mínimo do Carrinho
+Minimum cart value of {0} required,Valor mínimo de carrinho de {0} necessário
+Minimum length is {0} characters,O comprimento mínimo é de {0} caracteres
+Minimum Quantity,Quantidade Mínima
+Minimum working days required since Date of Joining to apply for this leave,Dias úteis mínimos necessários desde a Data de Admissão para solicitar esta licença
+Minute,Minuto
+Minutes,Minutos
+Miss,Senhorita
+Missing Values Required,Faltando Valores Obrigatórios
+mm/dd/yyyy,mm/dd/aaaa
+Mobile,Telemóvel
+Mobile No,Telemóvel
+Mobile Number,Número de Telemóvel
+Mode,Modo
+Mode of Payment,Modo de Pagamento
+module,módulo
+Module Name,Nome do Módulo
+Modules HTML,Módulos HTML
+Month,Mês
+Monthly,Mensal
+Monthly Attendance Sheet,Mapa Mensal de Assiduidade
+Monthly Long,Mensalmente Longo
+Months,Meses
+More,Mais
+More content for the bottom of the page.,Mais conteúdo na parte de baixo da página.
+More Information,Mais Informações
+Move,Mover
+Multiple Items Found,Múltiplos Artigos Encontrados
+Multiple Items Found: {0} items match barcode. Please refine search.,Vários Itens: {0} itens correspondem. Refine a pesquisa.
+Multiple Items Found: {0} items match. Please select one.,Vários Itens: {0} itens correspondem. Selecione um.
+Multiple Results,Vários Resultados
+Must be a publicly accessible Google Sheets URL,Deve ser um URL de planilhas do Google acessível publicamente
+Mute Sounds,Desativar Sons
+My Gift Cards ({0}),Meus Cartões Presente ({0})
+My Profile,Meu Perfil
+My Settings,Minhas Configurações
+N/A,N/D
+Name,Nome
+Naming,Nomeação
+Naming Series,Séries de Numeração
+Naming Series Error,Erro de Série de Nomes
+Navigate,Navegar
+Negative Stock,Stock Negativo
+Negative stock sales are now allowed,Vendas com stock negativo agora permitidas
+Negative stock sales are now restricted,Vendas com stock negativo agora restritas
+Net Amount,Valor Líquido
+Net Total,Total Líquido
+Net Total ({0} Items),Total Líquido ({0} Itens)
+Net Total:,Total Líquido:
+Net Variance,Variação Líquida
+Network connection error,Erro de conexão de rede
+Network Usage:,Uso de Rede:
+Never,Nunca
+New,Novo
+New Hires (This Month),Novas Contratações (Este Mês)
+New Offer Available,Nova Oferta Disponível
+New Order,Novo Pedido
+New Password,Nova Palavra-passe
+New Price,Novo Preço
+New Price List Rate,Novo Preço da Lista
+New Sale,Nova Venda
+New Transaction,Nova Transacção
+New value to be set,Novo valor a ser definido
+New version ready,Nova versão pronta
+Newsletter,Boletim Informativo
+Next,Seguinte
+Next Schedule Date,Próxima data programada
+No,Não
+No Active Shift,Sem Turno Activo
+No Copy,Nenhuma Cópia
+No countries found,Nenhum país encontrado
+No coupons found,Sem cupões encontrados
+No customers available,Sem clientes disponíveis
+No Data,Sem Dados
+No data available,Sem dados disponíveis
+No data to export,Nenhum dado para exportar
+No draft invoices,Sem facturas em rascunho
+No expiry,Sem validade
+no failed attempts,tentativas não falharam
+No feedback has been received yet,Nenhum feedback foi recebido ainda
+No Interview has been scheduled.,Nenhuma Entrevista foi agendada.
+No invoices found,Nenhuma factura encontrada
+No invoices found. Try different search criteria.,Nenhuma fatura encontrada. Tente diferentes critérios de pesquisa.
+No invoices were created. Closing amounts should match opening amounts.,Nenhuma factura criada. Fecho deve igualar abertura.
+No items available,Sem itens disponíveis
+No items available for return,Sem itens para devolução
+"No items found for ""{0}""","Nenhum item encontrado para ""{0}"""
+No items in cart,Nenhum artigo no carrinho
+No more invoices,Não há mais facturas
+No of. Positions,Nº de Vagas
+No offers available,Sem ofertas disponíveis
+No offline invoices pending synchronization,Nenhuma fatura offline pendente de sincronização
+No options available,Sem opções disponíveis
+No Outstanding,Nada em Dívida
+No outstanding balance,Sem saldo em dívida
+No Partial Payments,Sem Pagamentos Parciais
+No payment methods configured for this POS Profile,Sem métodos de pagamento configurados para este Perfil
+No pending invoices to sync,Sem facturas pendentes para sincronizar
+No pending offline invoices,Sem facturas offline pendentes
+No POS Profile Selected,Nenhum Perfil POS Selecionado
+No POS Profiles available. Please contact your administrator.,Nenhum Perfil POS disponível. Contacte o administrador.
+No promotions found,Nenhuma promoção encontrada
+No recent activity,Sem actividade recente
+"No results for ""{0}""","Sem resultados para ""{0}"""
+No results for {0},Sem resultados para {0}
+No results for {0} in {1},Sem resultados para {0} em {1}
+No results found,Sem resultados encontrados
+No results in {0},Sem resultados em {0}
+No return invoices,Sem facturas de devolução
+No sales,Sem vendas
+No Sales During This Shift,Sem Vendas Durante Este Turno
+No sales persons found,Nenhum vendedor encontrado
+No serial numbers available,Sem números de série disponíveis
+No serial numbers match your search,Nenhum número de série corresponde
+No Sorting,Sem Ordenação
+No stock available,Sem stock disponível
+No Stock Available,Sem Stock Disponível
+No Unpaid Invoices,Sem Facturas por Pagar
+No.,Nº
+Nobile Number,Número de Telemóvel
+Non Negative,Não Negativo
+Non-Conforming,Não conforme
+None,Nenhum
+Nos,Nos
+Not a valid user,Utilizador inválido
+Not active,Inativo
+Not Allowed,Não Desejados
+Not Allowed: Disabled User,Não permitido: Utilizador desativado
+Not enough stock available in the warehouse.\n\nPlease reduce the quantity or check stock availability.,Stock insuficiente no armazém.\n\nReduza a quantidade ou verifique a disponibilidade.
+Not Found,Não Encontrado
+Not permitted,Não Permitido
+Not Permitted,Não Permitido
+Not Started,Não Iniciado
+Not Synced,Não Sincronizado
+Note,Nota
+"Note: For best results,  images must be of the same size and width must be greater than height.","Nota: Para obter melhores resultados, as imagens devem ter o mesmo tamanho e a largura deve ser maior que a altura."
+Note: Multiple sessions will be allowed in case of mobile device,Observação: Serão permitidas múltiplas sessões no caso de dispositivo móvel
+Notes,Notas
+Notice Period,Aviso Prévio
+Notifications,Notificações
+Notify if unreplied,Informar se não for respondido
+Notify if unreplied for (in mins),Informar se não for respondido em (minutos)
+Number,Número
+Number Format,Formato de número
+Number of Backups,Número de Backups
+Number of Groups,Número de Grupos
+of {0},de {0}
+Off,Desligado
+Offer,Oferta
+Offer Applied,Oferta Aplicada
+Offer has been removed from cart,Oferta removida do carrinho
+Offer?,Oferta?
+Offers,Ofertas
+Offers applied and invoice refreshed,Ofertas aplicadas e fatura atualizada
+Office,Escritório
+Offline,Offline
+Offline ({0} pending),Offline ({0} pendentes)
+Offline invoice deleted successfully,Factura offline eliminada com sucesso
+Offline Invoices,Facturas Offline
+Offline mode active,Modo offline activo
+Oil Change,Mudança de Óleo
+OK,OK
+Old Password,Palavra-passe Antiga
+On Hold,Em Espera
+on_change,em mudança
+Online,Online
+Online - Click to sync,Online - Clique para sincronizar
+Online mode active,Modo online activo
+Only Allow Edit For,Somente permite edição para
+Only one unit available,Apenas uma unidade disponível
+Only One Use Per Customer,Apenas Uma Vez Por Cliente
+Only Send Records Updated in Last X Hours,Somente Enviar Registros Atualizados em Últimas X Horas
+Only {0} left in stock,Apenas {0} em stock
+"Only {0} units of \{1}\"" available in \""{2}\"". Current quantity: {3}""","Apenas {0} unid. de \{1}\"" em \""{2}\"". Qtd actual: {3}"""
+Oops! Something went wrong.,Ups! Algo correu mal.
+Open,Aberto
+Open Documents,Documentos abertos
+Open POS Shift,Abrir Turno POS
+Open Reference Document,Documento de Referência Aberto
+Open Shift,Abrir Turno
+Open URL in a New Tab,Abrir URL em uma nova guia
+OpenCV image processing enabled - Enhanced barcode detection,Processamento de imagem OpenCV ativado - Deteção de código de barras melhorada
+OpenCV Off,OpenCV Desligado
+OpenCV processing disabled,Processamento OpenCV desativado
+Opened,Inaugurado
+Opening,Abertura
+Opening Amount,Valor de Abertura
+Opening Balance (Optional),Saldo de Abertura (Opcional)
+Operation,Operação
+Opportunity,Oportunidade
+Opportunity Summary by Sales Stage,Resumo de Oportunidades por Etapa de Vendas
+Optional cap in {0},Limite opcional em {0}
+Optional minimum in {0},Mínimo opcional em {0}
+Optional: The alert will be sent if this expression is true,Opcional: O alerta será enviado se essa expressão é verdadeira
+Options Help,Ajuda sobre Opções
+or,ou
+Or enter serial numbers manually (one per line),Ou insira manualmente (um por linha)
+orange,laranja
+Order,Encomenda
+Orders,Encomendas
+Org History,História da Organização
+Org History Heading,Cabeçalho da História da Organização
+Original Price,Preço Original
+Other,Outro
+Other Sales,Outras Vendas
+Others,Outros
+OTP App,Aplicação OTP
+OTP Issuer Name,Nome da Emissora OTP
+OTP setup using OTP App was not completed. Please contact Administrator.,A configuração via App OTP não foi concluída. Contacte o Administrador.
+Out of stock,Esgotado
+Out of Stock,Esgotado
+Outgoing,Saída
+Outgoing Salary,Pagamento de Salário
+Output,Saída
+Outstanding,Em Dívida
+Outstanding Payments,Pagamentos em Dívida
+Outstanding:,Em Dívida:
+Over {0},Excesso {0}
+Overdue,Em Atraso
+Overdue ({0}),Em Atraso ({0})
+Overtime,Horas Extra
+Overtime Slip,Ficha de Horas Extra
+Overtime Type,Tipo de Horas Extra
+Overview,Visão Geral
+Owner,Proprietário
+Packing List,Lista de Empacotamento
+page,página
+Page,Página
+Page Building Blocks,Blocos de construção de página
+Page HTML,Página HTML
+Page Name,Nome da Página
+Page Settings,Configurações da página
+Page {0} of {1},Página {0} de {1}
+Paid,Pago
+Paid Amount,Valor Pago
+Paid Amount:,Valor Pago:
+Paid in Full,Pago na Totalidade
+Paper Size,Tamanho do Papel
+Parent Item,Artigo Principal
+Parent Label,Etiqueta Pai
+Partial,Parcial
+Partial Payment,Pagamento Parcial
+PARTIAL PAYMENT,PAGAMENTO PARCIAL
+Partial Payments,Pagamentos Parciais
+Partially Paid,Parcialmente Pago
+Partially Paid ({0}),Parcialmente Pago ({0})
+Partly Paid,Parcialmente Pago
+Passive,Passivo
+Password,Palavra-passe
+Password for Base DN,Senha para DN de base
+Password Reset Link Generation Limit,Limite de geração de link de redefinição de senha
+Past Quotes,Cotações Anteriores
+Patch,Remendo
+Path to private Key File,Caminho para o arquivo de chaves privado
+Path to Server Certificate,Caminho para o certificado do servidor
+PAY,PAGAR
+Pay on Account,Pagar na Conta
+Pay Outstanding,Pagar em Dívida
+Payment,Pagamento
+Payment added successfully,Pagamento adicionado com sucesso
+Payment Breakdown,Detalhe do Pagamento
+Payment Complete,Pagamento Completo
+Payment Entry,Recibo
+Payment Error,Erro de Pagamento
+Payment Failed,Pagamento Falhou
+Payment History,Histórico de Pagamentos
+Payment ID,ID do Pagamento
+Payment Methods,Métodos de Pagamento
+Payment name not found. Cannot open print view.,Nome do pagamento não encontrado. Não é possível abrir visualização de impressão.
+Payment Pending,Pagamento Pendente
+Payment processing failed,Processamento de pagamento falhou
+Payment Received,Pagamento Recebido
+Payment Reconciliation,Reconciliação de Pagamentos
+Payment saved offline,Pagamento guardado offline
+Payment Summary,Resumo do Pagamento
+Payment Total:,Total Pagamento:
+Payments,Pagamentos
+Payments:,Pagamentos:
+Payroll,Folha de Pagamento
+Payroll Entry,Entrada de Folha de Pagamento
+Payroll Payable Account,Conta de Pagamentos a Efectuar
+Payroll Period,Período de Folha de Pagamento
+PDF Page Size,Tamanho da página PDF
+PDF Settings,Configurações do PDF
+Peak Memory:,Memória de Pico:
+Peak Server:,Servidor de Pico:
+Peak:,Pico:
+Pending,Pendente
+Pending,Pendente
+Pending Approval,Aprovação pendente
+Pending Invoices,Faturas Pendentes
+Pending Sync,Sincronização Pendente
+per page,por página
+Percentage,Percentagem
+Percentage (%),Percentagem (%)
+Period,Período
+Periodically sync stock quantities from server in the background (runs in Web Worker),Sincroniza periodicamente quantidades do servidor em segundo plano
+Perm Level,Nível Permanente
+Permanent,Permanente
+Permission Denied,Permissão Negada
+Permission Manager,Gestor de Permissões
+Permission Required,Permissão Necessária
+Permission Rules,Regras de Permissão
+Personal,Pessoal
+Phone,Telefone
+Pie,Torta
+Plant,Fábrica
+Please add items to cart before proceeding to payment,Adicione itens ao carrinho antes de prosseguir para pagamento
+Please allow camera access to scan codes,Por favor permita acesso à câmara para escanear códigos
+Please configure a POS Profile first,Por favor configure primeiro um Perfil POS
+Please enter a coupon code,Insira um código de cupão
+Please enter a coupon name,Insira um nome de cupão
+Please enter a promotion name,Insira um nome para a promoção
+Please enter a valid discount amount,Insira um valor de desconto válido
+Please enter a valid discount percentage (1-100),Insira percentagem válida (1-100)
+Please enter a valid email address,Por favor insira um endereço de email válido
+Please enter a valid number,Por favor insira um número válido
+Please enter a valid phone number,Por favor insira um número de telefone válido
+Please enter all closing amounts,Por favor insira todos os valores de fecho
+Please make a payment or select an payment,Por favor faça um pagamento ou selecione um pagamento
+Please open a shift to start making sales,Por favor abra um turno para iniciar as vendas
+Please request phone payment or use another payment method,Por favor solicite pagamento por telefone ou use outro método de pagamento
+Please select a customer,Por favor selecione um cliente
+Please select a customer before proceeding,Selecione um cliente antes de prosseguir
+Please select a customer first,Por favor selecione primeiro um cliente
+Please select a customer for gift card,Selecione um cliente para cartão presente
+Please select a discount type,Selecione um tipo de desconto
+Please select a POS Profile to configure settings,Selecione um Perfil POS para configurar
+Please select an invoice,Por favor selecione uma fatura
+Please select at least one {0},Selecione pelo menos um {0}
+Please set the customer's mobile number,Por favor defina o número de telemóvel do cliente
+Please try again or enter the item manually.,Por favor tente novamente ou insira o artigo manualmente.
+Please verify the barcode or check the item's availability.,Por favor verifique o código de barras ou verifique a disponibilidade do artigo.
+Please verify the barcode or search manually.,Por favor verifique o código de barras ou procure manualmente.
+Please wait while we clear your cached data,Aguarde enquanto limpamos os dados em cache
+Please wait...,"Aguarde, por favor..."
+Points Balance,Saldo de Pontos
+Points Earned,Pontos Ganhos
+Points Redeemed,Pontos Resgatados
+Points to Redeem,Pontos a Resgatar
+Points Value,Valor dos Pontos
+Port,Porta
+POS,POS
+POS is offline without cached data. Please connect to sync.,POS offline sem dados em cache. Ligue-se para sincronizar.
+POS MZ,POS MZ
+POS Next,POS Next
+POS Profile,Perfil POS
+POS Profile not found,Perfil POS não encontrado
+POS Profile: {0},Perfil POS: {0}
+POS Settings,Definições POS
+Position,Posição
+Position the QR code or barcode within the scanning area,Posicione o código QR ou código de barras dentro da área de escaneamento
+Postal Code,Código Postal
+Posted On,Publicado Em
+Precision,Precisão
+Prefer not to say,Prefiro não dizer
+Preferred Billing Address,Endereço preferido de faturamento
+Preferred Shipping Address,Endereço preferido para entrega
+Prefix,Prefixo
+President,Presidente
+Press Enter to search,Pressione Enter para pesquisar
+Press Esc to close,Pressione Esc para fechar
+Press F1 for help,Pressione F1 para ajuda
+Preview,Pré-visualização
+Preview HTML,Pré-visualização de HTML
+Preview Message,Visualizar mensagem
+Previous,Anterior
+Price,Preço
+Price Changed,Preço Alterado
+Price List,Lista de Preços
+Price List Rate,Preço da Lista
+Prices are now tax-exclusive. This will apply to new items added to cart.,Os preços agora excluem imposto. Aplicar-se-á a novos itens.
+Prices are now tax-inclusive. This will apply to new items added to cart.,Os preços agora incluem imposto. Aplicar-se-á a novos itens.
+Pricing & Discounts,Preços e Descontos
+Pricing Error,Erro de Preços
+Pricing Rule,Regra de Preço
+PRICING RULE,REGRA PREÇO
+Pricing Rules,Regras de Preço
+Primary,Primário
+Primary Color,Cor primária
+print,imprimir
+Print,Imprimir
+Print Copies,Cópias
+Print Draft,Imprimir Rascunho
+Print Format,Formato de Impressão
+Print Format Help,Ajuda sobre Formatos de Impressão
+Print Format Type,Tipo do Formato de Impressão
+Print Heading,Cabeçalho de Documento
+Print Hide,Ocultar Impressão
+Print Hide If No Value,Ocultar Impressão se não Preenchido
+Print Invoice,Imprimir Factura
+Print Last Invoice,Imprimir Última Fatura
+Print Options,Opções de Impressão
+Print Preview,Pré-visualizar Impressão
+Print Receipt,Imprimir Recibo
+Print Report,Imprimir Relatório
+Print Server,Servidor de impressão
+Print Style Name,Nome do estilo de impressão
+Print Style Preview,Estilo de visualização de impressão
+Print Width,Largura de impressão
+"Print Width of the field, if the field is a column in a table","Largura de impressão do campo, se o campo é uma coluna na tabela"
+Print with letterhead,Imprimir com o timbre
+Print without confirmation,Imprimir sem confirmação
+Printer Name,Nome da impressora
+Printer Settings,Definições da Impressora
+Priority,Prioridade
+Privacy Policy,Política de Privacidade
+Privilege Leave,Licença de Privilégio
+Probationary Period,Período Experimental
+Proceed to payment,Prosseguir para pagamento
+Process Return,Processar Devolução
+Process return invoice,Processar devolução
+Processing,A processar
+Processing Payment,Processando Pagamento
+Processing...,A processar...
+Product,Produto
+Product Manager,Gestor de Produto
+Products,Produtos
+Professional Tax Deductions,Deduções de Imposto Profissional
+Profile,Perfil
+Project,Projeto
+Project Profitability,Rentabilidade do Projeto
+PROMO SCHEME,ESQ. PROMO
+Promo Schemes,Esq. Promo
+"Promotion ""{0}"" already exists. Please use a different name.","Promoção ""{0}"" já existe. Use um nome diferente."
+Promotion & Coupon Management,Gestão de Promoções e Cupões
+Promotion created successfully,Promoção criada com sucesso
+Promotion deleted successfully,Promoção eliminada com sucesso
+Promotion Name,Nome da Promoção
+Promotion saved successfully,Promoção guardada com sucesso
+Promotion status updated successfully,Estado da promoção actualizado com sucesso
+Promotion updated successfully,Promoção actualizada com sucesso
+Promotional,Promocional
+Promotional Scheme,Esquema Promocional
+Promotional Schemes,Esquemas Promocionais
+Promotions,Promoções
+Property Depends On,Propriedade depende
+Prospect,Prospecto
+Prospects Engaged But Not Converted,Prospects Contactados mas Não Convertidos
+Provident Fund Deductions,Deduções do INSS
+Provider,Fornecedor
+Provider Name,Nome do provedor
+Publish Salary Range,Publicar Intervalo Salarial
+Pull from Google Calendar,Puxe do Google Agenda
+Pulled from Google Calendar,Extraído do Google Agenda
+Pulled from Google Contacts,Extraído dos Contatos do Google
+Purchase,Compra
+Purchase Invoice,Fatura de Compra
+Purchase Manager,Gerente de Compras
+Purchase Master Manager,Gerente de Cadastros de Compras
+Purchase Taxes and Charges Template,Modelo de Impostos de Compras
+Purchase User,Usuário de Compra
+Purchases,Compras
+purple,roxo
+Purpose & Amount,Propósito e Valor
+Purpose of Travel,Finalidade da Viagem
+Push to Google Calendar,Enviar para o Google Agenda
+Push to Google Contacts,Enviar para os Contatos do Google
+Qty,Qtd
+QTY,QUANT
+Qty: {0},Qtd: {0}
+Quantity,Quantidade
+Quarter,Trimestre
+Quarter {0},Trimestre {0}
+Quarterly,Trimestralmente
+Query,Consulta
+Query Options,Opções de Consulta
+query-report,relatório-de-consulta
+Quick Access,Acesso Rápido
+Quick Actions,Acções Rápidas
+Quick amounts for {0},Valores rápidos para {0}
+Quick Entry,Entrada Rápida
+Quick Filters,Filtros Rápidos
+Quotation,Cotação
+Range,Alcance
+Rate,Preço
+Rate Us,Avalie-nos
+RAW Information Log,Registro de informações RAW
+Read by Recipient,Lido por destinatário
+Read by Recipient On,Lido por destinatário ativado
+Read Only Depends On,Somente leitura depende
+Read-only: Edit in ERPNext,Apenas leitura: Editar no ERPNext
+Ready,Pronto
+Reason,Motivo
+Reason for Requesting,Motivo da Solicitação
+Receipt,Recibo
+Receipt Sent,Recibo Enviado
+Receipt Settings,Definições de Recibo
+Receipts,Recibos
+Received,Recebido
+Receiver By Document Field,Receptor por campo de documento
+Receiver By Role,Receptor por função
+Receiver Parameter,Parâmetro do recebedor
+Recent Activity,Actividade Recente
+Recipient,Destinatário
+Recipient Unsubscribed,Destinatário com inscrição cancelada
+Recipients,Destinatários
+Recommended for a single biometric device / checkins via mobile app,Recomendado para um único dispositivo biométrico / registos via aplicação móvel
+Reconcile payment methods and close shift,Reconcilie os métodos de pagamento e feche o turno
+Recruitment Analytics,Análise de Recrutamento
+red,vermelho
+Red,Vermelho
+Redeem Points,Resgatar Pontos
+Redirect URL,Redirecionar URL
+Reference,Referência
+Reference Date,Data de Referência
+Reference Docname,Nome do Documento de Referência
+Reference DocName,Nome do Documento de Referência
+Reference Invoice,Fatura de Referência
+Reference name,Nome de Referência
+Reference Name,Nome de Referência
+Reference Owner,Proprietário de Referência
+Reference Report,Relatório de referência
+Referral Code,Código de Referência
+Referrer,Referenciador
+Referrer Details,Detalhes do Referenciador
+Refresh,Atualizar
+Refresh Google Sheet,Atualizar planilha do Google
+Refresh Items,Actualizar Itens
+Refresh items list,Actualizar lista de itens
+Refreshing items...,A actualizar itens...
+Refreshing...,A actualizar...
+Refund,Reembolso
+Refund Amount:,Valor do Reembolso:
+Refund Payment Methods,Métodos de Reembolso
+Refunded,Reembolsado
+Refunds,Reembolsos
+Register,Registar
+Rejected,Rejeitado
+Rejected,Rejeitado
+Release Reservation,Libertar Reserva
+Relinked,Religado
+Reload,Recarregar
+Reload Items,Recarregar Artigos
+Reload Now,Recarregar Agora
+Remaining,Restante
+Remaining to Pay,Restante a Pagar
+Remarks,Observações
+Remember Last Selected Value,Lembrar última seleção
+Remember Me,Lembrar-me
+Remove,Remover
+Remove all {0} items from cart?,Remover todos os {0} itens do carrinho?
+Remove customer,Remover cliente
+Remove item,Remover item
+Remove local data and refresh,Remover dados locais e atualizar
+Remove Offer,Remover Oferta
+Remove serial,Remover serial
+Remove Split,Remover Divisão
+Remove {0},Remover {0}
+Rename,Renomear
+Reopen,Reabrir
+Repay Unclaimed Amount from Salary,Reembolsar Valor Não Reclamado do Salário
+Repeat On,Repetir em
+Repeat on Day,Repetir no dia
+Repeat on Last Day of the Month,Repetir no último dia do mês
+Repeat this Event,Repita este evento
+Repeat Till,Repita até que
+Replied,Respondido
+Report,Relatório
+Report Description,Descrição do relatório
+Report Filters,Filtros de relatório
+Report Hide,Ocultar Relatório
+Report Information,Informações do Relatório
+Reports,Relatórios
+Reprint previous transaction,Reimprimir transação anterior
+Request,Pedido
+Request Approval,Pedir Aprovação
+Request Data,Solicitar Dados
+Request for Quote,Pedido de Cotação
+Request Structure,Estrutura da solicitação
+Request URL,URL do pedido
+Requested By,Solicitado Por
+Require Trusted Certificate,Exigir certificado confiável
+Required,Obrigatório
+Required columns cannot be hidden,Colunas obrigatórias não podem ser ocultadas
+Requires Approval,Requer Aprovação
+Reservation Expired,Reserva Expirada
+Reserve Stock,Reservar Stock
+Reset,Redefinir
+Reset Filter,Repor Filtro
+Reset Password,Redefinir Palavra-passe
+Reset Password Key,Redefinição de senha chave
+Reset Settings,Repor Definições
+Reset to default,Repor predefinição
+response,resposta
+Response,Resposta
+Responsibilities,Responsabilidades
+Restore,Restaurar
+Restore Defaults,Restaurar Padrões
+Restored,Restaurado
+Restrict IP,Restringir IP
+Restrict to Domain,Restringir ao domínio
+Restrict To Domain,Restringir ao domínio
+Resume Link,Link do CV
+Resume Shift,Retomar Turno
+Retention Bonus,Bónus de Retenção
+Retry,Tentar Novamente
+Return,Devolução
+Return against {0},Devolução contra {0}
+Return Against:,Devolução Contra:
+Return Invoice,Devolver Factura
+Return invoice {0} created successfully,Factura de devolução {0} criada com sucesso
+Return invoices will appear here,Facturas de devolução aparecerão aqui
+Return Qty:,Qtd Devolução:
+Return Reason,Motivo Devolução
+"Return Reason <span class=""text-gray-400"">(optional)</span>","Motivo <span class=""text-gray-400"">(opcional)</span>"
+Return Summary,Resumo da Devolução
+Return without Invoice,Devolução sem Fatura
+Returns,Devoluções
+Reverse Icon Color,Inverta Ícone Cor
+Revoked,Revogado
+Role and Level,Função e Nível
+Role Name,Nome da Função
+Roles Assigned,Funções Atribuídas
+Roles HTML,Funções HTML
+Roster,Escala de Trabalho
+Round Name,Nome da Ronda
+Round Robin,Robin Redondo
+Route Redirects,Redirecionamentos de rota
+Row Index,Índice de linhas
+Row Name,Nome da Linha
+Rows:,Linhas:
+Rule,Regra
+Rule Conditions,Condições da regra
+Rules with higher priority number will be applied first.,Regras com número de prioridade mais alta serão aplicadas primeiro.
+Run Jobs only Daily if Inactive For (Days),Executar trabalhos apenas diariamente se inativo por (dias)
+Run scheduled jobs only if checked,As tarefas agendadas somente serão executadas se a opção estiver marcada
+Salary Component,Componente Salarial
+Salary Paid Per,Salário Pago Por
+Salary Payments Based On Payment Mode,Pagamentos de Salário por Método de Pagamento
+Salary Payments via ECS,Pagamentos de Salário via Transferência Bancária
+Salary Payout,Pagamento de Salário
+Salary Register,Registo Salarial
+Salary Slip,Recibo de Salário
+Salary Structure,Estrutura Salarial
+Salary Structure Assignment,Atribuição de Estrutura Salarial
+Salary Withholding,Retenção Salarial
+Sale,Venda
+Sales,Vendas
+Sales Controls,Controlos de Vendas
+Sales Funnel,Funil de Vendas
+Sales Invoice,Fatura
+Sales Invoices,Faturas
+Sales Management,Gestão de Vendas
+Sales Manager,Gerente de Vendas
+Sales Master Manager,Gerente de Cadastros de Vendas
+Sales Operations,Operações de Vendas
+Sales Order,Ordem de Venda
+Sales Person,Vendedor
+Sales Persons,Vendedores
+Sales Pipeline,Pipeline de Vendas
+Sales Pipeline Analytics,Análise do Funil de Vendas
+Sales Representative,Representante de Vendas
+Sales Return,Devolução de Venda
+Sales Stage,Etapa de Vendas
+Sales Taxes and Charges Template,Modelo de Impostos de Vendas
+Sales User,Usuário de Vendas
+Sample,Amostra
+Sanctioned Amount,Valor Aprovado
+Save,Guardar
+Save & Clear,Guardar e Limpar
+Save Changes,Guardar Alterações
+Save invoices as drafts to continue later,Guarde facturas como rascunho para continuar depois
+Save these filters as...,Guardar filtros como...
+Saved Filters,Filtros Guardados
+Saving...,A guardar...
+Scan Complete,Digitalização Completa
+Scan Error,Erro de Escaneamento
+Scan Failed,Digitalização Falhou
+Scan QR Code/Barcode,Escanear Código QR/Código de Barras
+Scanned Code:,Código Escaneado:
+Scanner ON - Enable Auto for automatic addition,Scanner LIG - Active Auto para adição automática
+Scanning items,Escaneando artigos
+Scanning...,A digitalizar...
+Scheduled Job,Trabalho agendado
+Scheduled On,Agendado Para
+Scheduler Inactive,Agendador Inativo
+Scheduler is inactive. Cannot import data.,O agendador está inativo. Não é possível importar dados.
+Scheme,Esquema
+Search,Pesquisar
+Search Again,Pesquisar Novamente
+Search and select a customer for the transaction,Pesquise e selecione um cliente para a transacção
+Search by email: {0},Pesquisar por email: {0}
+Search by invoice number or customer name...,Pesquisar por nº factura ou nome...
+Search by invoice number or customer...,Pesquisar por nº factura ou cliente...
+"Search by item code, name or scan barcode","Pesquise por cód., nome ou digitalize"
+"Search by item code, serial number or barcode","Pesquisar por código, número de série ou código de barras"
+"Search by item name, code, or scan barcode","Pesquise por nome, código ou digitalize"
+Search by phone: {0},Pesquisar por telefone: {0}
+Search countries...,Pesquisar países...
+Search country or code...,Pesquisar país ou código...
+Search coupons...,Pesquisar cupões...
+Search customer in cart,Pesquisar cliente no carrinho
+Search customers,Pesquisar clientes
+"Search customers by name, mobile, or email...","Pesquise clientes por nome, telemóvel ou email..."
+Search Fields,Campos de Pesquisa
+Search for an item,Pesquisar item
+Search for Artigo availability across all warehouses,Verifique disponibilidade em todos os armazéns
+Search for Artigos across warehouses,Pesquise Artigos nos armazéns
+Search for item availability across all warehouses,Verifique disponibilidade em todos os armazéns
+Search for items across warehouses,Pesquise itens nos armazéns
+Search invoices...,Pesquisar facturas...
+Search item... (min 2 characters),Pesquisar item... (mín 2 caracteres)
+Search items,Pesquisar itens
+Search items... (min 2 characters),Pesquisar itens... (mín 2 caracteres)
+Search Mpesa Payments,Procurar Pagamentos M-Pesa
+Search or add customer...,Pesquisar ou adicionar cliente...
+Search or type a command ({0}),Pesquisar ou digitar um comando ({0})
+Search Priorities,Prioridades de pesquisa
+Search products...,Pesquisar produtos...
+Search promotions...,Pesquisar promoções...
+Search results,Resultados da pesquisa
+Search sales person...,Pesquisar vendedor...
+Search serial numbers...,Pesquisar números de série...
+Search to add sales persons,Pesquise para adicionar vendedores
+Search...,Pesquisar...
+Searching from {0} cached items,A pesquisar em {0} itens em cache
+Searching...,A pesquisar...
+Sec,Seg
+Second,Segundo
+Seconds,Segundos
+Section,Seção
+Section Break,Quebra de seção
+Security Settings,Configurações de Segurança
+Seen By,Visto por
+Seen By Table,Visto por tabela
+Select,Selecionar
+Select a Coupon,Selecione um Cupão
+Select a customer to use coupon,Selecione um cliente para usar cupão
+Select a Promotion,Selecione uma Promoção
+Select All,Selecionar Todos
+Select Batch Number,Selecionar Número de Lote
+Select Batch Numbers,Selecionar Números de Lote
+Select Columns to Display,Selecionar Colunas para Exibir
+Select Customer,Selecionar Cliente
+Select Customer Group,Selecionar Grupo de Clientes
+Select Date Range,Selecionar período
+Select Invoice to Return,Selecionar Factura para Devolução
+Select Item,Selecionar Item
+Select items to apply offers,Selecione artigos para aplicar ofertas
+Select Items to Return,Selecionar Itens para Devolução
+Select items to start or choose a quick action,Selecione itens ou escolha acção rápida
+Select Language,Selecionar Idioma
+Select method...,Selecionar método...
+Select Payment,Selecionar Pagamento
+Select payment method to add,Selecione método para adicionar
+Select payment method...,Selecionar método de pagam...
+Select POS Profile,Selecionar Perfil POS
+Select Printer,Selecionar Impressora
+Select Return Invoice,Selecionar Fatura de Devolução
+Select S.O,Selecionar P.V
+Select Sales Orders,Selecionar Pedidos de Venda
+Select Serial Numbers,Selecionar Números de Série
+Select Serial Numbers ({0}/{1}),Sel. Números de Série ({0}/{1})
+Select Territory,Selecionar Território
+Select the label after which you want to insert new field.,Selecione a etiqueta após a qual você deseja inserir um novo campo.
+Select Transaction,Selecione a Transação
+Select {0},Selecionar {0}
+Selected:,Selecionado:
+Send,Enviar
+Send After,Envie Depois
+Send alert if date matches this field's value,Enviar alerta se a data corresponde valor deste campo
+Send alert if this field's value changes,Enviar alerta se muda o valor desse campo
+Send Alert On,Enviar Alerta
+Send days before or after the reference date,Enviar dias antes ou depois da data de referência
+Send Email,Enviar Email
+Send login link,Enviar ligação de acesso
+Send Notification to,Enviar Notificação para
+Send Notifications For Documents Followed By Me,Enviar notificações para documentos seguidos por mim
+Send Now,Enviar Agora
+Send only if there is any data,Envie somente se houver quaisquer dados
+Send Print as PDF,Enviar impressão como PDF
+Send System Notification,Enviar Notificação do Sistema
+Send To All Assignees,Enviar para todos os cessionários
+Sending,Enviando
+Sent or Received,Enviados ou recebidos
+Sent Read Receipt-MZ,Enviar Confirmação de Leitura
+Separator,Separador
+Serial,Serial
+Serial No:,Nº Série:
+Serial Numbers,Números de Série
+serials,séries
+Series,Série
+Series List for this Transaction,Lista de séries para esta transação
+Server Action,Ação do Servidor
+Server CPU Usage:,Uso de CPU do Servidor:
+Server Error,Erro de Servidor
+Server Health,Saúde do Servidor
+Server IP,IP do servidor
+Server Memory Usage:,Uso de Memória do Servidor:
+Server Metrics,Métricas do Servidor
+Server Uptime:,Tempo Ativo do Servidor:
+Service,Serviço
+Services,Serviços
+"Session expired, please login again","Sessão expirada, por favor inicie sessão novamente"
+Set New Password,Definir nova senha
+Set Price,Definir Preço
+Set Property After Alert,Definir propriedade após o alerta
+Set Role For,Definir papel para
+Set Value,Definir valor
+Settings,Definições
+Settings Dropdown,Lista suspensa de configurações
+Settings saved and warehouse updated. Reloading stock...,Definições guardadas e armazém actualizado. A recarregar stock...
+Settings saved successfully,Definições guardadas com sucesso
+"Settings saved, warehouse updated, and tax mode changed. Cart will be recalculated.","Definições guardadas, armazém e impostos actualizados. Carrinho será recalculado."
+"Settings saved. Tax mode is now ""exclusive"". Cart will be recalculated.","Definições guardadas. Modo de imposto ""exclusivo"". Carrinho recalculado."
+"Settings saved. Tax mode is now ""inclusive"". Cart will be recalculated.","Definições guardadas. Modo de imposto ""inclusivo"". Carrinho recalculado."
+Setup your organization,Configure a sua organização
+share,ação
+Share,Partilhar
+Share Receipt,Partilhar Recibo
+Shared,Compartilhado
+Shift & Attendance,Turnos & Assiduidade
+Shift Assignment,Atribuição de Turno
+Shift Assignment Tool,Ferramenta de Atribuição de Turnos
+Shift Attendance,Assiduidade por Turno
+Shift closed successfully,Turno fechado com sucesso
+Shift Closing,Fecho de Turno
+Shift Details,Detalhes do Turno
+Shift ID,ID do Turno
+Shift is Open,O Turno está Aberto
+Shift Location,Local de Turno
+Shift Open:,Turno Aberto:
+Shift Opening,Abertura de Turno
+Shift Request,Pedido de Turno
+Shift Schedule,Horário de Turno
+Shift Schedule Assignment,Atribuição de Horário de Turno
+Shift start,Início do turno
+Shift Status,Estado do Turno
+Shift Summary,Resumo do Turno
+Shift Type,Tipo de Turno
+Shifts,Turnos
+Shipping,Expedição
+Shipping Address,Endereço Para Entrega
+Shop,Loja
+Short {0},Falta {0}
+Show,Mostrar
+Show Aggregate Value from Subsidiary Companies,Mostrar Valor Agregado das Empresas Subsidiárias
+Show All,Mostrar Tudo
+Show All Activity,Mostrar Toda Actividade
+Show discounts as percentages,Mostrar descontos como percentagens
+Show exact totals without rounding,Mostrar totais exactos sem arredondamento
+Show Full Error and Allow Reporting of Issues to the Developer,Mostrar erro completo e permitir relatórios de problemas para o desenvolvedor
+Show full form instead of a quick entry modal,Mostrar o formulário completo em vez de um modal de entrada rápida
+Show Full Form?,Mostrar formulário completo?
+Show in filter,Mostrar no filtro
+Show in Module Section,Mostrar na Seção Módulo
+Show Less,Mostrar Menos
+Show Line Breaks after Sections,Mostrar quebras de linha após seções
+Show More,Mostrar Mais
+Show password,Mostrar palavra-passe
+Show percentage difference according to this time interval,Mostra a diferença percentual de acordo com este intervalo de tempo
+Show Percentage Stats,Mostrar estatísticas percentuais
+Show Section Headings,Mostrar Seção Títulos
+Show Title,Mostrar Título
+Showing {0} to {1} of {2} entries,A mostrar {0} a {1} de {2} entradas
+Sick Leave,Baixa Médica
+Sidebar Items,Itens da barra lateral
+Sidebar Settings,Configurações da barra lateral
+Sign In,Entrar
+Sign in,Entrar
+Sign in to POS MZ,Entrar no POS MZ
+Sign in to POS Next,Entrar no POS Next
+Sign Out,Sair
+Sign out,Sair
+Sign Out Confirmation,Confirmação de Saída
+Sign out of session,Sair da sessão
+Sign Out Only,Apenas Sair
+Sign Out?,Sair?
+Sign up,Registar
+Sign Up,Registar
+Signature,Assinatura
+Signing in...,A entrar...
+Signing Out...,A Sair...
+Signing out...,A sair...
+Silent Print,Impressão Silenciosa
+Simultaneous Sessions,Sessões simultâneas
+Size,Tamanho
+Size:,Tamanho:
+Skill Assessment,Avaliação de Competências
+Skip,Ignorar
+Skip & Sign Out,Ignorar e Sair
+Skip Authorization,Ignorar autorização
+SKU,SKU
+Slack,Folga
+Slack Channel,Canal de folga
+Slow Queries:,Consultas Lentas:
+Small Text,Texto Pequeno
+Smallest Currency Fraction Value,Menor valor fracionado de moeda
+SMS Center,Centro de SMS
+SMS Log,Registo de SMS
+SMS Receipt,Enviar Recibo por SMS
+SMS Settings,Configurações de SMS
+SMS was not sent. Please contact Administrator.,O SMS não foi enviado. Contacte o Administrador.
+Snooze for 7 days,Adiar por 7 dias
+Social Login Provider,Provedor de acesso social
+Some data may not be available offline,Alguns dados podem não estar disponíveis offline
+Something went wrong.,Algo correu mal.
+Sort,Ordenar
+Sort Field,Ordenar por campo
+Sort items,Ordenar itens
+Sort Items,Ordenar Itens
+Sort Order,Ordem de classificação
+Sorted by {0} A-Z,Ordenado por {0} A-Z
+Sorted by {0} Z-A,Ordenado por {0} Z-A
+Source,Origem
+Source and Rating,Origem e Classificação
+Special Offer,Oferta Especial
+Specific Items,Itens Específicos
+Split Amount,Valor da Divisão
+Split Payment,Pagamento Dividido
+SSL/TLS Mode,Modo SSL / TLS
+Standard Selling Rate,Preço de Venda Padrão
+Staffing Details,Detalhes de Pessoal
+Staffing Plan,Plano de Pessoal
+Start,Iniciar
+Start Date,Data de Início
+Start Date Field,Campo de Data de Início
+Start New Sale,Iniciar Nova Venda
+Start Sale,Iniciar Venda
+Start typing to see suggestions,Comece a escrever para ver sugestões
+Started,Começado
+Starts on,Inicia em
+State,Província
+State/Province,Estado / Província
+States,Estados
+Static Parameters,Parâmetros estáticos
+Stats Time Interval,Intervalo de tempo das estatísticas
+Status,Estado
+Status,Estado
+Status:,Estado:
+Status: {0},Estado: {0}
+Step,Degrau
+Steps,Passos
+Stock,Stock
+Stock Controls,Controlos de Stock
+Stock Information,Informações de Stock
+Stock is lower than requested. Proceeding may create negative stock.,O stock é inferior ao solicitado. Prosseguir pode criar stock negativo.
+Stock Lookup,Consulta de Stock
+Stock Management,Gestão de Stock
+Stock Options,Opções de Acções
+Stock Reserved,Stock Reservado
+Stock Validation Policy,Política de Validação de Stock
+Stock Warning,Aviso de Stock
+Stop,Parar
+Stopped,Parado
+Stores the JSON of last known versions of various installed apps. It is used to show release notes.,Armazena o JSON das últimas versões conhecidas de vários aplicativos instalados. Ele é usado para mostrar notas de lançamento.
+Style,Estilo
+Style Settings,Configurações de Estilo
+Stylesheet,Folha de estilo
+Sub-domain provided by erpnext.com,Sub-domínio fornecido pelo erpnext.com
+Subdomain,Subdomínio
+Subject,Assunto
+Submit,Submeter
+Submit & Print,Submeter e Imprimir
+Submit After Import,Submeter após importação
+Submitted,Submetido
+Subsidiary,Subsidiário
+Subtitle,Subtítulo
+Subtotal,Subtotal
+Subtotal (before tax),Subtotal (antes imposto)
+Subtotal:,Subtotal:
+Success,Sucesso
+Success Message,Mensagem de sucesso
+Success URL,URL de Confirmação
+Successfully scanned:,Escaneado com sucesso:
+Supplier,Fornecedor
+Supplier Ledger Summary,Resumo do Razão de Fornecedores
+Support,Suporte
+Switch Camera,Alternar Câmara
+Switch theme appearance,Alternar aparência do tema
+Switch to grid view,Mudar para vista de grelha
+Switch to list view,Mudar para vista de lista
+Switched to {0}. Stock quantities refreshed.,Mudou para {0}. Stock actualizado.
+Switched to:,Alternado para:
+Symbol,Símbolo
+Sync,Sincronizar
+Sync All,Sincronizar Tudo
+Sync All Invoices,Sincronizar Todas as Faturas
+Sync Complete,Sincronização Concluída
+Sync Interval (seconds),Intervalo de Sincronização (segundos)
+Sync Now,Sincronizar Agora
+Sync Offline Invoices,Sincronizar Faturas Offline
+Sync with Google Calendar,Sincronize com o Google Agenda
+Sync with Google Contacts,Sincronizar com os contatos do Google
+Synced,Sincronizado
+Syncing,A Sincronizar
+Syncing catalog in background... {0} items cached,A sincronizar catálogo... {0} itens em cache
+Syncing...,A Sincronizar...
+System,Sistema
+System Information,Informações do Sistema
+System Manager,Administrador do Sistema
+System managers are allowed by default,Gerentes de sistema são permitidos por padrão
+System Notification,Notificação do sistema
+System Page,Página do sistema
+System Status,Estado do Sistema
+System Test,Teste de Sistema
+Table Break,Pausa para a mesa
+Table HTML,Tabela HTML
+Tables:,Tabelas:
+Task,Tarefa
+Tasks,Tarefas
+Tax,Imposto
+Tax Category,Categoria Fiscal
+Tax Collected,Imposto Cobrado
+Tax Configuration Error,Erro de Configuração de Imposto
+Tax ID,NUIT
+Tax Id,NUIT
+Tax Inclusive,Inclui Imposto
+TAX INVOICE,FACTURA
+Tax mode updated. Cart recalculated with new tax settings.,Modo de imposto actualizado. Carrinho recalculado.
+Tax Setup,Configuração de Impostos
+Tax Summary,Resumo de Impostos
+Tax:,Imposto:
+Taxable Income Relief Threshold Limit,Limite de Isenção de Rendimento Tributável
+Taxes & Charges,Impostos e Taxas
+Taxes:,Impostos:
+Team Members Heading,Título da página Membros da Equipe
+Technical: {0},Técnico: {0}
+Template,Modelo
+Template Options,Opções de modelo
+Template Warnings,Avisos do modelo
+Terms of Service,Termos de Serviço
+Territory,Território
+Territory Wise Sales,Vendas por Território
+Test Connection,Testar Ligação
+Text,Texto
+Text Align,Alinhar Texto
+Text Color,Cor do texto
+Text Editor,Editor de Texto
+Thank you for your business!,Obrigado pela sua preferência!
+The app stores data locally for offline use. This is called cache.,O aplicativo armazena dados localmente para uso offline. Isto chama-se cache.
+The coupon code you entered is not valid,O código de cupão inserido não é válido
+The date on which Salary Component with Amount will contribute for Earnings/Deduction in Salary Slip.,A data em que a Componente Salarial com Valor contribuirá para Rendimentos/Deduções no Recibo de Vencimento.
+The link will expire in {0} minutes,A ligação expira em {0} minutos
+The name that will appear in Google Calendar,O nome que aparecerá no Google Agenda
+The system could not retrieve the item details. Please try again.,O sistema não conseguiu obter os detalhes do artigo. Por favor tente novamente.
+Theme,Tema
+Theme Configuration,Configuração do Tema
+Theme URL,URL do tema
+These invoices will be submitted when you're back online,Estas facturas serão submetidas quando estiver online
+These invoices will be synced when connection is restored,Estas faturas serão sincronizadas quando a conexão for restaurada
+"These leaves are holidays permitted by the company however, availing it is optional for an Employee.","Estas licenças são feriados permitidos pela empresa, no entanto, o seu uso é opcional para um Funcionário."
+These values will be automatically updated in transactions and also will be useful to restrict permissions for this user on transactions containing these values.,Esses valores serão atualizados automaticamente em transações e também serão úteis para restringir as permissões para este usuário em operações que contenham esses valores.
+Third Party Authentication,Autenticação de Terceiros
+This action cannot be undone,Esta acção não pode ser desfeita
+This action cannot be undone.,Esta acção não pode ser desfeita.
+This barcode could not be matched to any item.,Este código de barras não pôde ser associado a nenhum artigo.
+This card will be available to all Users if this is set,Este cartão estará disponível para todos os usuários se estiver definido
+This chart will be available to all Users if this is set,Este gráfico estará disponível para todos os usuários se estiver definido
+This coupon already used !,Este cupão já foi usado!
+This coupon requires a minimum purchase of,Este cupão requer uma compra mínima de
+This coupon requires a minimum purchase of ,Este cupão requer uma compra mínima de 
+This field is required,Este campo é obrigatório
+This format is used if country specific format is not found,Este formato é usado se o formato específico país não é encontrado
+This is an item template. Please choose a variant.,Este é um modelo de artigo. Por favor escolha uma variante.
+This is the number of the last created transaction with this prefix,Este é o número da última transação criada com este prefixo
+This item is out of stock in all warehouses,Este item está esgotado em todos os armazéns
+This Month,Este Mês
+This Week,Esta Semana
+This will also delete all associated pricing rules. This action cannot be undone.,Isto também eliminará todas as regras associadas. Esta acção é irreversível.
+This will be shown in a modal after routing,Isso será mostrado em um modal após o roteamento
+This will be shown to the user in a dialog after routing to the report,Isso será mostrado ao usuário em uma caixa de diálogo após o roteamento para o relatório
+"This will clear all cached items, customers, and stock data. Invoices and drafts will be preserved.","Isto limpará cache de itens, clientes e stock. Facturas e rascunhos serão mantidos."
+This Year,Este Ano
+Time,Hora
+Time format,Formato da hora
+Time Format,Formato da hora
+Time in seconds to retain QR code image on server. Min:<strong>240</strong>,Tempo em segundos para manter a imagem do código QR no servidor. Min: <strong>240</strong>
+Time Series,Séries Temporais
+Time Series Based On,Séries Temporais Baseadas em
+Time Zones,Fusos horários
+Timeline,Linha do Tempo
+Timeline Links,Links da linha do tempo
+Timelines,Linhas do Tempo
+Times Used,Vezes Usado
+Timestamp: {0},Data/Hora: {0}
+Tip: Clear cache regularly to free up space and keep the app fast.,Dica: Limpe o cache regularmente para liberar espaço e manter o aplicativo rápido.
+Tip: Close unused tabs or apps to reduce lag.,Dica: Feche abas ou aplicativos não utilizados para reduzir atraso.
+Tip: Monitor slow queries and table size for optimal performance.,Dica: Monitore consultas lentas e tamanho da tabela para desempenho ideal.
+Title,Título
+Title Field,Campo Título
+Title Prefix,Prefixo do Título
+Title: {0},Título: {0}
+To,Para
+To and CC,Para e CC
+To Date,Data de Fim
+To Date Field,Até o momento do campo
+Today,Hoje
+Token,Símbolo
+Tools,Ferramentas
+Top,Topo
+Top Bar Items,Itens da barra superior
+Top Tables,Principais Tabelas
+Topic,Tópico
+Total,Total
+Total Active Items,Total de Artigos Ativos
+Total Actual,Total Real
+Total Amount,Valor Total
+Total Available,Total Disponível
+Total Available:,Total Disponível:
+Total Deduction (Company Currency),Dedução Total (Moeda da Empresa)
+Total Expected,Total Esperado
+Total Incoming Bills,Total de Faturas Recebidas
+Total Incoming Payment,Total de Pagamentos Recebidos
+Total Invoices:,Total de Faturas:
+Total items,Total de itens
+Total Mpesa:,Total M-Pesa:
+Total Outgoing Bills,Total de Faturas Emitidas
+Total Outgoing Payment,Total de Pagamentos Efetuados
+Total Outstanding,Total Pendente
+Total Paid:,Total Pago:
+Total Payments:,Total de Pagamentos:
+Total Quantity,Quantidade Total
+Total Refund:,Reembolso Total:
+Total Sales,Vendas Totais
+Total Selected :,Total Selecionado:
+Total Size,Tamanho Total
+Total Stock Value,Valor Total do Stock
+Total Subscribers,Total de Assinantes
+Total tax,Imposto total
+Total Tax Collected,Total de Imposto Cobrado
+Total Transactions,Total Transacções
+Total Unallocated,Total Não Alocado
+Total Variance,Variação Total
+Total Warehouses,Total de Armazéns
+TOTAL:,TOTAL:
+Total:,Total:
+Total: {0},Total: {0}
+Total: {0}% (should be 100%),Total: {0}% (deve ser 100%)
+Totals,Totais
+Track Changes,Rastrear Alterações
+Track Field,Trilha de corrida
+Track Seen,Marcar como visto
+Track Views,Acompanhar vistas
+Training,Formação
+Training Event,Evento de Formação
+Training Feedback,Feedback da Formação
+Training Program,Programa de Formação
+Training Result,Resultado da Formação
+Trainings (This Week),Formações (Esta Semana)
+Transaction,Transacção
+Transfer Stock,Transferir Stock
+Transgender,Transgênero
+Transition Rules,Regras de transição
+Transitions,Transições
+Translatable,Traduzível
+Translated Text,Texto Traduzido
+Travel,Viagem
+Travel Request,Pedido de Viagem
+Tree,Árvore
+Tree structures are implemented using Nested Set,As estruturas de árvore são implementadas usando o Conjunto Aninhado
+Trigger Method,Método gatilho
+Try a different search term,Tente outro termo
+Try a different search term or create a new customer,Tente outro termo ou crie um novo cliente
+Try Again,Tentar Novamente
+Two Factor Authentication,Autenticação de dois fatores
+Two Factor Authentication method,Método de autenticação de dois fatores
+Type,Tipo
+Type to search items...,Digite para pesquisar...
+Type: {0},Tipo: {0}
+Unable to add scanned item.,Não é possível adicionar artigo escaneado.
+Unable to connect to server. Check your internet connection.,Impossível ligar ao servidor. Verifique a internet.
+Unable to fetch draft invoices,Não é possível obter faturas rascunho
+Unable to fetch draft orders,Não é possível obter pedidos rascunho
+Unable to fetch M-Pesa payments,Não é possível obter pagamentos M-Pesa
+Unable to fetch sales orders,Não é possível obter pedidos de venda
+Unable to load the selected sales order,Não é possível carregar o pedido de venda selecionado
+Unable to print draft invoice,Não é possível imprimir fatura rascunho
+Unable to submit the selected payment,Não é possível submeter o pagamento selecionado
+Unallocated,Não Alocado
+Unassign Condition,Desatribuir condição
+Under Review,Em Análise
+Unique,Único
+Unit,Unidade
+Unit changed to {0},Unidade alterada para {0}
+Unit of Measure,Unidade de Medida
+Unknown,Desconhecido
+Unknown error,Erro desconhecido
+Unlimited,Ilimitado
+Unpaid,Não Pago
+Unpaid ({0}),Não Pago ({0})
+Unpaid Expense Claim,Reembolso de Despesa Não Pago
+Unread,Não lida
+Unread Notification Sent,Notificação de mensagem não lida enviada
+UNSEEN,Por Ler
+Unshared,Não Compartilhado
+Unsubscribe Method,Método de Cancelamento de Inscrição
+Until {0},Até {0}
+UOM,UM
+Update,Atualizar
+Update Customer,Atualizar Cliente
+Update Existing Records,Atualizar registros existentes
+Update Field,Atualizar Campo
+Update Item,Actualizar Item
+Update Series Number,Atualizar Números de Séries
+Update Settings,Atualizar configurações
+Update the promotion details below,Actualize os detalhes da promoção abaixo
+Update Value,Atualizar Valor
+Updates automatically,Atualiza automaticamente
+Upload,Carregar
+Upload Attendance,Carregar Assiduidade
+Upload pending transactions,Carregar transações pendentes
+Uploaded To Dropbox,Enviado para o Dropbox
+Uploaded To Google Drive,Carregado no Google Drive
+Upper Range,Limite Superior
+URL for documentation or help,URL para documentação ou ajuda
+Usage,Uso
+Usage Stats,Estatísticas de Uso
+Use ASCII encoding for password,Use codificação ASCII para senha
+Use date range to search for older invoices,Use intervalo de datas para procurar faturas antigas
+Use IMAP,Usar IMAP
+Use Percentage Discount,Usar Desconto Percentual
+Use Report Chart,Usar gráfico de relatório
+Use SSL,Usar SSL
+Use this fieldname to generate title,Utilize este campo para gerar o título
+Use TLS,Usar TLS
+Used:,Usado:
+Used: {0},Usado: {0}
+Used: {0}/{1},Usado: {0}/{1}
+User,Usuário
+User Agent,Agente de usuário
+User Cannot Create,O Usuário não pode criar
+User Cannot Search,O Usuário não pode pesquisar
+User Defaults,Padrões de Perfil
+User does not exist.,O utilizador não existe.
+User ID,ID de Usuário
+User ID / Email,ID de Utilizador / Email
+User ID Property,Propriedade de ID do usuário
+User Image,Imagem do Usuário
+User must always select,O Usuário deve sempre selecionar
+User Name,Nome de usuário
+User Permissions,Permissões do Utilizador
+User Tags,Etiquetas de Usuários
+User {0} is disabled,Usuário {0} está desativado
+User: {0},Utilizador: {0}
+Username,Nome de Utilizador
+Using basic camera settings due to device limitations,Usando configurações básicas da câmara devido a limitações do dispositivo
+Using cached customer balance,Usando saldo do cliente em cache
+Valid,Válido
+Valid email and name required,É necessário e-mail e nome válidos
+Valid From,Válido De
+Valid Login id required.,É necessário um identificador de início de sessão válido.
+Valid Until,Válido Até
+Validate Field,Validar Campo
+Validation Error,Erro de Validação
+Validity,Validade
+Validity & Usage,Validade e Utilização
+Value,Valor
+Value Based On,Valor Baseado em
+Value Changed,Valor Alterado
+Value must be positive,O valor deve ser positivo
+Value To Be Set,Valor a ser definido
+Value to Validate,Valor para Validar
+Values Changed,Valores Alterados
+Vehicle Log,Registo de Viatura
+Vehicle Service Item,Serviço de Viatura
+Verification,Verificação
+Verification Code,Código de verificação
+Verification code email not sent. Please contact Administrator.,O e‑mail com o código de verificação não foi enviado. Contacte o Administrador.
+Verified,Verificado
+Verify,Verificar
+Verify closing amounts for each payment method,Verifique os valores de fecho para cada método de pagamento
+Verifying...,A verificar...
+Version,Versão
+Vice President,Vice-Presidente
+Video URL,URL do vídeo
+View,Ver
+View all available offers,Ver todas as ofertas
+View and update coupon information,Ver e actualizar informação do cupão
+View Bundle,Ver Pacote
+View cart,Ver carrinho
+View cart with {0} items,Ver carrinho com {0} itens
+View current shift details,Ver detalhes do turno actual
+View Details,Ver Detalhes
+View draft invoices,Ver facturas em rascunho
+View Full Report,Ver Relatório Completo
+View invoice history,Ver histórico de facturas
+View items,Ver itens
+View Outstanding,Ver Dívida
+View pricing rule details (read-only),Ver detalhes da regra de preço (apenas leitura)
+View Properties (via Customize Form),Exibir Propriedades (via Personalizar Formulário)
+View Receipt,Ver Recibo
+View Report,Ver relatório
+View Settings,Ver Definições
+View Shift,Ver Turno
+Viewed By,Visto por
+Views,Visualizações
+Visit,Visita
+Waiting for payment...,Aguardando pagamento...
+Walk In,Presencial
+Walk-in Customer,Cliente Não Registado
+Wallet,Carteira
+Warehouse,Armazém
+Warehouse Availability,Disponibilidade em Armazém
+Warehouse not set,Armazém não definido
+Warehouse Selection,Seleção de Armazém
+Warehouse updated but failed to reload stock. Please refresh manually.,Armazém actualizado mas falha ao recarregar stock. Actualize manualmente.
+Warehouse wise Stock Value,Valor do Stock por Armazém
+Warehouse: {0},Armazém: {0}
+Warning,Aviso
+Warning: High cache usage may affect performance.,Aviso: Uso elevado de cache pode afetar o desempenho.
+Warning: High lag may indicate heavy processing or browser slowness.,Aviso: Atraso elevado pode indicar processamento pesado ou lentidão do navegador.
+Warranty Claim,Reclamação de Garantia
+Web Form Fields,Campos de formulário Web
+Website,Site
+Website Item,Artigo do Site
+Website Listing,Listagem no Site
+Website Manager,Administrador do Site
+Website Theme Image,Imagem do Tema do Site
+Week,Semana
+Week {0},Semana {0}
+Weekdays,Dias da Semana
+Weekly,Semanalmente
+Weekly Long,Semanalmente Longo
+Weeks,Semanas
+Welcome to POS MZ,Bem-vindo ao POS MZ
+Welcome to POS MZ!,Bem-vindo ao POS MZ!
+Welcome to POS Next,Bem-vindo ao POS Next
+Welcome to POS Next!,Bem-vindo ao POS Next!
+Welcome to {0},Bem-vindo Ao {0}
+WhatsApp Receipt,Recibo WhatsApp
+Wheels,Rodas
+"When enabled, displayed prices include tax. When disabled, tax is calculated separately. Changes apply immediately to your cart when you save.","Se activo, preços incluem imposto. Senão, calculado à parte. Aplica-se ao guardar."
+Why is this Candidate Qualified for this Position?,Porque é que este Candidato é Qualificado para esta Posição?
+Work References,Referências Profissionais
+Work Schedule,Horário de Trabalho
+Work without server connection,Trabalhar sem conexão com servidor
+Workflow,Fluxo de Trabalho
+Workflow Action is not created for optional states,A ação do fluxo de trabalho não é criada para estados opcionais
+Workflow Action Name,Nome da Ação do Fluxo de Trabalho
+Workflow Name,Nome do Fluxo de Trabalho
+Working Hours,Horário de Trabalho
+Wrapping up,Empacotando
+Write,Escrever
+Write Off Change,Ajustar Troco
+Write off small change amounts,Ajustar pequenas diferenças de troco
+X Field,Campo X
+Y Axis,Eixo Y
+Year,Ano
+Yearly,Anualmente
+Years,Anos
+yellow,amarelo
+Yes,Sim
+"Yes, Cancel sale","""Sim"
+Yesterday,Ontem
+You can now start making sales,Pode agora começar a efectuar vendas
+You don't have permission to create coupons,Não tem permissão para criar cupões
+You don't have permission to create customers. Contact your administrator.,Não tem permissão para criar clientes. Contacte o administrador.
+You don't have permission to create promotions,Não tem permissão para criar promoções
+You have an active shift open. Would you like to:,Tem um turno activo aberto. Deseja:
+You have an open shift. Would you like to resume it or close it and open a new one?,Tem um turno aberto. Deseja retomá-lo ou fechá-lo e abrir um novo?
+You have less than expected.,Tem menos do que o esperado.
+You have more than expected.,Tem mais do que o esperado.
+You haven't created a Política de Licenças yet,Ainda não criou uma Política de Licenças
+You haven't created a Veículo yet,Ainda não criou um Veículo
+You need to enable JavaScript for your app to work.,Precisa ativar o JavaScript para a sua aplicação funcionar.
+You need to open a shift before you can start making sales.,Precisa de abrir um turno antes de poder começar a vender.
+You will be logged out of POS MZ,Será desconectado do POS MZ
+You will be logged out of POS Next,Irá sair do POS Next
+Your cart doesn,O seu carrinho não
+Your cart doesn't meet the requirements for this offer.,O seu carrinho não cumpre os requisitos desta oferta.
+Your cart is empty,O seu carrinho está vazio
+Your point of sale system is ready to use.,O seu sistema de ponto de venda está pronto a usar.
+Your Shift is Still Open!,O seu turno ainda está aberto!
+yyyy-mm-dd,dd/mm/yyyy
+Zero means send records updated at anytime,Zero significa enviar registros atualizados a qualquer momento
+{0} ({1}) added to cart,{0} ({1}) adicionado ao carrinho
+{0} - {1} of {2},{0} - {1} de {2}
+{0} added to cart,{0} adicionado ao carrinho
+{0} Amount,Valor {0}
+{0} applied successfully,{0} aplicado com sucesso
+{0} created and selected,{0} criado e selecionado
+{0} failed,{0} falhou
+{0} free item(s) included,{0} item(ns) grátis incluído(s)
+{0} hours ago,há {0} horas
+{0} invoice - {1} outstanding,{0} factura - {1} em dívida
+{0} invoice(s) failed to sync,{0} factura(s) falharam a sincronização
+{0} invoice(s) synced successfully,{0} factura(s) sincronizada(s) com sucesso
+{0} invoices,{0} facturas
+{0} invoices - {1} outstanding,{0} facturas - {1} em dívida
+{0} is mandatory,{0} é obrigatório
+{0} is required,{0} é necessário
+{0} item(s),{0} item(ns)
+{0} item(s) selected,{0} item(ns) selecionado(s)
+{0} items,{0} itens
+{0} items found,{0} itens encontrados
+{0} minutes ago,há {0} minutos
+{0} of {1} customers,{0} de {1} clientes
+{0} OFF,{0} DESC
+{0} off {1},{0} desc em {1}
+{0} paid,{0} pago
+{0} paid of {1},{0} pago de {1}
+{0} Pending Invoice(s),{0} Factura(s) Pendente(s)
+{0} reserved,{0} reservado
+{0} selected,{0} selecionado(s)
+{0} settings applied immediately,{0} definições aplicadas imediatamente
+{0} transactions • {1},{0} transacções • {1}
+"{0} units available in \{1}\""""","{0} unidades disponíveis em \{1}\"""""
+{0} updated successfully,{0} actualizado com sucesso
+{0}% OFF,{0}% DESC
+{0}% off {1},{0}% desc em {1}
+{0}: maximum {1},{0}: máximo {1}
+{0}: {1} Bundles,{0}: {1} Pacotes
+{0}: {1} {2},{0}: {1} {2}
+{0}h {1}m,{0}h {1}m
+{0}h {1}m {2}s,{0}h {1}m {2}s
+{0}m,{0}m
+{0}m ago,há {0}m
+{0}s ago,há {0}s
+~15 KB per sync cycle,~15 KB por ciclo
+~{0} MB per hour,~{0} MB por hora
+"• Use ↑↓ to navigate, Enter to select","• Use ↑↓ para navegar, Enter para selecionar"
+⚠️ Payment total must equal refund amount,⚠️ Total pagam. deve igualar reembolso
+⚠️ {0} already returned,⚠️ {0} já devolvido
+✓ Balanced,✓ Equilibrado
+✓ Connection successful: {0},✓ Ligação bem-sucedida: {0}
+✓ Shift Closed,✓ Turno Fechado
+✓ Shift closed successfully,✓ Turno fechado com sucesso
+✗ Connection failed: {0},✗ Ligação falhou: {0}
+⭐ Recent & Frequent,⭐ Recentes e Frequentes
+Joining,Admissão
