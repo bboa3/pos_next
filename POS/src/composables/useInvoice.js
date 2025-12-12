@@ -7,7 +7,7 @@ import { useSerialNumberStore } from "@/stores/serialNumber"
 export function useInvoice() {
 	// Serial Number Store for returning serials when items are removed
 	const serialStore = useSerialNumberStore()
-	const cartStore = usePOSCartStore()
+
 	// State
 	const invoiceItems = ref([])
 	const customer = ref(null)
