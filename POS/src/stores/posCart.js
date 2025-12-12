@@ -137,7 +137,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			return
 		}
 
-		return await useInvoice().submitInvoice(targetDoctype.value)
+		return await baseSubmitInvoice(targetDoctype.value, deliveryDate.value)
 	}
 
 	async function createSalesOrder() {

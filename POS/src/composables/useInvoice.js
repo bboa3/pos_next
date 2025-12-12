@@ -2,7 +2,7 @@ import { createResource } from "frappe-ui"
 import { computed, ref, toRaw } from "vue"
 import { isOffline } from "@/utils/offline"
 import { useSerialNumberStore } from "@/stores/serialNumber"
-import { usePOSCartStore } from "@/stores/posCart"
+
 
 export function useInvoice() {
 	// Serial Number Store for returning serials when items are removed
@@ -701,7 +701,7 @@ export function useInvoice() {
 		return result?.data || result
 	}
 
-	async function submitInvoice(targetDoctype = "Sales Invoice") {
+	async function submitInvoice(targetDoctype = "Sales Invoice", deliveryDate = null) {
 		/**
 		 * Two-step submission process:
 		 * 1. Create/update draft invoice
@@ -752,8 +752,8 @@ export function useInvoice() {
 				update_stock: 1, // Critical: Ensures stock is updated
 			}
 
-			if (targetDoctype === "Sales Order") {
-				invoiceData.delivery_date = cartStore.deliveryDate
+			if (targetDoctype === "Sales Order" && deliveryDate) {
+				invoiceData.delivery_date = deliveryDate
 			}
 
 			// Add sales_team if provided
