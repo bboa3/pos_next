@@ -1206,17 +1206,11 @@
 					</svg>
 					<span>{{ __("Checkout") }}</span>
 				</button>
+			</div>
+		</div>
 
-				<!-- Document Type Dropdown -->
-				<div class="relative flex-1" v-if="items.length > 0">
-					<button
-						type="button"
-						@click="toggleDocTypeDropdown"
-						class="w-full py-2.5 px-2 rounded-lg font-semibold text-xs text-gray-700 bg-gray-50 hover:bg-gray-100 active:bg-gray-200 transition-all touch-manipulation active:scale-[0.98] flex items-center justify-center"
-						:aria-label="__('Select document type')"
-					>
-						<svg
-							class="w-4 h-4 me-1.5"
+		<!-- Edit Item Dialog -->
+		<EditItemDialog
 			v-model="showEditDialog"
 			:item="selectedItem"
 			:warehouses="warehouses"
