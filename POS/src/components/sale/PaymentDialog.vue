@@ -1,289 +1,194 @@
 <template>
-	<Dialog v-model="show" :options="{ title: __('Complete Payment'), size: '4xl' }">
+	<Dialog v-model="show" :options="{ title: __('Complete Payment'), size: '5xl' }">
 		<template #body-content>
-			<div class="flex flex-col gap-4">
-				<!-- INFORMATION SECTION (TOP) -->
-
-				<!-- Payment Summary Card -->
-				<div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
-					<div class="flex justify-between items-start mb-3">
-						<div>
-							<div class="text-start text-xs font-medium text-gray-600 mb-1">{{ __('Total Amount') }}</div>
-							<div class="text-start text-3xl font-bold text-gray-900">
-								{{ formatCurrency(grandTotal) }}
-							</div>
-						</div>
-						<div class="text-end">
-							<div v-if="remainingAmount > 0" class="mb-2">
-								<div class="text-start text-xs font-medium text-orange-600 mb-1">{{ __('Remaining') }}</div>
-								<div class="text-start text-xl font-bold text-orange-600">
-									{{ formatCurrency(remainingAmount) }}
-								</div>
-							</div>
-							<div v-if="changeAmount > 0">
-								<div class="text-start text-xs font-medium text-green-600 mb-1">{{ __('Change') }}</div>
-								<div class="text-start text-xl font-bold text-green-600">
-									{{ formatCurrency(changeAmount) }}
-								</div>
-							</div>
-							<div v-if="totalPaid >= grandTotal && changeAmount === 0" class="flex items-center text-green-600">
-								<svg class="w-5 h-5 me-1" fill="currentColor" viewBox="0 0 20 20">
-									<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-								</svg>
-								<span class="text-start text-xs font-semibold">{{ __('Paid in Full') }}</span>
-							</div>
-						</div>
-					</div>
-
-					<!-- Progress Bar -->
-					<div class="w-full bg-white rounded-full h-2.5 overflow-hidden shadow-inner">
-						<div
-							:class="[
-								'h-full transition-all duration-300',
-								totalPaid >= grandTotal ? 'bg-green-500' : 'bg-blue-500'
-							]"
-							:style="{ width: `${grandTotal > 0 ? Math.min((totalPaid / grandTotal) * 100, 100) : 0}%` }"
-						></div>
-					</div>
-					<div class="text-start text-xs text-gray-600 mt-1">
-						{{ __('{0} paid of {1}', [formatCurrency(totalPaid), formatCurrency(grandTotal)]) }}
-					</div>
-				</div>
-
-				<!-- Customer Credit Display -->
-				<div
-					v-if="allowCreditSale"
-					:class="[
-						'rounded-lg p-3 border-2',
-						totalAvailableCredit > 0
-							? 'bg-gradient-to-br from-emerald-50 to-green-50 border-emerald-200'
-							: totalAvailableCredit < 0
-							? 'bg-gradient-to-br from-red-50 to-rose-50 border-red-300'
-							: 'bg-gradient-to-br from-gray-50 to-slate-50 border-gray-200'
-					]"
-				>
-					<div class="flex items-center justify-between">
-						<div class="flex items-center gap-2">
-							<div
-								:class="[
-									'w-8 h-8 rounded-full flex items-center justify-center',
-									totalAvailableCredit > 0
-										? 'bg-emerald-200'
-										: totalAvailableCredit < 0
-										? 'bg-red-200'
-										: 'bg-gray-200'
-								]"
-							>
-								<svg
-									:class="[
-										'w-5 h-5',
-										totalAvailableCredit > 0
-											? 'text-emerald-700'
-											: totalAvailableCredit < 0
-											? 'text-red-700'
-											: 'text-gray-700'
-									]"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										v-if="totalAvailableCredit >= 0"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
-									/>
-									<path
-										v-else
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-									/>
-								</svg>
-							</div>
-							<div>
-								<div class="text-start text-xs font-semibold text-gray-800">
-									{{ totalAvailableCredit >= 0 ? __('Customer Credit Available') : __('Customer Outstanding Balance') }}
-								</div>
-								<div v-if="totalAvailableCredit > 0" class="text-start text-xs text-emerald-700">
-									{{ __('Credit can be applied to invoice') }}
-								</div>
-								<div v-else-if="totalAvailableCredit < 0" class="text-start text-xs text-red-700">
-									{{ __('Amount owed by customer') }}
-								</div>
-								<div v-else class="text-start text-xs text-gray-600">
-									{{ __('No outstanding balance') }}
-								</div>
-							</div>
-						</div>
-						<div class="text-end">
-							<div
-								:class="[
-									'text-start text-xs font-medium',
-									totalAvailableCredit > 0
-										? 'text-emerald-700'
-										: totalAvailableCredit < 0
-										? 'text-red-700'
-										: 'text-gray-700'
-								]"
-							>
-								{{ totalAvailableCredit >= 0 ? __('Available') : __('Outstanding') }}
-							</div>
-							<div
-								:class="[
-									'text-start text-2xl font-bold',
-									totalAvailableCredit > 0
-										? 'text-emerald-700'
-										: totalAvailableCredit < 0
-										? 'text-red-700'
-										: 'text-gray-700'
-								]"
-							>
-								{{ formatCurrency(Math.abs(totalAvailableCredit)) }}
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Sales Persons Selection -->
-				<div v-if="settingsStore.enableSalesPersons" class="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-3">
-					<div class="flex items-center justify-between mb-2">
-						<div class="flex items-center gap-2">
-							<div class="w-6 h-6 rounded-full bg-purple-200 flex items-center justify-center">
-								<svg class="w-4 h-4 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-								</svg>
-							</div>
-							<span class="text-xs font-bold text-purple-900">
-								{{ settingsStore.isMultipleSalesPersons
-									? __('Sales Persons')
-									: __('Sales Person')
-								}}
-							</span>
-							<span v-if="selectedSalesPersons.length > 0" class="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-0.5 rounded">
-								{{ settingsStore.isSingleSalesPerson
-									? __('1 selected')
-									: __('{0} selected', [selectedSalesPersons.length]) }}
-							</span>
-						</div>
-						<button
-							v-if="selectedSalesPersons.length > 0"
-							@click="clearSalesPersons"
-							class="text-xs text-purple-700 hover:text-purple-900 font-semibold px-2 py-1 bg-purple-100 hover:bg-purple-200 rounded transition-colors"
-						>
-							{{ settingsStore.isSingleSalesPerson ? __('Clear') : __('Clear All') }}
-						</button>
-					</div>
-
-					<!-- Search Input -->
-					<div class="relative mb-2">
-						<input
-							v-model="salesPersonSearch"
-							type="text"
-							:placeholder="__('Search sales person...')"
-							class="w-full px-3 py-2 ps-9 text-xs border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
-						/>
-						<svg class="w-4 h-4 text-gray-400 absolute start-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-						</svg>
-					</div>
-
-					<!-- Selected Sales Persons (Chips) -->
-					<div v-if="selectedSalesPersons.length > 0" class="mb-2 flex flex-col gap-1.5">
-						<div class="text-[10px] font-semibold text-purple-700 uppercase tracking-wide mb-1">{{ __('Selected:') }}</div>
-						<div
-							v-for="person in selectedSalesPersons"
-							:key="person.sales_person"
-							class="flex items-center justify-between p-2 bg-purple-100 border border-purple-300 rounded-lg"
-						>
-							<div class="flex items-center gap-2 flex-1">
+			<!-- Two Column Layout - constrained to viewport height -->
+			<div class="grid grid-cols-1 lg:grid-cols-5 gap-2 items-stretch overflow-hidden">
+				<!-- Left Column (2/5): Sales Person + Invoice Summary -->
+				<div class="lg:col-span-2 flex flex-col gap-1.5 min-h-0 overflow-hidden" :style="{ maxHeight: leftColumnMaxHeight }">
+					<!-- Sales Person Selection (Compact) -->
+					<div v-if="settingsStore.enableSalesPersons" class="bg-purple-50 border border-purple-200 rounded-lg p-2">
+						<!-- Search Input with inline selected badge -->
+						<div class="relative">
+							<input
+								v-model="salesPersonSearch"
+								type="text"
+								:placeholder="selectedSalesPersons.length > 0
+									? selectedSalesPersons[0].sales_person_name || selectedSalesPersons[0].sales_person
+									: __('Search sales person...')"
+								class="w-full px-3 py-2 ps-9 pe-20 text-xs border border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+							/>
+							<svg class="w-4 h-4 text-purple-500 absolute start-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+							</svg>
+							<!-- Selected count badge -->
+							<div v-if="selectedSalesPersons.length > 0" class="absolute end-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+								<span class="text-[10px] font-bold text-purple-600 bg-purple-100 px-1.5 py-0.5 rounded">
+									{{ selectedSalesPersons.length }}
+								</span>
 								<button
-									@click="removeSalesPerson(person.sales_person)"
-									class="text-purple-600 hover:text-purple-800 hover:bg-purple-200 rounded p-0.5 transition-colors"
+									@click="clearSalesPersons"
+									class="text-purple-500 hover:text-purple-700 p-0.5"
 								>
 									<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
 										<path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
 									</svg>
 								</button>
-								<span class="text-xs font-medium text-gray-900 flex-1">
-									{{ person.sales_person_name || person.sales_person }}
-								</span>
-							</div>
-							<!-- Only show allocation input for Multiple mode -->
-							<div v-if="settingsStore.isMultipleSalesPersons" class="flex items-center gap-1">
-								<input
-									type="number"
-									:value="person.allocated_percentage"
-									@input="updateSalesPersonAllocation(person.sales_person, $event.target.value)"
-									placeholder="%"
-									min="0"
-									max="100"
-									step="1"
-									class="w-14 px-1.5 py-1 text-xs font-semibold text-end border border-purple-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500 bg-white"
-								/>
-								<span class="text-xs text-gray-600 font-medium">%</span>
-							</div>
-							<!-- Show 100% badge for Single mode -->
-							<div v-else class="text-xs font-semibold text-purple-700 bg-purple-200 px-2 py-1 rounded">
-								100%
 							</div>
 						</div>
 
-						<!-- Total Allocation Warning (only for Multiple mode) -->
-						<div v-if="settingsStore.isMultipleSalesPersons && totalAllocation !== 100" class="flex items-center gap-2 p-2 bg-yellow-50 border border-yellow-300 rounded mt-2">
-							<svg class="w-4 h-4 text-yellow-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-								<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-							</svg>
-							<span class="text-xs font-medium text-yellow-800">
-								{{ __('Total: {0}% (should be 100%)', [totalAllocation]) }}
-							</span>
+						<!-- Dropdown Results (only when searching) -->
+						<div v-if="salesPersonSearch && filteredSalesPersons.length > 0" class="mt-1 max-h-32 overflow-y-auto border border-purple-200 rounded-lg bg-white">
+							<div
+								v-for="person in filteredSalesPersons"
+								:key="person.name"
+								@click="addSalesPerson(person)"
+								class="flex items-center gap-2 p-2 hover:bg-purple-50 cursor-pointer border-b border-purple-100 last:border-b-0 text-xs"
+							>
+								<svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+								</svg>
+								<span class="font-medium text-gray-900">{{ person.sales_person_name || person.name }}</span>
+							</div>
+						</div>
+
+						<!-- No Results -->
+						<div v-if="salesPersonSearch && filteredSalesPersons.length === 0 && !loadingSalesPersons" class="mt-1 text-center py-2 text-xs text-gray-500">
+							{{ __('No sales persons found') }}
+						</div>
+
+						<!-- Selected Sales Persons (compact chips) -->
+						<div v-if="selectedSalesPersons.length > 0 && !salesPersonSearch" class="mt-2 flex flex-wrap gap-1">
+							<div
+								v-for="person in selectedSalesPersons"
+								:key="person.sales_person"
+								class="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 border border-purple-300 rounded text-xs"
+							>
+								<span class="font-medium text-gray-900 truncate max-w-[100px]">
+									{{ person.sales_person_name || person.sales_person }}
+								</span>
+								<span v-if="settingsStore.isMultipleSalesPersons" class="text-purple-600 font-semibold">
+									{{ person.allocated_percentage }}%
+								</span>
+								<button
+									@click="removeSalesPerson(person.sales_person)"
+									class="text-purple-500 hover:text-purple-700"
+								>
+									<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+									</svg>
+								</button>
+							</div>
 						</div>
 					</div>
 
-					<!-- Available Sales Persons Dropdown -->
-					<div v-if="filteredSalesPersons.length > 0 && salesPersonSearch" class="max-h-48 overflow-y-auto border border-purple-200 rounded-lg bg-white">
-						<div
-							v-for="person in filteredSalesPersons"
-							:key="person.name"
-							@click="addSalesPerson(person)"
-							class="flex items-center justify-between p-2 hover:bg-purple-50 cursor-pointer border-b border-purple-100 last:border-b-0 transition-colors"
-						>
-							<div class="flex items-center gap-2">
-								<svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-								</svg>
-								<div>
-									<div class="text-xs font-medium text-gray-900">
-										{{ person.sales_person_name || person.name }}
+					<!-- Outstanding Balance Row (full width, two columns) -->
+					<div v-if="allowCreditSale && totalAvailableCredit !== 0" :class="[
+						'rounded-lg border p-2 flex items-center justify-between',
+						totalAvailableCredit < 0
+							? 'bg-red-50 border-red-200'
+							: 'bg-emerald-50 border-emerald-200'
+					]">
+						<span :class="[
+							'text-xs font-semibold',
+							totalAvailableCredit < 0 ? 'text-red-700' : 'text-emerald-700'
+						]">
+							{{ totalAvailableCredit < 0 ? __('Outstanding Balance') : __('Credit Balance') }}
+						</span>
+						<span :class="[
+							'text-base font-bold',
+							totalAvailableCredit < 0 ? 'text-red-600' : 'text-emerald-600'
+						]">
+							{{ formatCurrency(Math.abs(totalAvailableCredit)) }}
+						</span>
+					</div>
+
+					<!-- Invoice Summary -->
+					<div class="bg-white rounded-lg border border-gray-200 overflow-hidden flex flex-col flex-1 min-h-0">
+						<!-- Header -->
+						<div class="px-3 py-2 border-b border-gray-200 bg-gray-50">
+							<div class="flex items-center justify-between">
+								<h3 class="text-gray-900 font-semibold text-sm">{{ __('Invoice Summary') }}</h3>
+								<span class="text-gray-500 text-xs">{{ items.length }} {{ items.length === 1 ? __('item') : __('items') }}</span>
+							</div>
+							<div v-if="customer" class="text-gray-600 text-xs mt-0.5">
+								{{ customer?.customer_name || customer?.name || customer }}
+							</div>
+						</div>
+
+						<!-- Items List (scrollable, takes available space) -->
+						<div v-if="items.length > 0" class="flex-1 overflow-y-auto divide-y divide-gray-100 min-h-0">
+							<div
+								v-for="(item, index) in items"
+								:key="index"
+								class="px-3 py-2 hover:bg-gray-50"
+							>
+								<div class="flex items-start justify-between gap-2">
+									<div class="flex-1 min-w-0">
+										<div class="font-medium text-sm text-gray-900 truncate">{{ item.item_name || item.item_code }}</div>
+										<div class="text-xs text-gray-500 mt-0.5">
+											{{ item.qty || item.quantity }} × {{ formatCurrency(item.rate || item.price_list_rate) }}
+										</div>
 									</div>
-									<div v-if="person.commission_rate" class="text-[10px] text-gray-500">
-										{{ __('Commission: {0}%', [person.commission_rate]) }}
+									<div class="text-sm font-semibold text-gray-900">
+										{{ formatCurrency(item.amount || ((item.qty || item.quantity) * (item.rate || item.price_list_rate))) }}
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
+						<div v-else class="flex-1 px-3 py-4 text-center text-gray-400 text-sm flex items-center justify-center">
+							{{ __('No items') }}
+						</div>
 
-					<!-- Empty State -->
-					<div v-else-if="!salesPersonSearch && selectedSalesPersons.length === 0 && !loadingSalesPersons" class="text-center py-3">
-						<svg class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-						</svg>
-						<div class="text-xs text-gray-500">{{ __('Search to add sales persons') }}</div>
-					</div>
+						<!-- Amounts Breakdown -->
+						<div class="border-t border-gray-200 bg-gray-50 px-3 py-2 space-y-1">
+							<!-- Subtotal -->
+							<div class="flex items-center justify-between text-sm">
+								<span class="text-gray-600">{{ __('Subtotal') }}</span>
+								<span class="font-medium text-gray-900">{{ formatCurrency(subtotal) }}</span>
+							</div>
+							<!-- Tax -->
+							<div v-if="taxAmount > 0" class="flex items-center justify-between text-sm">
+								<span class="text-gray-600">{{ __('Tax') }}</span>
+								<span class="font-medium text-gray-900">{{ formatCurrency(taxAmount) }}</span>
+							</div>
+							<!-- Discount -->
+							<div v-if="discountAmount > 0" class="flex items-center justify-between text-sm">
+								<span class="text-gray-600">{{ __('Discount') }}</span>
+								<span class="font-medium text-red-600">-{{ formatCurrency(discountAmount) }}</span>
+							</div>
+							<!-- Grand Total -->
+							<div class="flex items-center justify-between pt-2 mt-1 border-t border-gray-300">
+								<span class="text-base font-bold text-gray-900">{{ __('Grand Total') }}</span>
+								<span class="text-xl font-bold text-gray-900">{{ formatCurrency(grandTotal) }}</span>
+							</div>
+						</div>
 
-					<!-- Loading State -->
-					<div v-if="loadingSalesPersons" class="text-center py-3">
-						<div class="text-xs text-gray-500">{{ __('Loading sales persons...') }}</div>
+						<!-- Payment Status - Two Equal Halves -->
+						<div class="border-t border-gray-200">
+							<div class="grid grid-cols-2 divide-x divide-gray-200">
+								<!-- Paid (Left Half) -->
+								<div class="p-3 bg-blue-50 text-center">
+									<div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{{ __('Paid') }}</div>
+									<div class="text-xl font-bold text-blue-600">{{ formatCurrency(totalPaid) }}</div>
+								</div>
+								<!-- Remaining / Change (Right Half) -->
+								<div v-if="remainingAmount > 0" class="p-3 bg-orange-50 text-center">
+									<div class="text-xs font-medium text-orange-600 uppercase tracking-wide mb-1">{{ __('Remaining') }}</div>
+									<div class="text-xl font-bold text-orange-600">{{ formatCurrency(remainingAmount) }}</div>
+								</div>
+								<div v-else-if="changeAmount > 0" class="p-3 bg-green-50 text-center">
+									<div class="text-xs font-medium text-green-600 uppercase tracking-wide mb-1">{{ __('Change') }}</div>
+									<div class="text-xl font-bold text-green-600">{{ formatCurrency(changeAmount) }}</div>
+								</div>
+								<div v-else class="p-3 bg-green-50 flex flex-col items-center justify-center">
+									<svg class="w-5 h-5 text-green-600 mb-1" fill="currentColor" viewBox="0 0 20 20">
+										<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+									</svg>
+									<span class="text-sm font-bold text-green-600">{{ __('Fully Paid') }}</span>
+								</div>
+							</div>
+						</div>
 					</div>
-
-					<!-- No Results -->
-					<div v-if="salesPersonSearch && filteredSalesPersons.length === 0 && !loadingSalesPersons" class="text-center py-3">
-						<div class="text-xs text-gray-500">{{ __('No sales persons found') }}</div>
-					</div>
-				</div>
 
 				<!-- Additional Discount Section (Compact) -->
 				<div v-if="settingsStore.allowAdditionalDiscount" class="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-300 rounded-lg p-2">
@@ -337,303 +242,230 @@
 						</div>
 					</div>
 				</div>
-
-				<!-- Payment Methods Grid -->
-				<div class="text-start mb-3">
-					<h3 class="text-sm font-semibold text-gray-700 mb-1">{{ __('Payment Methods') }}</h3>
-					<div class="text-xs text-gray-500">
-						{{ __('Select payment method to add') }}
-					</div>
-					<!-- Loading State -->
-					<div v-if="loadingPaymentMethods" class="flex items-center justify-center py-8">
-						<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-						<span class="ms-3 text-sm text-gray-500">{{ __('Loading payment methods...') }}</span>
-					</div>
-					<!-- Payment Methods -->
-					<div v-else-if="paymentMethods.length > 0" class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
-						<button
-							v-for="method in paymentMethods"
-							:key="method.mode_of_payment"
-							@click="quickAddPayment(method)"
-							:disabled="remainingAmount === 0"
-							:class="[
-								'group relative p-4 rounded-xl border-2 transition-all text-start',
-								'hover:shadow-lg transform hover:-translate-y-0.5',
-								remainingAmount === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
-								'border-gray-200 hover:border-blue-400 bg-white hover:bg-blue-50'
-							]"
-						>
-							<div class="flex items-start justify-between">
-								<div class="flex-1">
-									<div class="flex items-center mb-1">
-										<span class="text-2xl me-2">{{ getPaymentIcon(method.type) }}</span>
-										<div>
-											<div class="font-semibold text-sm text-gray-900">
-												{{ method.mode_of_payment }}
-											</div>
-											<div class="text-xs text-gray-500">{{ method.type || __('Cash') }}</div>
-										</div>
-									</div>
-								</div>
-								<div class="opacity-0 group-hover:opacity-100 transition-opacity">
-									<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-									</svg>
-								</div>
-							</div>
-							<div v-if="getMethodTotal(method.mode_of_payment) > 0"
-								class="mt-2 pt-2 border-t border-gray-200">
-								<div class="text-xs text-gray-500">{{ __('Added') }}</div>
-								<div class="font-bold text-blue-600">
-									{{ formatCurrency(getMethodTotal(method.mode_of_payment)) }}
-								</div>
-							</div>
-						</button>
-					</div>
-					<!-- Empty State -->
-					<div v-else class="text-center py-8 text-gray-500">
-						<svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-						</svg>
-						<p class="text-sm">{{ __('No payment methods available') }}</p>
-					</div>
 				</div>
+				<!-- End Left Column -->
 
-				<!-- Quick Amount Buttons -->
-				<div v-if="remainingAmount > 0 && lastSelectedMethod" class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-					<div class="text-start text-xs font-medium text-gray-600 mb-2">
-						{{ __('Quick amounts for {0}', [lastSelectedMethod.mode_of_payment]) }}
+				<!-- Right Column (3/5): Payment Methods + Quick Amounts + Numpad -->
+				<div ref="rightColumnRef" class="lg:col-span-3 bg-gray-50 rounded-lg border border-gray-200 p-3">
+					<!-- Payment Methods -->
+					<div class="mb-3">
+						<div class="flex items-center justify-between mb-2">
+							<div class="text-start text-xs font-semibold text-gray-500 uppercase tracking-wide">{{ __('Payment Method') }}</div>
+							<!-- Clear All Payments Button -->
+							<button
+								v-if="paymentEntries.length > 0"
+								@click="clearAll"
+								class="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+								:title="__('Clear all payments')"
+							>
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+								</svg>
+							</button>
+						</div>
+						<div v-if="loadingPaymentMethods" class="flex items-center gap-2">
+							<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+							<span class="text-sm text-gray-500">{{ __('Loading...') }}</span>
+						</div>
+						<div v-else-if="paymentMethods.length > 0" class="flex flex-wrap gap-2">
+							<button
+								v-for="method in paymentMethods"
+								:key="method.mode_of_payment"
+								@click="quickAddPayment(method)"
+								:disabled="remainingAmount === 0"
+								:class="[
+									'inline-flex items-center gap-2 h-11 px-4 rounded-lg border-2 transition-all text-sm font-medium',
+									remainingAmount === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+									lastSelectedMethod?.mode_of_payment === method.mode_of_payment
+										? 'border-blue-500 bg-blue-50 text-blue-700'
+										: 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 text-gray-700'
+								]"
+							>
+								<span class="text-lg">{{ getPaymentIcon(method.type) }}</span>
+								<span>{{ method.mode_of_payment }}</span>
+								<span v-if="getMethodTotal(method.mode_of_payment) > 0" class="text-xs font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">
+									{{ formatCurrency(getMethodTotal(method.mode_of_payment)) }}
+								</span>
+							</button>
+						</div>
+						<div v-else class="text-sm text-gray-500">{{ __('No payment methods available') }}</div>
 					</div>
-					<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-						<button
-							v-for="amount in quickAmounts"
-							:key="amount"
-							@click="addCustomPayment(lastSelectedMethod, amount)"
-							class="px-4 py-3 text-sm font-semibold rounded-lg bg-white border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-all"
-						>
-							{{ formatCurrency(amount) }}
-						</button>
+
+					<!-- Quick Amounts -->
+					<div v-if="lastSelectedMethod" class="mb-3">
+						<div class="text-start text-xs font-medium text-gray-600 mb-1.5">
+							{{ __('Quick amounts for {0}', [lastSelectedMethod.mode_of_payment]) }}
+						</div>
+						<div class="grid grid-cols-4 gap-1.5">
+							<button
+								v-for="amount in quickAmounts"
+								:key="amount"
+								@click="addCustomPayment(lastSelectedMethod, amount)"
+								:disabled="remainingAmount === 0"
+								class="px-2 py-2 text-sm font-semibold rounded-lg bg-white border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-all disabled:opacity-50"
+							>
+								{{ formatCurrency(amount) }}
+							</button>
+						</div>
 					</div>
-					<div class="mt-4">
-						<div class="text-start text-xs font-medium text-gray-600 mb-1">{{ __('Custom amount') }}</div>
-						<div class="flex gap-2">
-							<Input
-								v-model="customAmount"
-								type="number"
-								step="5"
-								min="0"
-								placeholder="0.00"
-								class="flex-1"
-								@keyup.enter="addCustomPayment(lastSelectedMethod, customAmount)"
-							/>
-							<Button
-								variant="solid"
-								theme="blue"
-								@click="addCustomPayment(lastSelectedMethod, customAmount)"
-								:disabled="!customAmount || customAmount <= 0"
+					<div v-else class="mb-3 p-2 bg-blue-50 rounded-lg text-center">
+						<p class="text-xs text-blue-600">{{ __('Select a payment method to start') }}</p>
+					</div>
+
+					<!-- Numeric Keypad -->
+					<div class="bg-white rounded-lg border border-gray-200 p-3">
+						<!-- Amount Display -->
+						<div class="bg-gray-100 rounded-lg p-3 mb-3">
+							<div class="text-2xl font-bold text-gray-900 text-center flex items-center justify-center gap-2">
+								<span>{{ currencySymbol }}</span>
+								<span class="font-mono tracking-wider">{{ numpadDisplay || '0.00' }}</span>
+							</div>
+						</div>
+
+						<!-- Keypad Grid (4 columns) -->
+						<div class="grid grid-cols-4 gap-1.5">
+							<!-- Row 1: 7, 8, 9, Backspace -->
+							<button
+								v-for="num in ['7', '8', '9']"
+								:key="num"
+								@click="numpadInput(num)"
+								class="h-12 text-xl font-semibold rounded-lg bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95"
+							>
+								{{ num }}
+							</button>
+							<button
+								@click="numpadBackspace"
+								class="h-12 text-lg font-semibold rounded-lg bg-red-50 border-2 border-red-200 hover:border-red-400 hover:bg-red-100 text-red-600 transition-all active:scale-95 flex items-center justify-center"
+							>
+								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z"/>
+								</svg>
+							</button>
+
+							<!-- Row 2: 4, 5, 6, Clear -->
+							<button
+								v-for="num in ['4', '5', '6']"
+								:key="num"
+								@click="numpadInput(num)"
+								class="h-12 text-xl font-semibold rounded-lg bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95"
+							>
+								{{ num }}
+							</button>
+							<button
+								@click="numpadClear"
+								class="h-12 text-lg font-semibold rounded-lg bg-orange-50 border-2 border-orange-200 hover:border-orange-400 hover:bg-orange-100 text-orange-600 transition-all active:scale-95"
+							>
+								C
+							</button>
+
+							<!-- Row 3: 1, 2, 3, Add (spans 2 rows) -->
+							<button
+								v-for="num in ['1', '2', '3']"
+								:key="num"
+								@click="numpadInput(num)"
+								class="h-12 text-xl font-semibold rounded-lg bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95"
+							>
+								{{ num }}
+							</button>
+							<button
+								@click="numpadAddPayment"
+								:disabled="!numpadValue || numpadValue <= 0 || !lastSelectedMethod"
+								:class="[
+									'h-[8.5rem] row-span-2 text-xl font-bold rounded-xl transition-all active:scale-95',
+									!numpadValue || numpadValue <= 0 || !lastSelectedMethod
+										? 'bg-gray-100 border-2 border-gray-200 text-gray-400 cursor-not-allowed'
+										: 'bg-blue-600 border-2 border-blue-600 hover:bg-blue-700 text-white'
+								]"
 							>
 								{{ __('Add') }}
-							</Button>
+							</button>
+
+							<!-- Row 4: 00, 0, . -->
+							<button
+								@click="numpadInput('00')"
+								class="h-16 text-2xl font-semibold rounded-xl bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95"
+							>
+								00
+							</button>
+							<button
+								@click="numpadInput('0')"
+								class="h-16 text-2xl font-semibold rounded-xl bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95"
+							>
+								0
+							</button>
+							<button
+								@click="numpadInput('.')"
+								:disabled="numpadDisplay.includes('.')"
+								:class="[
+									'h-16 text-2xl font-semibold rounded-xl transition-all active:scale-95',
+									numpadDisplay.includes('.')
+										? 'bg-gray-100 border-2 border-gray-200 text-gray-400 cursor-not-allowed'
+										: 'bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800'
+								]"
+							>
+								.
+							</button>
 						</div>
 					</div>
-				</div>
 
-				<!-- Active Payment Entries -->
-				<div v-if="paymentEntries.length > 0">
-					<h3 class="text-start text-sm font-semibold text-gray-700 mb-3">{{ __('Payment Breakdown') }}</h3>
-					<div class="flex flex-col gap-2 max-h-64 overflow-y-auto">
-						<div
-							v-for="(entry, index) in paymentEntries"
-							:key="index"
-							class="group flex items-center justify-between p-3 bg-white rounded-lg border-2 border-gray-200 hover:border-red-300 transition-all"
+					<!-- Action Buttons - Below Keypad -->
+					<div class="flex flex-col gap-2 mt-4">
+						<!-- Primary Row: Pay on Account + Complete Payment -->
+						<div class="flex items-center gap-2">
+							<!-- Pay on Account Button (if credit sales enabled) -->
+							<button
+								v-if="allowCreditSale"
+								@click="addCreditAccountPayment"
+								:disabled="paymentEntries.length > 0"
+								:class="[
+									'flex-1 inline-flex items-center justify-center gap-2 transition-colors focus:outline-none',
+									'h-12 text-sm font-semibold px-4 rounded-lg',
+									paymentEntries.length > 0
+										? 'bg-orange-300 text-white cursor-not-allowed'
+										: 'bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 focus-visible:ring-2 focus-visible:ring-orange-400'
+								]"
+							>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+								</svg>
+								<span>{{ __('Pay on Account') }}</span>
+							</button>
+
+							<!-- Complete/Partial Payment Button -->
+							<button
+								@click="completePayment"
+								:disabled="!canComplete"
+								:class="[
+									'flex-1 inline-flex items-center justify-center gap-2 transition-colors focus:outline-none',
+									'h-12 text-sm font-semibold px-5 rounded-lg',
+									!canComplete
+										? 'bg-blue-300 text-white cursor-not-allowed'
+										: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-400'
+								]"
+							>
+								<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+								</svg>
+								<span>{{ paymentButtonText }}</span>
+							</button>
+						</div>
+
+						<!-- Apply Credit Button (if available) -->
+						<button
+							v-if="allowCreditSale && totalAvailableCredit > 0 && remainingAmount > 0"
+							@click="applyCustomerCredit"
+							class="w-full inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 rounded-lg transition-colors"
 						>
-							<div class="flex items-center gap-3">
-								<span class="text-xl">{{ getPaymentIcon(entry.type) }}</span>
-								<div>
-									<div class="font-medium text-sm text-gray-900">{{ entry.mode_of_payment }}</div>
-									<div class="text-xs text-gray-500">{{ entry.type }}</div>
-								</div>
-							</div>
-							<div class="flex items-center gap-4">
-								<input
-									v-model.number="entry.amount"
-									type="number"
-									step="5"
-									min="0"
-									class="w-28 px-3 py-1 text-end font-bold text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-									@input="updatePaymentEntry(index, $event.target.value)"
-								/>
-								<button
-									@click="removePaymentEntry(index)"
-									class="opacity-0 group-hover:opacity-100 p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all"
-								>
-									<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-									</svg>
-								</button>
-							</div>
-						</div>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+							</svg>
+							<span>{{ __('Apply Credit') }}</span>
+						</button>
 					</div>
 				</div>
+				<!-- End Right Column -->
 			</div>
-		</template>
-
-		<template #actions>
-			<!-- Mobile Layout: Stacked buttons -->
-			<div class="flex flex-col w-full gap-2 sm:hidden">
-				<!-- Complete/Partial Payment Button -->
-				<button
-					@click="completePayment"
-					:disabled="!canComplete"
-					:class="[
-						'w-full inline-flex items-center justify-center gap-2 transition-colors focus:outline-none',
-						'h-12 text-base font-semibold px-4 rounded-lg touch-manipulation',
-						!canComplete
-							? 'bg-blue-300 text-white cursor-not-allowed'
-							: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-400'
-					]"
-				>
-					<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-						<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-					</svg>
-					<span>{{ paymentButtonText }}</span>
-				</button>
-
-				<!-- Pay on Account Button (if credit sales enabled) -->
-				<button
-					v-if="allowCreditSale"
-					@click="addCreditAccountPayment"
-					:disabled="paymentEntries.length > 0"
-					:class="[
-						'w-full inline-flex items-center justify-center gap-2 transition-colors focus:outline-none',
-						'h-12 text-base font-semibold px-4 rounded-lg touch-manipulation',
-						paymentEntries.length > 0
-							? 'bg-orange-300 text-white cursor-not-allowed'
-							: 'bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 focus-visible:ring-2 focus-visible:ring-orange-400'
-					]"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-					</svg>
-					<span>{{ __('Pay on Account') }}</span>
-				</button>
-
-				<!-- Apply Credit Button (if available) - full width on mobile -->
-				<button
-					v-if="allowCreditSale && totalAvailableCredit > 0 && remainingAmount > 0"
-					@click="applyCustomerCredit"
-					class="w-full inline-flex items-center justify-center gap-2 h-11 px-4 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 rounded-lg transition-colors touch-manipulation"
-				>
-					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-					</svg>
-					<span>{{ __('Apply Credit') }}</span>
-				</button>
-
-				<!-- Secondary row: Clear and Cancel - equal width side by side -->
-				<div class="flex items-center gap-2 mt-1">
-					<button
-						@click="clearAll"
-						:disabled="paymentEntries.length === 0"
-						:class="[
-							'flex-1 inline-flex items-center justify-center gap-1.5 h-11 px-3 text-sm font-medium rounded-lg transition-colors touch-manipulation',
-							paymentEntries.length === 0
-								? 'text-gray-400 bg-gray-50 cursor-not-allowed'
-								: 'text-red-600 bg-red-50 hover:bg-red-100 active:bg-red-200'
-						]"
-					>
-						<svg class="w-4 h-4 rtl:scale-x-[-1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-						</svg>
-						<span>{{ __('Clear') }}</span>
-					</button>
-
-					<button
-						@click="show = false"
-						class="flex-1 inline-flex items-center justify-center gap-1.5 h-11 px-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-lg transition-colors touch-manipulation"
-					>
-						<span>{{ __('Cancel') }}</span>
-					</button>
-				</div>
-			</div>
-
-			<!-- Desktop Layout: Single row with proper alignment -->
-			<div class="hidden sm:flex items-center justify-between w-full gap-3">
-				<!-- Start: Secondary actions -->
-				<div class="flex items-center gap-2">
-					<!-- Clear Button -->
-					<button
-						v-if="paymentEntries.length > 0"
-						@click="clearAll"
-						class="inline-flex items-center justify-center gap-1.5 h-9 px-3 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 active:bg-red-200 rounded-lg transition-colors"
-					>
-						<svg class="w-4 h-4 rtl:scale-x-[-1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-						</svg>
-						<span>{{ __('Clear All') }}</span>
-					</button>
-
-					<!-- Apply Credit Button (if available) -->
-					<button
-						v-if="allowCreditSale && totalAvailableCredit > 0 && remainingAmount > 0"
-						@click="applyCustomerCredit"
-						class="inline-flex items-center justify-center gap-1.5 h-9 px-3 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 rounded-lg transition-colors"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-						</svg>
-						<span>{{ __('Apply Credit') }}</span>
-					</button>
-				</div>
-
-				<!-- End: Primary actions -->
-				<div class="flex items-center gap-2">
-					<!-- Cancel Button -->
-					<button
-						@click="show = false"
-						class="inline-flex items-center justify-center h-9 px-4 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-lg transition-colors"
-					>
-						{{ __('Cancel') }}
-					</button>
-
-					<!-- Pay on Account Button (if credit sales enabled) -->
-					<button
-						v-if="allowCreditSale"
-						@click="addCreditAccountPayment"
-						:disabled="paymentEntries.length > 0"
-						:class="[
-							'inline-flex items-center justify-center gap-2 transition-colors focus:outline-none',
-							'h-9 text-sm font-semibold px-4 rounded-lg',
-							paymentEntries.length > 0
-								? 'bg-orange-300 text-white cursor-not-allowed'
-								: 'bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 focus-visible:ring-2 focus-visible:ring-orange-400'
-						]"
-					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-						</svg>
-						<span>{{ __('Pay on Account') }}</span>
-					</button>
-
-					<!-- Complete/Partial Payment Button -->
-					<button
-						@click="completePayment"
-						:disabled="!canComplete"
-						:class="[
-							'inline-flex items-center justify-center gap-2 transition-colors focus:outline-none',
-							'h-9 text-sm font-semibold px-5 rounded-lg',
-							!canComplete
-								? 'bg-blue-300 text-white cursor-not-allowed'
-								: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-400'
-						]"
-					>
-						<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-							<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-						</svg>
-						<span>{{ paymentButtonText }}</span>
-					</button>
-				</div>
-			</div>
+			<!-- End Two Column Layout -->
 		</template>
 	</Dialog>
 </template>
@@ -643,8 +475,8 @@ import { usePOSSettingsStore } from "@/stores/posSettings"
 import { formatCurrency as formatCurrencyUtil, getCurrencySymbol } from "@/utils/currency"
 import { getPaymentIcon } from "@/utils/payment"
 import { offlineWorker } from "@/utils/offline/workerClient"
-import { Button, Dialog, Input, createResource } from "frappe-ui"
-import { computed, ref, watch } from "vue"
+import { Dialog, createResource } from "frappe-ui"
+import { computed, ref, watch, nextTick } from "vue"
 import { useToast } from "@/composables/useToast"
 
 const settingsStore = usePOSSettingsStore()
@@ -681,6 +513,18 @@ const props = defineProps({
 		type: [String, Object],
 		default: null,
 	},
+	items: {
+		type: Array,
+		default: () => [],
+	},
+	taxAmount: {
+		type: Number,
+		default: 0,
+	},
+	discountAmount: {
+		type: Number,
+		default: 0,
+	},
 	company: {
 		type: String,
 		default: "",
@@ -706,6 +550,74 @@ const paymentEntries = ref([])
 const customerCredit = ref([])
 const customerBalance = ref({ total_outstanding: 0, total_credit: 0, net_balance: 0 })
 const loadingCredit = ref(false)
+
+// Column refs for height matching
+const rightColumnRef = ref(null)
+const leftColumnMaxHeight = ref('auto')
+
+// Calculate and sync column heights when dialog opens
+function syncColumnHeights() {
+	nextTick(() => {
+		if (rightColumnRef.value) {
+			const rightHeight = rightColumnRef.value.offsetHeight
+			leftColumnMaxHeight.value = `${rightHeight}px`
+		}
+	})
+}
+
+// Watch for dialog open to sync heights
+watch(() => props.modelValue, (isOpen) => {
+	if (isOpen) {
+		// Small delay to ensure DOM is rendered
+		setTimeout(syncColumnHeights, 50)
+	}
+})
+
+// Numpad state
+const numpadDisplay = ref('')
+const numpadValue = computed(() => {
+	const val = Number.parseFloat(numpadDisplay.value)
+	return Number.isNaN(val) ? 0 : val
+})
+
+// Numpad functions
+function numpadInput(char) {
+	// Prevent multiple decimal points
+	if (char === '.' && numpadDisplay.value.includes('.')) {
+		return
+	}
+
+	// Limit decimal places to 2
+	if (numpadDisplay.value.includes('.')) {
+		const [, decimal] = numpadDisplay.value.split('.')
+		if (decimal && decimal.length >= 2) {
+			return
+		}
+	}
+
+	// Limit total length to reasonable amount
+	if (numpadDisplay.value.length >= 10) {
+		return
+	}
+
+	// Add the character
+	numpadDisplay.value += char
+}
+
+function numpadBackspace() {
+	numpadDisplay.value = numpadDisplay.value.slice(0, -1)
+}
+
+function numpadClear() {
+	numpadDisplay.value = ''
+}
+
+function numpadAddPayment() {
+	if (numpadValue.value > 0 && lastSelectedMethod.value) {
+		addCustomPayment(lastSelectedMethod.value, numpadValue.value)
+		numpadClear()
+	}
+}
 
 // Additional discount state
 const localAdditionalDiscount = ref(0)
@@ -827,13 +739,6 @@ const filteredSalesPersons = computed(() => {
 		.slice(0, 10) // Limit to 10 results for performance
 })
 
-// Computed for total allocation percentage
-const totalAllocation = computed(() => {
-	return selectedSalesPersons.value.reduce((sum, person) => {
-		return sum + (person.allocated_percentage || 0)
-	}, 0)
-})
-
 // Helper functions for sales persons
 function addSalesPerson(person) {
 	// For Single mode, replace the existing selection
@@ -865,13 +770,6 @@ function removeSalesPerson(personName) {
 	const index = selectedSalesPersons.value.findIndex(p => p.sales_person === personName)
 	if (index > -1) {
 		selectedSalesPersons.value.splice(index, 1)
-	}
-}
-
-function updateSalesPersonAllocation(personName, value) {
-	const person = selectedSalesPersons.value.find(p => p.sales_person === personName)
-	if (person) {
-		person.allocated_percentage = Number.parseFloat(value) || 0
 	}
 }
 
@@ -1057,6 +955,7 @@ watch(show, (newVal) => {
 		// Reset state when dialog opens
 		paymentEntries.value = []
 		customAmount.value = ""
+		numpadDisplay.value = ""
 		lastSelectedMethod.value = null
 		customerCredit.value = []
 		customerBalance.value = { total_outstanding: 0, total_credit: 0, net_balance: 0 }
@@ -1186,17 +1085,6 @@ function addCreditAccountPayment() {
 	console.log('[PaymentDialog] Emitting credit sale payment-completed:', paymentData)
 	emit("payment-completed", paymentData)
 	show.value = false
-}
-
-function removePaymentEntry(index) {
-	paymentEntries.value.splice(index, 1)
-}
-
-function updatePaymentEntry(index, value) {
-	const amt = Number.parseFloat(value)
-	if (amt && amt > 0) {
-		paymentEntries.value[index].amount = amt
-	}
 }
 
 function clearAll() {
