@@ -107,10 +107,10 @@
 						<!-- Header -->
 						<div class="px-3 py-2 border-b border-gray-200 bg-gray-50">
 							<div class="flex items-center justify-between">
-								<h3 class="text-gray-900 font-semibold text-sm">{{ __('Invoice Summary') }}</h3>
-								<span class="text-gray-500 text-xs">{{ items.length }} {{ items.length === 1 ? __('item') : __('items') }}</span>
+								<h3 class="text-gray-900 font-semibold text-sm text-start">{{ __('Invoice Summary') }}</h3>
+								<span class="text-gray-500 text-xs text-end">{{ items.length === 1 ? __('1 item') : __('{0} items', [items.length]) }}</span>
 							</div>
-							<div v-if="customer" class="text-gray-600 text-xs mt-0.5">
+							<div v-if="customer" class="text-gray-600 text-xs mt-0.5 text-start">
 								{{ customer?.customer_name || customer?.name || customer }}
 							</div>
 						</div>
@@ -123,13 +123,13 @@
 								class="px-3 py-2 hover:bg-gray-50"
 							>
 								<div class="flex items-start justify-between gap-2">
-									<div class="flex-1 min-w-0">
+									<div class="flex-1 min-w-0 text-start">
 										<div class="font-medium text-sm text-gray-900 truncate">{{ item.item_name || item.item_code }}</div>
 										<div class="text-xs text-gray-500 mt-0.5">
-											{{ item.qty || item.quantity }} × {{ formatCurrency(item.rate || item.price_list_rate) }}
+											{{ formatCurrency(item.rate || item.price_list_rate) }} × {{ item.qty || item.quantity }}
 										</div>
 									</div>
-									<div class="text-sm font-semibold text-gray-900">
+									<div class="text-sm font-semibold text-gray-900 text-end">
 										{{ formatCurrency(item.amount || ((item.qty || item.quantity) * (item.rate || item.price_list_rate))) }}
 									</div>
 								</div>
@@ -143,23 +143,23 @@
 						<div class="border-t border-gray-200 bg-gray-50 px-3 py-2 space-y-1">
 							<!-- Subtotal -->
 							<div class="flex items-center justify-between text-sm">
-								<span class="text-gray-600">{{ __('Subtotal') }}</span>
-								<span class="font-medium text-gray-900">{{ formatCurrency(subtotal) }}</span>
+								<span class="text-gray-600 text-start">{{ __('Subtotal') }}</span>
+								<span class="font-medium text-gray-900 text-end">{{ formatCurrency(subtotal) }}</span>
 							</div>
 							<!-- Tax -->
 							<div v-if="taxAmount > 0" class="flex items-center justify-between text-sm">
-								<span class="text-gray-600">{{ __('Tax') }}</span>
-								<span class="font-medium text-gray-900">{{ formatCurrency(taxAmount) }}</span>
+								<span class="text-gray-600 text-start">{{ __('Tax') }}</span>
+								<span class="font-medium text-gray-900 text-end">{{ formatCurrency(taxAmount) }}</span>
 							</div>
 							<!-- Discount -->
 							<div v-if="discountAmount > 0" class="flex items-center justify-between text-sm">
-								<span class="text-gray-600">{{ __('Discount') }}</span>
-								<span class="font-medium text-red-600">-{{ formatCurrency(discountAmount) }}</span>
+								<span class="text-gray-600 text-start">{{ __('Discount') }}</span>
+								<span class="font-medium text-red-600 text-end">-{{ formatCurrency(discountAmount) }}</span>
 							</div>
 							<!-- Grand Total -->
 							<div class="flex items-center justify-between pt-2 mt-1 border-t border-gray-300">
-								<span class="text-base font-bold text-gray-900">{{ __('Grand Total') }}</span>
-								<span class="text-xl font-bold text-gray-900">{{ formatCurrency(grandTotal) }}</span>
+								<span class="text-base font-bold text-gray-900 text-start">{{ __('Grand Total') }}</span>
+								<span class="text-xl font-bold text-gray-900 text-end">{{ formatCurrency(grandTotal) }}</span>
 							</div>
 						</div>
 
@@ -296,24 +296,57 @@
 						<div class="text-start text-xs font-medium text-gray-600 mb-1.5">
 							{{ __('Quick amounts for {0}', [lastSelectedMethod.mode_of_payment]) }}
 						</div>
-						<div class="grid grid-cols-4 gap-1.5">
+						<div class="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-1.5">
 							<button
 								v-for="amount in quickAmounts"
 								:key="amount"
 								@click="addCustomPayment(lastSelectedMethod, amount)"
 								:disabled="remainingAmount === 0"
-								class="px-2 py-2 text-sm font-semibold rounded-lg bg-white border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-all disabled:opacity-50"
+								class="px-3 py-3 lg:px-2 lg:py-2 text-base lg:text-sm font-semibold rounded-lg bg-white border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-all disabled:opacity-50"
 							>
 								{{ formatCurrency(amount) }}
 							</button>
 						</div>
 					</div>
-					<div v-else class="mb-3 p-2 bg-blue-50 rounded-lg text-center">
-						<p class="text-xs text-blue-600">{{ __('Select a payment method to start') }}</p>
+					<div v-else class="mb-3 p-3 lg:p-2 bg-blue-50 rounded-lg text-center">
+						<p class="text-sm lg:text-xs text-blue-600">{{ __('Select a payment method to start') }}</p>
 					</div>
 
-					<!-- Numeric Keypad -->
-					<div class="bg-white rounded-lg border border-gray-200 p-3">
+					<!-- Mobile Custom Amount Input (visible only on mobile) -->
+					<div v-if="lastSelectedMethod" class="lg:hidden mb-3">
+						<div class="text-start text-xs font-medium text-gray-600 mb-1.5">
+							{{ __('Custom Amount') }}
+						</div>
+						<div class="flex gap-2">
+							<div class="relative flex-1">
+								<span class="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">{{ currencySymbol }}</span>
+								<input
+									v-model="mobileCustomAmount"
+									type="number"
+									inputmode="decimal"
+									:placeholder="__('Enter amount')"
+									min="0"
+									step="0.01"
+									class="w-full h-12 ps-10 pe-3 text-lg font-semibold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+								/>
+							</div>
+							<button
+								@click="addMobileCustomPayment"
+								:disabled="!mobileCustomAmount || mobileCustomAmount <= 0"
+								:class="[
+									'h-12 px-6 text-base font-bold rounded-lg transition-all',
+									!mobileCustomAmount || mobileCustomAmount <= 0
+										? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+										: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
+								]"
+							>
+								{{ __('Add') }}
+							</button>
+						</div>
+					</div>
+
+					<!-- Numeric Keypad (hidden on mobile) -->
+					<div class="hidden lg:block bg-white rounded-lg border border-gray-200 p-3">
 						<!-- Amount Display -->
 						<div class="bg-gray-100 rounded-lg p-3 mb-3">
 							<div class="text-2xl font-bold text-gray-900 text-center flex items-center justify-center gap-2">
@@ -579,6 +612,17 @@ const numpadValue = computed(() => {
 	const val = Number.parseFloat(numpadDisplay.value)
 	return Number.isNaN(val) ? 0 : val
 })
+
+// Mobile custom amount state
+const mobileCustomAmount = ref('')
+
+function addMobileCustomPayment() {
+	const amount = Number.parseFloat(mobileCustomAmount.value)
+	if (amount > 0 && lastSelectedMethod.value) {
+		addCustomPayment(lastSelectedMethod.value, amount)
+		mobileCustomAmount.value = ''
+	}
+}
 
 // Numpad functions
 function numpadInput(char) {
@@ -956,6 +1000,7 @@ watch(show, (newVal) => {
 		paymentEntries.value = []
 		customAmount.value = ""
 		numpadDisplay.value = ""
+		mobileCustomAmount.value = ""
 		lastSelectedMethod.value = null
 		customerCredit.value = []
 		customerBalance.value = { total_outstanding: 0, total_credit: 0, net_balance: 0 }
