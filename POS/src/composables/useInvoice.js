@@ -750,6 +750,10 @@ export function useInvoice() {
 				update_stock: 1, // Critical: Ensures stock is updated
 			}
 
+			if (targetDoctype === "Sales Order") {
+				invoiceData.delivery_date = cartStore.deliveryDate
+			}
+
 			// Add sales_team if provided
 			if (rawSalesTeam && rawSalesTeam.length > 0) {
 				invoiceData.sales_team = rawSalesTeam.map((member) => ({

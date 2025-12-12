@@ -121,6 +121,12 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		targetDoctype.value = doctype
 	}
 
+	const deliveryDate = ref("")
+
+	function setDeliveryDate(date) {
+		deliveryDate.value = date
+	}
+
 	async function submitInvoice() {
 		if (invoiceItems.value.length === 0) {
 			showWarning(__("Cart is empty"))
@@ -968,5 +974,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		targetDoctype,
 		setTargetDoctype,
 		createSalesOrder,
+		deliveryDate,
+		setDeliveryDate,
 	}
 })
