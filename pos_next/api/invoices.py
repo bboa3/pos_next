@@ -475,7 +475,7 @@ def update_invoice(data):
                     pass  # Will be handled during save
 
         # For return invoices, ensure payments are negative
-        if invoice_doc.is_return:
+        if invoice_doc.get("is_return"):
             for payment in invoice_doc.payments:
                 payment.amount = -abs(payment.amount)
                 if payment.base_amount:
