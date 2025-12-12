@@ -202,7 +202,7 @@ def _auto_set_return_batches(invoice_doc):
     available batch in FIFO order. If no batches exist in the selected
     warehouse, an informative error is raised.
     """
-    if not invoice_doc.is_return or invoice_doc.get("return_against"):
+    if not invoice_doc.get("is_return") or invoice_doc.get("return_against"):
         return
 
     for d in invoice_doc.items:
