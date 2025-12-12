@@ -342,6 +342,19 @@
 										)
 								"
 								@update-uom="cartStore.changeItemUOM"
+								@edit-item="handleEditItem"
+								@view-shift="uiStore.showOpenShiftDialog = true"
+								@show-drafts="uiStore.showDraftDialog = true"
+								@show-history="uiStore.showHistoryDialog = true"
+								@show-return="uiStore.showReturnDialog = true"
+								@close-shift="handleCloseShift()"
+								@create-sales-order="handleCreateSalesOrder"
+							/>
+						</div>
+					</keep-alive>
+
+					<!-- Mobile Floating Cart Button -->
+					<button
 						v-if="
 							!uiStore.isDesktop &&
 							uiStore.mobileActiveTab === 'items' &&
