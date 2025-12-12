@@ -1980,7 +1980,8 @@ function handleOutsideClick(event) {
  */
 onMounted(() => {
 	if (typeof document === "undefined") return;
-	document.addEventListener("click", handleOutsideClick);
+	// Use mousedown instead of click to catch events before they are swallowed by other handlers
+	document.addEventListener("mousedown", handleOutsideClick);
 });
 
 /**
@@ -1989,7 +1990,7 @@ onMounted(() => {
  */
 onBeforeUnmount(() => {
 	if (typeof document === "undefined") return;
-	document.removeEventListener("click", handleOutsideClick);
+	document.removeEventListener("mousedown", handleOutsideClick);
 });
 </script>
 ```
