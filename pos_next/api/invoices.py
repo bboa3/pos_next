@@ -706,8 +706,8 @@ def submit_invoice(invoice=None, data=None):
             "grand_total": invoice_doc.grand_total,
             "total": invoice_doc.total,
             "net_total": invoice_doc.net_total,
-            "outstanding_amount": invoice_doc.outstanding_amount,
-            "paid_amount": invoice_doc.paid_amount,
+            "outstanding_amount": getattr(invoice_doc, "outstanding_amount", 0),
+            "paid_amount": getattr(invoice_doc, "paid_amount", 0),
             "change_amount": getattr(invoice_doc, "change_amount", 0),
         }
     except Exception as e:
