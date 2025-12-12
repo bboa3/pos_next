@@ -28,7 +28,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		addItem: addItemToInvoice,
 		removeItem,
 		updateItemQuantity,
-		submitInvoice,
+		submitInvoice: baseSubmitInvoice,
 		clearCart: clearInvoiceCart,
 		loadTaxRules,
 		setTaxInclusive,
