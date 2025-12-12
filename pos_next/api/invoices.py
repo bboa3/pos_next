@@ -464,10 +464,11 @@ def update_invoice(data):
 
         # Set accounts for payment methods before saving
         for payment in invoice_doc.payments:
-            if payment.mode_of_payment and not payment.get("account"):
+            mode_of_payment = payment.get("mode_of_payment")
+            if mode_of_payment and not payment.get("account"):
                 try:
                     account_info = get_payment_account(
-                        payment.mode_of_payment, invoice_doc.company
+                        mode_of_payment, invoice_doc.company
                     )
                     payment.account = account_info["account"]
                 except Exception:
