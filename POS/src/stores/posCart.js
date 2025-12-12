@@ -122,13 +122,6 @@ export const usePOSCartStore = defineStore("posCart", () => {
 	}
 
 	async function submitInvoice() {
-		if (targetDoctype.value === "Sales Order") {
-			return await createSalesOrder()
-		}
-		return await useInvoice().submitInvoice()
-	}
-
-	async function createSalesOrder() {
 		if (invoiceItems.value.length === 0) {
 			showWarning(__("Cart is empty"))
 			return
@@ -137,6 +130,13 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			showWarning(__("Please select a customer"))
 			return
 		}
+
+		return await useInvoice().submitInvoice(targetDoctype.value)
+	}
+
+	async function createSalesOrder() {
+		return await submitInvoice()
+	}
 
 		try {
 			const result = await saveDraft("Sales Order")

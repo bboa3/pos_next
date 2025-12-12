@@ -699,7 +699,7 @@ export function useInvoice() {
 		return result?.data || result
 	}
 
-	async function submitInvoice() {
+	async function submitInvoice(targetDoctype = "Sales Invoice") {
 		/**
 		 * Two-step submission process:
 		 * 1. Create/update draft invoice
@@ -713,7 +713,7 @@ export function useInvoice() {
 			const rawSalesTeam = toRaw(salesTeam.value)
 
 			const invoiceData = {
-				doctype: "Sales Invoice",
+				doctype: targetDoctype,
 				pos_profile: posProfile.value,
 				posa_pos_opening_shift: posOpeningShift.value,
 				customer: customer.value?.name || customer.value,
