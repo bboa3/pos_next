@@ -310,7 +310,7 @@ def update_invoice(data):
         data = json.loads(data) if isinstance(data, str) else data
 
         pos_profile = data.get("pos_profile")
-        doctype = "Sales Invoice"
+        doctype = data.get("doctype", "Sales Invoice")
 
         # Ensure the document type is set
         data.setdefault("doctype", doctype)
@@ -553,7 +553,7 @@ def submit_invoice(invoice=None, data=None):
             invoice = json.loads(invoice)
 
         pos_profile = invoice.get("pos_profile")
-        doctype = "Sales Invoice"
+        doctype = invoice.get("doctype", "Sales Invoice")
 
         invoice_name = invoice.get("name")
 

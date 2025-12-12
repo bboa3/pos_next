@@ -39,6 +39,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		getItemDetailsResource,
 		recalculateItem,
 		rebuildIncrementalCache,
+		saveDraft,
 	} = useInvoice()
 
 	const offersStore = usePOSOffersStore()
@@ -112,6 +113,28 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		appliedOffers.value = []
 		appliedCoupon.value = null
 		currentDraftId.value = null
+	}
+
+	async function createSalesOrder() {
+		if (invoiceItems.value.length === 0) {
+			showWarning(__("Cart is empty"))
+			return
+		}
+		if (!customer.value) {
+			showWarning(__("Please select a customer"))
+			return
+		}
+
+		try {
+			const result = await saveDraft("Sales Order")
+			showSuccess(__("Sales Order created successfully"))
+			clearCart()
+			return result
+		} catch (error) {
+			console.error("Failed to create Sales Order:", error)
+			showError(__("Failed to create Sales Order"))
+			throw error
+		}
 	}
 
 	function setCustomer(selectedCustomer) {
@@ -945,6 +968,8 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		autoApplyEligibleOffers,
 		changeItemUOM,
 		updateItemDetails,
+		createSalesOrder,
+		saveDraft,
 		getItemDetailsResource,
 		recalculateItem,
 		rebuildIncrementalCache,
