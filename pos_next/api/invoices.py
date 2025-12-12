@@ -360,7 +360,7 @@ def update_invoice(data):
                         pass  # Will be handled during save
 
         # Validate return items if this is a return invoice
-        if (data.get("is_return") or invoice_doc.is_return) and invoice_doc.get(
+        if (data.get("is_return") or invoice_doc.get("is_return")) and invoice_doc.get(
             "return_against"
         ):
             validation = validate_return_items(
