@@ -294,18 +294,22 @@
 							<button
 								v-for="method in paymentMethods"
 								:key="method.mode_of_payment"
-								@click="quickAddPayment(method)"
-								:disabled="remainingAmount === 0"
+								@click="selectPaymentMethod(method)"
+								@mousedown="startLongPress(method)"
+								@mouseup="cancelLongPress"
+								@mouseleave="cancelLongPress"
+								@touchstart.prevent="startLongPress(method)"
+								@touchend="cancelLongPress"
+								@touchcancel="cancelLongPress"
 								:class="[
-									'inline-flex items-center gap-2 h-11 px-4 rounded-lg border-2 transition-all text-sm font-medium',
-									remainingAmount === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+									'inline-flex items-center gap-2 h-11 px-4 rounded-lg border-2 transition-all text-sm font-medium select-none',
 									lastSelectedMethod?.mode_of_payment === method.mode_of_payment
 										? 'border-blue-500 bg-blue-50 text-blue-700'
 										: 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 text-gray-700'
 								]"
 							>
 								<span class="text-lg">{{ getPaymentIcon(method.type) }}</span>
-								<span>{{ method.mode_of_payment }}</span>
+								<span>{{ __(method.mode_of_payment) }}</span>
 								<span v-if="getMethodTotal(method.mode_of_payment) > 0" class="text-xs font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">
 									{{ formatCurrency(getMethodTotal(method.mode_of_payment)) }}
 								</span>
@@ -336,7 +340,7 @@
 					<!-- Quick Amounts Area -->
 					<div v-if="lastSelectedMethod && remainingAmount > 0" class="mb-3">
 						<div class="text-start text-xs font-medium text-gray-600 mb-1.5">
-							{{ __('Quick amounts for {0}', [lastSelectedMethod.mode_of_payment]) }}
+							{{ __('Quick amounts for {0}', [__(lastSelectedMethod.mode_of_payment)]) }}
 						</div>
 						<div class="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-1.5">
 							<button
@@ -392,7 +396,7 @@
 						<div class="hidden lg:block bg-white rounded-lg border border-gray-200 p-3">
 						<!-- Amount Display -->
 						<div class="bg-gray-100 rounded-lg p-3 mb-3">
-							<div class="text-2xl font-bold text-gray-900 text-center flex items-center justify-center gap-2">
+							<div dir="ltr" class="text-2xl font-bold text-gray-900 text-center flex items-center justify-center gap-2">
 								<span>{{ currencySymbol }}</span>
 								<span class="font-mono tracking-wider">{{ numpadDisplay || '0.00' }}</span>
 							</div>
@@ -538,10 +542,12 @@ import { usePOSSettingsStore } from "@/stores/posSettings"
 import { formatCurrency as formatCurrencyUtil, getCurrencySymbol } from "@/utils/currency"
 import { getPaymentIcon } from "@/utils/payment"
 import { offlineWorker } from "@/utils/offline/workerClient"
+import { logger } from "@/utils/logger"
 import { Dialog, createResource } from "frappe-ui"
 import { computed, ref, watch, nextTick } from "vue"
 import { useToast } from "@/composables/useToast"
 
+const log = logger.create('PaymentDialog')
 const settingsStore = usePOSSettingsStore()
 const { showWarning } = useToast()
 
@@ -727,7 +733,7 @@ const customerCreditResource = createResource({
 	url: "pos_next.api.credit_sales.get_available_credit",
 	makeParams() {
 		const customerName = props.customer?.name || props.customer
-		console.log('[PaymentDialog] Fetching credit for customer:', customerName)
+		log.debug('[PaymentDialog] Fetching credit for customer:', customerName)
 		return {
 			customer: customerName,
 			company: props.company,
@@ -736,13 +742,13 @@ const customerCreditResource = createResource({
 	},
 	auto: false,
 	onSuccess(data) {
-		console.log('[PaymentDialog] Customer credit loaded:', data)
+		log.debug('[PaymentDialog] Customer credit loaded:', data)
 		customerCredit.value = data || []
 		loadingCredit.value = false
-		console.log('[PaymentDialog] Total available credit:', totalAvailableCredit.value)
+		log.debug('[PaymentDialog] Total available credit:', totalAvailableCredit.value)
 	},
 	onError(error) {
-		console.error("[PaymentDialog] Error loading customer credit:", error)
+		log.error("[PaymentDialog] Error loading customer credit:", error)
 		customerCredit.value = []
 		loadingCredit.value = false
 	},
@@ -752,7 +758,7 @@ const customerBalanceResource = createResource({
 	url: "pos_next.api.credit_sales.get_customer_balance",
 	makeParams() {
 		const customerName = props.customer?.name || props.customer
-		console.log('[PaymentDialog] Fetching balance for customer:', customerName)
+		log.debug('[PaymentDialog] Fetching balance for customer:', customerName)
 		return {
 			customer: customerName,
 			company: props.company,
@@ -760,12 +766,12 @@ const customerBalanceResource = createResource({
 	},
 	auto: false,
 	onSuccess(data) {
-		console.log('[PaymentDialog] Customer balance loaded:', data)
+		log.debug('[PaymentDialog] Customer balance loaded:', data)
 		customerBalance.value = data || { total_outstanding: 0, total_credit: 0, net_balance: 0 }
-		console.log('[PaymentDialog] Net balance:', customerBalance.value.net_balance)
+		log.debug('[PaymentDialog] Net balance:', customerBalance.value.net_balance)
 	},
 	onError(error) {
-		console.error("[PaymentDialog] Error loading customer balance:", error)
+		log.error("[PaymentDialog] Error loading customer balance:", error)
 		customerBalance.value = { total_outstanding: 0, total_credit: 0, net_balance: 0 }
 	},
 })
@@ -785,12 +791,12 @@ const salesPersonsResource = createResource({
 	},
 	auto: false,
 	onSuccess(data) {
-		console.log('[PaymentDialog] Sales persons loaded:', data)
+		log.debug('[PaymentDialog] Sales persons loaded:', data)
 		salesPersons.value = data?.message || data || []
 		loadingSalesPersons.value = false
 	},
 	onError(error) {
-		console.error("[PaymentDialog] Error loading sales persons:", error)
+		log.error("[PaymentDialog] Error loading sales persons:", error)
 		salesPersons.value = []
 		loadingSalesPersons.value = false
 	},
@@ -861,7 +867,7 @@ function clearSalesPersons() {
 async function loadPaymentMethods() {
 	// Guard: Don't load if posProfile is not set or already loading
 	if (!props.posProfile) {
-		console.warn(
+		log.warn(
 			"PaymentDialog: Cannot load payment methods - posProfile is not set",
 		)
 		return
@@ -890,7 +896,7 @@ async function loadPaymentMethods() {
 			await paymentMethodsResource.fetch()
 		}
 	} catch (error) {
-		console.error("Error loading payment methods:", error)
+		log.error("Error loading payment methods:", error)
 	} finally {
 		loadingPaymentMethods.value = false
 	}
@@ -1032,7 +1038,7 @@ watch(
 	() => props.posProfile,
 	(newProfile) => {
 		if (newProfile) {
-			console.log('[PaymentDialog] Preloading payment methods for profile:', newProfile)
+			log.debug('[PaymentDialog] Preloading payment methods for profile:', newProfile)
 			loadPaymentMethods()
 			// Also preload sales persons if enabled
 			if (settingsStore.enableSalesPersons && salesPersons.value.length === 0) {
@@ -1058,7 +1064,7 @@ watch(show, (newVal) => {
 		salesPersonSearch.value = ''
 
 		// Debug logging
-		console.log('[PaymentDialog] Dialog opened with props:', {
+		log.debug('[PaymentDialog] Dialog opened with props:', {
 			allowCreditSale: props.allowCreditSale,
 			customer: props.customer,
 			company: props.company,
@@ -1073,12 +1079,12 @@ watch(show, (newVal) => {
 
 		// Load customer credit and balance if enabled and customer is selected
 		if (props.allowCreditSale && props.customer && props.company) {
-			console.log('[PaymentDialog] Loading customer credit and balance...')
+			log.debug('[PaymentDialog] Loading customer credit and balance...')
 			loadingCredit.value = true
 			customerCreditResource.fetch()
 			customerBalanceResource.fetch()
 		} else {
-			console.log('[PaymentDialog] Not loading credit because:', {
+			log.debug('[PaymentDialog] Not loading credit because:', {
 				allowCreditSale: props.allowCreditSale,
 				hasCustomer: !!props.customer,
 				hasCompany: !!props.company
@@ -1087,9 +1093,44 @@ watch(show, (newVal) => {
 	}
 })
 
-// One-click payment - adds remaining amount with selected method
+// Long press state for payment methods
+let longPressTimer = null
+let longPressTriggered = false
+const LONG_PRESS_DURATION = 500 // ms
+
+// Select payment method (click) - just selects, doesn't add payment
+function selectPaymentMethod(method) {
+	// If long press was triggered, don't also trigger click
+	if (longPressTriggered) {
+		longPressTriggered = false
+		return
+	}
+
+	log.debug('[PaymentDialog] Select payment method:', method.mode_of_payment)
+	lastSelectedMethod.value = method
+}
+
+// Start long press timer
+function startLongPress(method) {
+	longPressTriggered = false
+
+	longPressTimer = setTimeout(() => {
+		longPressTriggered = true
+		quickAddPayment(method)
+	}, LONG_PRESS_DURATION)
+}
+
+// Cancel long press timer
+function cancelLongPress() {
+	if (longPressTimer) {
+		clearTimeout(longPressTimer)
+		longPressTimer = null
+	}
+}
+
+// Long press payment - adds remaining amount with selected method
 function quickAddPayment(method) {
-	console.log('[PaymentDialog] Quick add payment:', {
+	log.debug('[PaymentDialog] Quick add payment (long press):', {
 		method: method.mode_of_payment,
 		remainingAmount: remainingAmount.value,
 		currentEntries: paymentEntries.value.length
@@ -1105,13 +1146,13 @@ function quickAddPayment(method) {
 		type: method.type || __('Cash'),
 	})
 
-	console.log('[PaymentDialog] Payment added, new entries:', paymentEntries.value)
+	log.debug('[PaymentDialog] Payment added, new entries:', paymentEntries.value)
 	customAmount.value = ""
 }
 
 // Add custom amount for a method
 function addCustomPayment(method, amount) {
-	console.log('[PaymentDialog] Add custom payment:', {
+	log.debug('[PaymentDialog] Add custom payment:', {
 		method: method.mode_of_payment,
 		amount: amount,
 		currentEntries: paymentEntries.value.length
@@ -1126,13 +1167,13 @@ function addCustomPayment(method, amount) {
 		type: method.type || __('Cash'),
 	})
 
-	console.log('[PaymentDialog] Payment added, new entries:', paymentEntries.value)
+	log.debug('[PaymentDialog] Payment added, new entries:', paymentEntries.value)
 	customAmount.value = ""
 }
 
 // Apply existing customer credit to payment
 function applyCustomerCredit() {
-	console.log('[PaymentDialog] Apply customer credit:', {
+	log.debug('[PaymentDialog] Apply customer credit:', {
 		totalCredit: totalAvailableCredit.value,
 		remainingAmount: remainingAmount.value,
 		currentEntries: paymentEntries.value.length
@@ -1155,12 +1196,12 @@ function applyCustomerCredit() {
 		}))
 	})
 
-	console.log('[PaymentDialog] Existing credit applied, new entries:', paymentEntries.value)
+	log.debug('[PaymentDialog] Existing credit applied, new entries:', paymentEntries.value)
 }
 
 // Add "Pay on Account" - Credit Sale (invoice with outstanding amount)
 function addCreditAccountPayment() {
-	console.log('[PaymentDialog] Add credit account payment (Pay Later):', {
+	log.debug('[PaymentDialog] Add credit account payment (Pay Later):', {
 		grandTotal: props.grandTotal,
 		currentPaid: totalPaid.value,
 		remainingAmount: remainingAmount.value
@@ -1177,7 +1218,7 @@ function addCreditAccountPayment() {
 		outstanding_amount: props.grandTotal,
 	}
 
-	console.log('[PaymentDialog] Emitting credit sale payment-completed:', paymentData)
+	log.debug('[PaymentDialog] Emitting credit sale payment-completed:', paymentData)
 	emit("payment-completed", paymentData)
 	show.value = false
 }
@@ -1188,7 +1229,7 @@ function clearAll() {
 }
 
 function completePayment() {
-	console.log('[PaymentDialog] Complete payment called:', {
+	log.debug('[PaymentDialog] Complete payment called:', {
 		canComplete: canComplete.value,
 		totalPaid: totalPaid.value,
 		grandTotal: props.grandTotal,
@@ -1198,7 +1239,7 @@ function completePayment() {
 	})
 
 	if (!canComplete.value) {
-		console.warn('[PaymentDialog] Cannot complete - validation failed')
+		log.warn('[PaymentDialog] Cannot complete - validation failed')
 		return
 	}
 
@@ -1213,7 +1254,7 @@ function completePayment() {
 		sales_team: selectedSalesPersons.value.length > 0 ? selectedSalesPersons.value : null,
 	}
 
-	console.log('[PaymentDialog] Emitting payment-completed:', paymentData)
+	log.debug('[PaymentDialog] Emitting payment-completed:', paymentData)
 
 	emit("payment-completed", paymentData)
 
@@ -1294,11 +1335,6 @@ function handleAdditionalDiscountTypeChange() {
 	// Don't reset - preserve last value when toggling type
 	// Just recalculate to ensure it's within limits
 	handleAdditionalDiscountChange()
-}
-
-function clearAdditionalDiscount() {
-	localAdditionalDiscount.value = 0
-	emit("update-additional-discount", 0)
 }
 
 function incrementDiscount() {
