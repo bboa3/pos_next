@@ -94,11 +94,12 @@
 						]">
 							{{ totalAvailableCredit < 0 ? __('Outstanding Balance') : __('Credit Balance') }}
 						</span>
+						<!-- Show remaining credit (after used amount is deducted) for positive balance -->
 						<span :class="[
 							'text-base font-bold',
 							totalAvailableCredit < 0 ? 'text-red-600' : 'text-emerald-600'
 						]">
-							{{ formatCurrency(Math.abs(totalAvailableCredit)) }}
+							{{ totalAvailableCredit < 0 ? formatCurrency(Math.abs(totalAvailableCredit)) : formatCurrency(remainingAvailableCredit) }}
 						</span>
 					</div>
 
@@ -141,6 +142,81 @@
 
 						<!-- Amounts Breakdown -->
 						<div class="border-t border-gray-200 bg-gray-50 px-3 py-2 space-y-1">
+							<!-- Additional Discount Row -->
+							<div v-if="settingsStore.allowAdditionalDiscount" class="pb-1.5 mb-1 border-b border-dashed border-orange-200">
+								<!-- Label with calculated amount -->
+								<div class="flex items-center justify-between gap-2 mb-1.5">
+									<div class="flex items-center gap-1.5 min-w-0">
+										<svg class="w-3.5 h-3.5 text-orange-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+										</svg>
+										<span class="text-xs font-medium text-orange-700">{{ __('Additional Discount') }}</span>
+									</div>
+									<span v-if="localAdditionalDiscount > 0" class="text-xs font-bold text-red-600">
+										-{{ formatCurrency(calculatedAdditionalDiscount) }}
+									</span>
+								</div>
+								<!-- Grid: 1/2 Counter Input, 1/4 Percentage, 1/4 Amount -->
+								<div class="grid grid-cols-4 gap-1.5">
+									<!-- Counter Input (2/4 = 1/2) -->
+									<div class="col-span-2 flex items-center border border-orange-300 rounded-lg bg-white overflow-hidden">
+										<!-- Decrement Button -->
+										<button
+											@click="decrementDiscount"
+											:disabled="localAdditionalDiscount <= 0"
+											class="h-9 w-9 flex items-center justify-center text-orange-600 hover:bg-orange-50 disabled:text-gray-300 disabled:hover:bg-transparent transition-colors flex-shrink-0"
+										>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+											</svg>
+										</button>
+										<!-- Input -->
+										<input
+											type="number"
+											v-model.number="localAdditionalDiscount"
+											@input="handleAdditionalDiscountChange"
+											:placeholder="additionalDiscountType === 'percentage' ? '0' : '0.00'"
+											min="0"
+											:max="additionalDiscountType === 'percentage' ? 100 : subtotal"
+											step="1"
+											class="flex-1 h-9 px-1 text-sm font-semibold text-center bg-transparent border-none focus:outline-none focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+										/>
+										<!-- Increment Button -->
+										<button
+											@click="incrementDiscount"
+											class="h-9 w-9 flex items-center justify-center text-orange-600 hover:bg-orange-50 transition-colors flex-shrink-0"
+										>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+											</svg>
+										</button>
+									</div>
+									<!-- Percentage Button (1/4) -->
+									<button
+										@click="additionalDiscountType = 'percentage'; handleAdditionalDiscountTypeChange()"
+										:class="[
+											'h-9 rounded-lg text-sm font-bold transition-colors',
+											additionalDiscountType === 'percentage'
+												? 'bg-orange-500 text-white'
+												: 'bg-white text-orange-600 border border-orange-300 hover:bg-orange-50'
+										]"
+									>
+										%
+									</button>
+									<!-- Amount Button (1/4) -->
+									<button
+										@click="additionalDiscountType = 'amount'; handleAdditionalDiscountTypeChange()"
+										:class="[
+											'h-9 rounded-lg text-sm font-bold transition-colors',
+											additionalDiscountType === 'amount'
+												? 'bg-orange-500 text-white'
+												: 'bg-white text-orange-600 border border-orange-300 hover:bg-orange-50'
+										]"
+									>
+										{{ currencySymbol }}
+									</button>
+								</div>
+							</div>
 							<!-- Subtotal -->
 							<div class="flex items-center justify-between text-sm">
 								<span class="text-gray-600 text-start">{{ __('Subtotal') }}</span>
@@ -151,7 +227,7 @@
 								<span class="text-gray-600 text-start">{{ __('Tax') }}</span>
 								<span class="font-medium text-gray-900 text-end">{{ formatCurrency(taxAmount) }}</span>
 							</div>
-							<!-- Discount -->
+							<!-- Discount (shows the calculated additional discount amount) -->
 							<div v-if="discountAmount > 0" class="flex items-center justify-between text-sm">
 								<span class="text-gray-600 text-start">{{ __('Discount') }}</span>
 								<span class="font-medium text-red-600 text-end">-{{ formatCurrency(discountAmount) }}</span>
@@ -189,64 +265,11 @@
 							</div>
 						</div>
 					</div>
-
-				<!-- Additional Discount Section (Compact) -->
-				<div v-if="settingsStore.allowAdditionalDiscount" class="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-300 rounded-lg p-2">
-					<div class="flex items-center justify-between mb-1.5">
-						<div class="flex items-center gap-1.5">
-							<div class="w-5 h-5 rounded-full bg-orange-200 flex items-center justify-center">
-								<svg class="w-3 h-3 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-								</svg>
-							</div>
-							<span class="text-[11px] font-bold text-orange-900">{{ __('Additional Discount') }}</span>
-							<span v-if="localAdditionalDiscount > 0" class="text-[10px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded">
-								-{{ formatCurrency(additionalDiscountType === 'percentage' ? (subtotal * localAdditionalDiscount / 100) : localAdditionalDiscount) }}
-							</span>
-						</div>
-						<button
-							v-if="localAdditionalDiscount > 0"
-							@click="clearAdditionalDiscount"
-							class="text-[10px] text-orange-700 hover:text-orange-900 font-semibold px-1.5 py-0.5 bg-orange-100 hover:bg-orange-200 rounded transition-colors"
-						>
-							{{ __('Clear') }}
-						</button>
-					</div>
-					<div class="grid grid-cols-[100px_1fr] gap-1.5">
-						<!-- Discount Type Selector (Compact) -->
-						<select
-							v-model="additionalDiscountType"
-							@change="handleAdditionalDiscountTypeChange"
-							class="w-full px-1.5 py-1.5 text-[11px] font-medium border border-orange-300 rounded focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent bg-white"
-						>
-							<option value="percentage">{{ __('% Percent') }}</option>
-							<option value="amount">{{ __('{0} Amount', [currencySymbol]) }}</option>
-						</select>
-						<!-- Discount Value Input (Compact) -->
-						<div class="relative">
-							<span v-if="additionalDiscountType === 'amount'" class="absolute start-2 top-1/2 -translate-y-1/2 text-gray-600 text-[11px] font-medium">{{ currencySymbol }}</span>
-							<input
-								type="number"
-								v-model.number="localAdditionalDiscount"
-								@input="handleAdditionalDiscountChange"
-								placeholder="0.00"
-								min="0"
-								:max="additionalDiscountType === 'percentage' ? 100 : subtotal"
-								step="0.01"
-								:class="[
-									'w-full py-1.5 text-[11px] font-semibold border border-orange-300 rounded focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent bg-white placeholder-gray-400',
-									additionalDiscountType === 'amount' ? 'ps-9 pe-2' : 'px-2 pe-6'
-								]"
-							/>
-							<span v-if="additionalDiscountType === 'percentage'" class="absolute end-2 top-1/2 -translate-y-1/2 text-gray-600 text-[11px] font-medium">%</span>
-						</div>
-					</div>
-				</div>
 				</div>
 				<!-- End Left Column -->
 
 				<!-- Right Column (3/5): Payment Methods + Quick Amounts + Numpad -->
-				<div ref="rightColumnRef" class="lg:col-span-3 bg-gray-50 rounded-lg border border-gray-200 p-3">
+				<div ref="rightColumnRef" class="lg:col-span-3 bg-gray-50 rounded-lg border border-gray-200 p-3" :style="{ minHeight: rightColumnMinHeight }">
 					<!-- Payment Methods -->
 					<div class="mb-3">
 						<div class="flex items-center justify-between mb-2">
@@ -287,12 +310,31 @@
 									{{ formatCurrency(getMethodTotal(method.mode_of_payment)) }}
 								</span>
 							</button>
+							<!-- Credit Balance as Payment Method -->
+							<button
+								v-if="allowCreditSale && (remainingAvailableCredit > 0 || getMethodTotal('Customer Credit') > 0)"
+								@click="applyCustomerCredit"
+								:disabled="remainingAmount === 0 || remainingAvailableCredit === 0"
+								:class="[
+									'inline-flex items-center gap-2 h-11 px-4 rounded-lg border-2 transition-all text-sm font-medium',
+									remainingAmount === 0 || remainingAvailableCredit === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+									getMethodTotal('Customer Credit') > 0
+										? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+										: 'border-emerald-300 bg-emerald-50 hover:border-emerald-500 hover:bg-emerald-100 text-emerald-700'
+								]"
+							>
+								<span class="text-lg">💳</span>
+								<span>{{ __('Credit Balance') }}</span>
+								<span v-if="getMethodTotal('Customer Credit') > 0" class="text-xs font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">
+									{{ formatCurrency(getMethodTotal('Customer Credit')) }}
+								</span>
+							</button>
 						</div>
 						<div v-else class="text-sm text-gray-500">{{ __('No payment methods available') }}</div>
 					</div>
 
-					<!-- Quick Amounts -->
-					<div v-if="lastSelectedMethod" class="mb-3">
+					<!-- Quick Amounts Area -->
+					<div v-if="lastSelectedMethod && remainingAmount > 0" class="mb-3">
 						<div class="text-start text-xs font-medium text-gray-600 mb-1.5">
 							{{ __('Quick amounts for {0}', [lastSelectedMethod.mode_of_payment]) }}
 						</div>
@@ -301,52 +343,53 @@
 								v-for="amount in quickAmounts"
 								:key="amount"
 								@click="addCustomPayment(lastSelectedMethod, amount)"
-								:disabled="remainingAmount === 0"
-								class="px-3 py-3 lg:px-2 lg:py-2 text-base lg:text-sm font-semibold rounded-lg bg-white border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-all disabled:opacity-50"
+								class="px-3 py-3 lg:px-2 lg:py-2 text-base lg:text-sm font-semibold rounded-lg bg-white border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-all"
 							>
 								{{ formatCurrency(amount) }}
 							</button>
 						</div>
 					</div>
-					<div v-else class="mb-3 p-3 lg:p-2 bg-blue-50 rounded-lg text-center">
+					<div v-else-if="!lastSelectedMethod && remainingAmount > 0" class="mb-3 p-3 lg:p-2 bg-blue-50 rounded-lg text-center">
 						<p class="text-sm lg:text-xs text-blue-600">{{ __('Select a payment method to start') }}</p>
 					</div>
 
-					<!-- Mobile Custom Amount Input (visible only on mobile) -->
-					<div v-if="lastSelectedMethod" class="lg:hidden mb-3">
-						<div class="text-start text-xs font-medium text-gray-600 mb-1.5">
-							{{ __('Custom Amount') }}
-						</div>
-						<div class="flex gap-2">
-							<div class="relative flex-1">
-								<span class="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">{{ currencySymbol }}</span>
-								<input
-									v-model="mobileCustomAmount"
-									type="number"
-									inputmode="decimal"
-									:placeholder="__('Enter amount')"
-									min="0"
-									step="0.01"
-									class="w-full h-12 ps-10 pe-3 text-lg font-semibold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-								/>
+					<!-- Keypad and Actions Container -->
+					<div>
+						<!-- Mobile Custom Amount Input (visible only on mobile) -->
+						<div v-if="lastSelectedMethod" class="lg:hidden mb-3">
+							<div class="text-start text-xs font-medium text-gray-600 mb-1.5">
+								{{ __('Custom Amount') }}
 							</div>
-							<button
-								@click="addMobileCustomPayment"
-								:disabled="!mobileCustomAmount || mobileCustomAmount <= 0"
-								:class="[
-									'h-12 px-6 text-base font-bold rounded-lg transition-all',
-									!mobileCustomAmount || mobileCustomAmount <= 0
-										? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-										: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
-								]"
-							>
-								{{ __('Add') }}
-							</button>
+							<div class="flex gap-2">
+								<div class="relative flex-1">
+									<span class="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">{{ currencySymbol }}</span>
+									<input
+										v-model="mobileCustomAmount"
+										type="number"
+										inputmode="decimal"
+										:placeholder="__('Enter amount')"
+										min="0"
+										step="0.01"
+										class="w-full h-12 ps-10 pe-3 text-lg font-semibold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+									/>
+								</div>
+								<button
+									@click="addMobileCustomPayment"
+									:disabled="!mobileCustomAmount || mobileCustomAmount <= 0"
+									:class="[
+										'h-12 px-6 text-base font-bold rounded-lg transition-all',
+										!mobileCustomAmount || mobileCustomAmount <= 0
+											? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+											: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
+									]"
+								>
+									{{ __('Add') }}
+								</button>
+							</div>
 						</div>
-					</div>
 
-					<!-- Numeric Keypad (hidden on mobile) -->
-					<div class="hidden lg:block bg-white rounded-lg border border-gray-200 p-3">
+						<!-- Numeric Keypad (hidden on mobile) -->
+						<div class="hidden lg:block bg-white rounded-lg border border-gray-200 p-3">
 						<!-- Amount Display -->
 						<div class="bg-gray-100 rounded-lg p-3 mb-3">
 							<div class="text-2xl font-bold text-gray-900 text-center flex items-center justify-center gap-2">
@@ -438,13 +481,11 @@
 							>
 								.
 							</button>
+							</div>
 						</div>
-					</div>
 
-					<!-- Action Buttons - Below Keypad -->
-					<div class="flex flex-col gap-2 mt-4">
-						<!-- Primary Row: Pay on Account + Complete Payment -->
-						<div class="flex items-center gap-2">
+						<!-- Action Buttons - Below Keypad -->
+						<div class="flex items-center gap-2 mt-4">
 							<!-- Pay on Account Button (if credit sales enabled) -->
 							<button
 								v-if="allowCreditSale"
@@ -482,19 +523,8 @@
 								<span>{{ paymentButtonText }}</span>
 							</button>
 						</div>
-
-						<!-- Apply Credit Button (if available) -->
-						<button
-							v-if="allowCreditSale && totalAvailableCredit > 0 && remainingAmount > 0"
-							@click="applyCustomerCredit"
-							class="w-full inline-flex items-center justify-center gap-2 h-10 px-4 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 rounded-lg transition-colors"
-						>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-							</svg>
-							<span>{{ __('Apply Credit') }}</span>
-						</button>
 					</div>
+					<!-- End Keypad and Actions Container -->
 				</div>
 				<!-- End Right Column -->
 			</div>
@@ -587,6 +617,7 @@ const loadingCredit = ref(false)
 // Column refs for height matching
 const rightColumnRef = ref(null)
 const leftColumnMaxHeight = ref('auto')
+const rightColumnMinHeight = ref('auto')
 
 // Calculate and sync column heights when dialog opens
 function syncColumnHeights() {
@@ -594,6 +625,8 @@ function syncColumnHeights() {
 		if (rightColumnRef.value) {
 			const rightHeight = rightColumnRef.value.offsetHeight
 			leftColumnMaxHeight.value = `${rightHeight}px`
+			// Preserve initial height to prevent shrinking when Quick Amounts is hidden
+			rightColumnMinHeight.value = `${rightHeight}px`
 		}
 	})
 }
@@ -601,6 +634,8 @@ function syncColumnHeights() {
 // Watch for dialog open to sync heights
 watch(() => props.modelValue, (isOpen) => {
 	if (isOpen) {
+		// Reset min height when dialog opens so we can measure fresh
+		rightColumnMinHeight.value = 'auto'
 		// Small delay to ensure DOM is rendered
 		setTimeout(syncColumnHeights, 50)
 	}
@@ -879,6 +914,21 @@ const totalAvailableCredit = computed(() => {
 	// Use net_balance: negative means customer has credit, positive means they owe
 	// Return negative of net_balance so positive = credit available, negative = outstanding
 	return round2(-customerBalance.value.net_balance)
+})
+
+// Remaining credit after deducting what's already been applied as payment
+const remainingAvailableCredit = computed(() => {
+	const usedCredit = getMethodTotal('Customer Credit')
+	const remaining = totalAvailableCredit.value - usedCredit
+	return remaining > 0 ? round2(remaining) : 0
+})
+
+// Calculate the actual discount amount based on type (percentage or fixed amount)
+const calculatedAdditionalDiscount = computed(() => {
+	if (additionalDiscountType.value === 'percentage') {
+		return round2((props.subtotal * localAdditionalDiscount.value) / 100)
+	}
+	return round2(localAdditionalDiscount.value)
 })
 
 const remainingAmount = computed(() => {
@@ -1249,6 +1299,19 @@ function handleAdditionalDiscountTypeChange() {
 function clearAdditionalDiscount() {
 	localAdditionalDiscount.value = 0
 	emit("update-additional-discount", 0)
+}
+
+function incrementDiscount() {
+	const step = additionalDiscountType.value === 'percentage' ? 1 : 5
+	localAdditionalDiscount.value = (localAdditionalDiscount.value || 0) + step
+	handleAdditionalDiscountChange()
+}
+
+function decrementDiscount() {
+	const step = additionalDiscountType.value === 'percentage' ? 1 : 5
+	const newValue = (localAdditionalDiscount.value || 0) - step
+	localAdditionalDiscount.value = newValue < 0 ? 0 : newValue
+	handleAdditionalDiscountChange()
 }
 
 // Watch for dialog open to sync additional discount from parent
