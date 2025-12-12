@@ -150,7 +150,10 @@
 						</button>
 
 						<!-- Sales Order Dropdown -->
-						<div v-if="settingsStore.allowSalesOrder" class="js-doctype-dropdown relative">
+						<div
+							v-if="settingsStore.allowSalesOrder"
+							class="js-doctype-dropdown relative"
+						>
 							<button
 								type="button"
 								@click="toggleDocTypeDropdown"
@@ -303,7 +306,10 @@
 						</button>
 
 						<!-- Sales Order Dropdown -->
-						<div v-if="settingsStore.allowSalesOrder" class="js-doctype-dropdown relative">
+						<div
+							v-if="settingsStore.allowSalesOrder"
+							class="js-doctype-dropdown relative"
+						>
 							<button
 								type="button"
 								@click="toggleDocTypeDropdown"
@@ -388,86 +394,83 @@
 							</div>
 						</div>
 					</div>
+				</div>
 
-
-					</div>
-
-					<!-- Customer Dropdown -->
-					<div
-						v-if="customerSearch.trim().length >= 2"
-						class="absolute z-50 mt-0.5 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-hidden"
-					>
-						<!-- Customer Results -->
-						<div v-if="customerResults.length > 0" class="max-h-48 overflow-y-auto">
-							<button
-								type="button"
-								v-for="(cust, index) in customerResults"
-								:key="cust.name"
-								@click="selectCustomer(cust)"
-								:class="[
-									'w-full text-start px-2 py-1.5 flex items-center gap-1.5 border-b border-gray-100 last:border-0 transition-colors duration-75',
-									index === selectedIndex ? 'bg-blue-100' : 'hover:bg-blue-50',
-								]"
-							>
-								<div
-									class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0"
-								>
-									<span class="text-[10px] font-bold text-blue-600">{{
-										getInitials(cust.customer_name)
-									}}</span>
-								</div>
-								<div class="flex-1 min-w-0">
-									<p class="text-[11px] font-semibold text-gray-900 truncate">
-										{{ cust.customer_name }}
-									</p>
-									<p v-if="cust.mobile_no" class="text-[9px] text-gray-600">
-										{{ cust.mobile_no }}
-									</p>
-								</div>
-							</button>
-						</div>
-
-						<!-- No Results + Create New Option -->
-						<div v-else-if="customerSearch.trim().length >= 2">
-							<div
-								class="px-2 py-1.5 text-center text-[11px] font-medium text-gray-700 border-b border-gray-100"
-							>
-								{{ __('No results for "{0}"', [customerSearch]) }}
-							</div>
-						</div>
-
-						<!-- Create New Customer Option -->
+				<!-- Customer Dropdown -->
+				<div
+					v-if="customerSearch.trim().length >= 2"
+					class="absolute z-50 mt-0.5 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-hidden"
+				>
+					<!-- Customer Results -->
+					<div v-if="customerResults.length > 0" class="max-h-48 overflow-y-auto">
 						<button
 							type="button"
-							v-if="customerSearch.trim().length >= 2"
-							@click="createNewCustomer"
-							class="w-full text-start px-2 py-1.5 hover:bg-green-50 flex items-center gap-1.5 transition-colors border-t border-gray-200"
+							v-for="(cust, index) in customerResults"
+							:key="cust.name"
+							@click="selectCustomer(cust)"
+							:class="[
+								'w-full text-start px-2 py-1.5 flex items-center gap-1.5 border-b border-gray-100 last:border-0 transition-colors duration-75',
+								index === selectedIndex ? 'bg-blue-100' : 'hover:bg-blue-50',
+							]"
 						>
 							<div
-								class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0"
+								class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0"
 							>
-								<svg
-									class="w-3 h-3 text-green-600"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M12 4v16m8-8H4"
-									/>
-								</svg>
+								<span class="text-[10px] font-bold text-blue-600">{{
+									getInitials(cust.customer_name)
+								}}</span>
 							</div>
-							<div class="flex-1">
-								<p class="text-[11px] font-medium text-green-700">
-									{{ __("Create New Customer") }}
+							<div class="flex-1 min-w-0">
+								<p class="text-[11px] font-semibold text-gray-900 truncate">
+									{{ cust.customer_name }}
 								</p>
-								<p class="text-[9px] text-green-600">"{{ customerSearch }}"</p>
+								<p v-if="cust.mobile_no" class="text-[9px] text-gray-600">
+									{{ cust.mobile_no }}
+								</p>
 							</div>
 						</button>
 					</div>
+
+					<!-- No Results + Create New Option -->
+					<div v-else-if="customerSearch.trim().length >= 2">
+						<div
+							class="px-2 py-1.5 text-center text-[11px] font-medium text-gray-700 border-b border-gray-100"
+						>
+							{{ __('No results for "{0}"', [customerSearch]) }}
+						</div>
+					</div>
+
+					<!-- Create New Customer Option -->
+					<button
+						type="button"
+						v-if="customerSearch.trim().length >= 2"
+						@click="createNewCustomer"
+						class="w-full text-start px-2 py-1.5 hover:bg-green-50 flex items-center gap-1.5 transition-colors border-t border-gray-200"
+					>
+						<div
+							class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0"
+						>
+							<svg
+								class="w-3 h-3 text-green-600"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 4v16m8-8H4"
+								/>
+							</svg>
+						</div>
+						<div class="flex-1">
+							<p class="text-[11px] font-medium text-green-700">
+								{{ __("Create New Customer") }}
+							</p>
+							<p class="text-[9px] text-green-600">"{{ customerSearch }}"</p>
+						</div>
+					</button>
 				</div>
 			</div>
 		</div>
