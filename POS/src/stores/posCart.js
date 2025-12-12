@@ -976,5 +976,8 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		submitInvoice,
 		applyDiscountToCart,
 		buildInvoiceDataForOffers,
+		targetDoctype,
+		setTargetDoctype,
+		createSalesOrder,
 	}
 })
