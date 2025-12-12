@@ -463,6 +463,8 @@ def update_invoice(data):
         invoice_doc.calculate_taxes_and_totals()
         if invoice_doc.grand_total is None:
             invoice_doc.grand_total = 0.0
+        if invoice_doc.base_grand_total is None:
+            invoice_doc.base_grand_total = 0.0
 
         # Set accounts for payment methods before saving
         for payment in invoice_doc.payments:
