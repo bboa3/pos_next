@@ -148,6 +148,92 @@
 								/>
 							</svg>
 						</button>
+
+						<!-- Sales Order Dropdown -->
+						<div v-if="settingsStore.allowSalesOrder" class="js-doctype-dropdown relative">
+							<button
+								type="button"
+								@click="toggleDocTypeDropdown"
+								class="flex items-center justify-center w-8 h-8 bg-white border border-gray-200 hover:bg-gray-50 active:bg-gray-100 rounded-lg text-gray-700 transition-colors shadow-sm hover:shadow touch-manipulation flex-shrink-0"
+								:title="__('Select Document Type')"
+							>
+								<svg
+									class="w-4 h-4"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+									/>
+								</svg>
+								<div
+									class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-blue-500 rounded-full flex items-center justify-center text-[7px] text-white font-bold"
+								>
+									{{ cartStore.targetDoctype === "Sales Order" ? "SO" : "SI" }}
+								</div>
+							</button>
+
+							<!-- Dropdown Menu -->
+							<div
+								v-if="showDocTypeDropdown"
+								class="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden"
+							>
+								<button
+									type="button"
+									@click="selectDocType('Sales Invoice')"
+									class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center justify-between"
+									:class="{
+										'bg-blue-50 text-blue-700':
+											cartStore.targetDoctype === 'Sales Invoice',
+									}"
+								>
+									<span>{{ __("Sales Invoice") }}</span>
+									<svg
+										v-if="cartStore.targetDoctype === 'Sales Invoice'"
+										class="w-4 h-4"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M5 13l4 4L19 7"
+										/>
+									</svg>
+								</button>
+								<button
+									type="button"
+									@click="selectDocType('Sales Order')"
+									class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center justify-between"
+									:class="{
+										'bg-blue-50 text-blue-700':
+											cartStore.targetDoctype === 'Sales Order',
+									}"
+								>
+									<span>{{ __("Sales Order") }}</span>
+									<svg
+										v-if="cartStore.targetDoctype === 'Sales Order'"
+										class="w-4 h-4"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M5 13l4 4L19 7"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div v-else>
@@ -217,7 +303,7 @@
 						</button>
 
 						<!-- Sales Order Dropdown -->
-						<div v-if="settingsStore.allowSalesOrder" class="relative">
+						<div v-if="settingsStore.allowSalesOrder" class="js-doctype-dropdown relative">
 							<button
 								type="button"
 								@click="toggleDocTypeDropdown"
@@ -301,6 +387,9 @@
 								</button>
 							</div>
 						</div>
+					</div>
+
+
 					</div>
 
 					<!-- Customer Dropdown -->
@@ -1875,7 +1964,7 @@ function handleOutsideClick(event) {
 	// Close DocType dropdown if clicking outside
 	if (showDocTypeDropdown.value) {
 		const clickedInsideDocTypeDropdown =
-			target instanceof Element && target.closest(".relative.flex-1"); // Assuming the dropdown is within this container
+			target instanceof Element && target.closest(".js-doctype-dropdown");
 		if (!clickedInsideDocTypeDropdown) {
 			showDocTypeDropdown.value = false;
 		}
