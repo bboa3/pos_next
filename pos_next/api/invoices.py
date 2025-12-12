@@ -589,12 +589,14 @@ def submit_invoice(invoice=None, data=None):
                 pass  # Branch is optional, continue without it
 
         # Set accounts for all payment methods before saving
-        for payment in invoice_doc.payments:
-            if payment.mode_of_payment:
-                account_info = get_payment_account(
-                    payment.mode_of_payment, invoice_doc.company
-                )
-                payment.account = account_info["account"]
+        # Set accounts for all payment methods before saving
+        if hasattr(invoice_doc, "payments"):
+            for payment in invoice_doc.payments:
+                if payment.mode_of_payment:
+                    account_info = get_payment_account(
+                        payment.mode_of_payment, invoice_doc.company
+                    )
+                    payment.account = account_info["account"]
 
         # Handle sales team (multiple sales persons)
         sales_team_data = invoice.get("sales_team") or data.get("sales_team")
