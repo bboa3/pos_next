@@ -1,10 +1,16 @@
 <template>
-	<Dialog v-model="show" :options="{ title: __('Complete Payment'), size: '5xl' }">
+	<Dialog v-model="show" :options="{ title: __('Complete Payment'), size: dynamicDialogSize }">
 		<template #body-content>
 			<!-- Two Column Layout - constrained to viewport height -->
-			<div class="grid grid-cols-1 lg:grid-cols-5 gap-2 items-stretch overflow-hidden">
+			<div
+				:class="['grid grid-cols-1 lg:grid-cols-5 items-stretch overflow-hidden', dynamicGap]"
+				:style="{ maxHeight: dialogContentMaxHeight }"
+			>
 				<!-- Left Column (2/5): Sales Person + Invoice Summary -->
-				<div class="lg:col-span-2 flex flex-col gap-1.5 min-h-0 overflow-hidden" :style="{ maxHeight: leftColumnMaxHeight }">
+				<div
+					class="lg:col-span-2 flex flex-col gap-1.5 min-h-0 overflow-hidden"
+					:style="{ maxHeight: dynamicLeftColumnHeight }"
+				>
 					<!-- Sales Person Selection (Compact) -->
 					<div v-if="settingsStore.enableSalesPersons" class="bg-purple-50 border border-purple-200 rounded-lg p-2">
 						<!-- Search Input with inline selected badge -->
@@ -106,9 +112,9 @@
 					<!-- Invoice Summary -->
 					<div class="bg-white rounded-lg border border-gray-200 overflow-hidden flex flex-col flex-1 min-h-0">
 						<!-- Header -->
-						<div class="px-3 py-2 border-b border-gray-200 bg-gray-50">
+						<div :class="['px-3 border-b border-gray-200 bg-gray-50', isCompactMode ? 'py-1.5' : 'py-2']">
 							<div class="flex items-center justify-between">
-								<h3 class="text-gray-900 font-semibold text-sm text-start">{{ __('Invoice Summary') }}</h3>
+								<h3 :class="['text-gray-900 font-semibold text-start', dynamicTextSize.header]">{{ __('Invoice Summary') }}</h3>
 								<span class="text-gray-500 text-xs text-end">{{ items.length === 1 ? __('1 item') : __('{0} items', [items.length]) }}</span>
 							</div>
 							<div v-if="customer" class="text-gray-600 text-xs mt-0.5 text-start">
@@ -234,8 +240,8 @@
 							</div>
 							<!-- Grand Total -->
 							<div class="flex items-center justify-between pt-2 mt-1 border-t border-gray-300">
-								<span class="text-base font-bold text-gray-900 text-start">{{ __('Grand Total') }}</span>
-								<span class="text-xl font-bold text-gray-900 text-end">{{ formatCurrency(grandTotal) }}</span>
+								<span :class="['font-bold text-gray-900 text-start', isCompactMode ? 'text-sm' : 'text-base']">{{ __('Grand Total') }}</span>
+								<span :class="['font-bold text-gray-900 text-end', dynamicTextSize.grandTotal]">{{ formatCurrency(grandTotal) }}</span>
 							</div>
 						</div>
 
@@ -243,24 +249,24 @@
 						<div class="border-t border-gray-200">
 							<div class="grid grid-cols-2 divide-x divide-gray-200">
 								<!-- Paid (Left Half) -->
-								<div class="p-3 bg-blue-50 text-center">
+								<div :class="['bg-blue-50 text-center', isCompactMode ? 'p-2' : 'p-3']">
 									<div class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{{ __('Paid') }}</div>
-									<div class="text-xl font-bold text-blue-600">{{ formatCurrency(totalPaid) }}</div>
+									<div :class="['font-bold text-blue-600', dynamicTextSize.amount]">{{ formatCurrency(totalPaid) }}</div>
 								</div>
 								<!-- Remaining / Change (Right Half) -->
-								<div v-if="remainingAmount > 0" class="p-3 bg-orange-50 text-center">
+								<div v-if="remainingAmount > 0" :class="['bg-orange-50 text-center', isCompactMode ? 'p-2' : 'p-3']">
 									<div class="text-xs font-medium text-orange-600 uppercase tracking-wide mb-1">{{ __('Remaining') }}</div>
-									<div class="text-xl font-bold text-orange-600">{{ formatCurrency(remainingAmount) }}</div>
+									<div :class="['font-bold text-orange-600', dynamicTextSize.amount]">{{ formatCurrency(remainingAmount) }}</div>
 								</div>
-								<div v-else-if="changeAmount > 0" class="p-3 bg-green-50 text-center">
+								<div v-else-if="changeAmount > 0" :class="['bg-green-50 text-center', isCompactMode ? 'p-2' : 'p-3']">
 									<div class="text-xs font-medium text-green-600 uppercase tracking-wide mb-1">{{ __('Change') }}</div>
-									<div class="text-xl font-bold text-green-600">{{ formatCurrency(changeAmount) }}</div>
+									<div :class="['font-bold text-green-600', dynamicTextSize.amount]">{{ formatCurrency(changeAmount) }}</div>
 								</div>
-								<div v-else class="p-3 bg-green-50 flex flex-col items-center justify-center">
+								<div v-else :class="['bg-green-50 flex flex-col items-center justify-center', isCompactMode ? 'p-2' : 'p-3']">
 									<svg class="w-5 h-5 text-green-600 mb-1" fill="currentColor" viewBox="0 0 20 20">
 										<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
 									</svg>
-									<span class="text-sm font-bold text-green-600">{{ __('Fully Paid') }}</span>
+									<span :class="['font-bold text-green-600', dynamicTextSize.body]">{{ __('Fully Paid') }}</span>
 								</div>
 							</div>
 						</div>
@@ -269,9 +275,13 @@
 				<!-- End Left Column -->
 
 				<!-- Right Column (3/5): Payment Methods + Quick Amounts + Numpad -->
-				<div ref="rightColumnRef" class="lg:col-span-3 bg-gray-50 rounded-lg border border-gray-200 p-3" :style="{ minHeight: rightColumnMinHeight }">
+				<div
+					ref="rightColumnRef"
+					:class="['lg:col-span-3 bg-gray-50 rounded-lg border border-gray-200', isCompactMode ? 'p-2' : 'p-3']"
+					:style="{ minHeight: rightColumnMinHeight }"
+				>
 					<!-- Payment Methods -->
-					<div class="mb-3">
+					<div :class="isCompactMode ? 'mb-2' : 'mb-3'">
 						<div class="flex items-center justify-between mb-2">
 							<div class="text-start text-xs font-semibold text-gray-500 uppercase tracking-wide">{{ __('Payment Method') }}</div>
 							<!-- Clear All Payments Button -->
@@ -302,13 +312,14 @@
 								@touchend="cancelLongPress"
 								@touchcancel="cancelLongPress"
 								:class="[
-									'inline-flex items-center gap-2 h-11 px-4 rounded-lg border-2 transition-all text-sm font-medium select-none',
+									'inline-flex items-center gap-2 px-4 rounded-lg border-2 transition-all font-medium select-none',
+									isCompactMode ? 'h-9 text-xs' : 'h-11 text-sm',
 									lastSelectedMethod?.mode_of_payment === method.mode_of_payment
 										? 'border-blue-500 bg-blue-50 text-blue-700'
 										: 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 text-gray-700'
 								]"
 							>
-								<span class="text-lg">{{ getPaymentIcon(method.type) }}</span>
+								<span :class="isCompactMode ? 'text-base' : 'text-lg'">{{ getPaymentIcon(method.type) }}</span>
 								<span>{{ __(method.mode_of_payment) }}</span>
 								<span v-if="getMethodTotal(method.mode_of_payment) > 0" class="text-xs font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">
 									{{ formatCurrency(getMethodTotal(method.mode_of_payment)) }}
@@ -320,14 +331,15 @@
 								@click="applyCustomerCredit"
 								:disabled="remainingAmount === 0 || remainingAvailableCredit === 0"
 								:class="[
-									'inline-flex items-center gap-2 h-11 px-4 rounded-lg border-2 transition-all text-sm font-medium',
+									'inline-flex items-center gap-2 px-4 rounded-lg border-2 transition-all font-medium',
+									isCompactMode ? 'h-9 text-xs' : 'h-11 text-sm',
 									remainingAmount === 0 || remainingAvailableCredit === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
 									getMethodTotal('Customer Credit') > 0
 										? 'border-emerald-500 bg-emerald-50 text-emerald-700'
 										: 'border-emerald-300 bg-emerald-50 hover:border-emerald-500 hover:bg-emerald-100 text-emerald-700'
 								]"
 							>
-								<span class="text-lg">💳</span>
+								<span :class="isCompactMode ? 'text-base' : 'text-lg'">💳</span>
 								<span>{{ __('Credit Balance') }}</span>
 								<span v-if="getMethodTotal('Customer Credit') > 0" class="text-xs font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">
 									{{ formatCurrency(getMethodTotal('Customer Credit')) }}
@@ -338,7 +350,7 @@
 					</div>
 
 					<!-- Quick Amounts Area -->
-					<div v-if="lastSelectedMethod && remainingAmount > 0" class="mb-3">
+					<div v-if="lastSelectedMethod && remainingAmount > 0" :class="isCompactMode ? 'mb-2' : 'mb-3'">
 						<div class="text-start text-xs font-medium text-gray-600 mb-1.5">
 							{{ __('Quick amounts for {0}', [__(lastSelectedMethod.mode_of_payment)]) }}
 						</div>
@@ -347,13 +359,16 @@
 								v-for="amount in quickAmounts"
 								:key="amount"
 								@click="addCustomPayment(lastSelectedMethod, amount)"
-								class="px-3 py-3 lg:px-2 lg:py-2 text-base lg:text-sm font-semibold rounded-lg bg-white border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-all"
+								:class="[
+									'font-semibold rounded-lg bg-white border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-all',
+									isCompactMode ? 'px-2 py-2 text-xs lg:text-sm' : 'px-3 py-3 lg:px-2 lg:py-2 text-base lg:text-sm'
+								]"
 							>
 								{{ formatCurrency(amount) }}
 							</button>
 						</div>
 					</div>
-					<div v-else-if="!lastSelectedMethod && remainingAmount > 0" class="mb-3 p-3 lg:p-2 bg-blue-50 rounded-lg text-center">
+					<div v-else-if="!lastSelectedMethod && remainingAmount > 0" :class="['bg-blue-50 rounded-lg text-center', isCompactMode ? 'mb-2 p-2' : 'mb-3 p-3 lg:p-2']">
 						<p class="text-sm lg:text-xs text-blue-600">{{ __('Select a payment method to start') }}</p>
 					</div>
 
@@ -393,29 +408,29 @@
 						</div>
 
 						<!-- Numeric Keypad (hidden on mobile) -->
-						<div class="hidden lg:block bg-white rounded-lg border border-gray-200 p-3">
+						<div :class="['hidden lg:block bg-white rounded-lg border border-gray-200', isCompactMode ? 'p-2' : 'p-3']">
 						<!-- Amount Display -->
-						<div class="bg-gray-100 rounded-lg p-3 mb-3">
-							<div dir="ltr" class="text-2xl font-bold text-gray-900 text-center flex items-center justify-center gap-2">
+						<div :class="['bg-gray-100 rounded-lg', isCompactMode ? 'p-2 mb-2' : 'p-3 mb-3']">
+							<div dir="ltr" :class="['font-bold text-gray-900 text-center flex items-center justify-center gap-2', isCompactMode ? 'text-xl' : 'text-2xl']">
 								<span>{{ currencySymbol }}</span>
 								<span class="font-mono tracking-wider">{{ numpadDisplay || '0.00' }}</span>
 							</div>
 						</div>
 
 						<!-- Keypad Grid (4 columns) -->
-						<div class="grid grid-cols-4 gap-1.5">
+						<div :class="['grid grid-cols-4', isCompactMode ? 'gap-1' : 'gap-1.5']">
 							<!-- Row 1: 7, 8, 9, Backspace -->
 							<button
 								v-for="num in ['7', '8', '9']"
 								:key="num"
 								@click="numpadInput(num)"
-								class="h-12 text-xl font-semibold rounded-lg bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95"
+								:class="[dynamicNumpadSize.key, 'text-xl font-semibold rounded-lg bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95']"
 							>
 								{{ num }}
 							</button>
 							<button
 								@click="numpadBackspace"
-								class="h-12 text-lg font-semibold rounded-lg bg-red-50 border-2 border-red-200 hover:border-red-400 hover:bg-red-100 text-red-600 transition-all active:scale-95 flex items-center justify-center"
+								:class="[dynamicNumpadSize.key, 'text-lg font-semibold rounded-lg bg-red-50 border-2 border-red-200 hover:border-red-400 hover:bg-red-100 text-red-600 transition-all active:scale-95 flex items-center justify-center']"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z"/>
@@ -427,13 +442,13 @@
 								v-for="num in ['4', '5', '6']"
 								:key="num"
 								@click="numpadInput(num)"
-								class="h-12 text-xl font-semibold rounded-lg bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95"
+								:class="[dynamicNumpadSize.key, 'text-xl font-semibold rounded-lg bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95']"
 							>
 								{{ num }}
 							</button>
 							<button
 								@click="numpadClear"
-								class="h-12 text-lg font-semibold rounded-lg bg-orange-50 border-2 border-orange-200 hover:border-orange-400 hover:bg-orange-100 text-orange-600 transition-all active:scale-95"
+								:class="[dynamicNumpadSize.key, 'text-lg font-semibold rounded-lg bg-orange-50 border-2 border-orange-200 hover:border-orange-400 hover:bg-orange-100 text-orange-600 transition-all active:scale-95']"
 							>
 								C
 							</button>
@@ -443,7 +458,7 @@
 								v-for="num in ['1', '2', '3']"
 								:key="num"
 								@click="numpadInput(num)"
-								class="h-12 text-xl font-semibold rounded-lg bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95"
+								:class="[dynamicNumpadSize.key, 'text-xl font-semibold rounded-lg bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95']"
 							>
 								{{ num }}
 							</button>
@@ -451,7 +466,7 @@
 								@click="numpadAddPayment"
 								:disabled="!numpadValue || numpadValue <= 0 || !lastSelectedMethod"
 								:class="[
-									'h-[8.5rem] row-span-2 text-xl font-bold rounded-xl transition-all active:scale-95',
+									dynamicNumpadSize.addBtn, 'row-span-2 text-xl font-bold rounded-xl transition-all active:scale-95',
 									!numpadValue || numpadValue <= 0 || !lastSelectedMethod
 										? 'bg-gray-100 border-2 border-gray-200 text-gray-400 cursor-not-allowed'
 										: 'bg-blue-600 border-2 border-blue-600 hover:bg-blue-700 text-white'
@@ -463,13 +478,13 @@
 							<!-- Row 4: 00, 0, . -->
 							<button
 								@click="numpadInput('00')"
-								class="h-16 text-2xl font-semibold rounded-xl bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95"
+								:class="[isCompactMode ? 'h-12' : 'h-16', 'text-2xl font-semibold rounded-xl bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95']"
 							>
 								00
 							</button>
 							<button
 								@click="numpadInput('0')"
-								class="h-16 text-2xl font-semibold rounded-xl bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95"
+								:class="[isCompactMode ? 'h-12' : 'h-16', 'text-2xl font-semibold rounded-xl bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800 transition-all active:scale-95']"
 							>
 								0
 							</button>
@@ -477,7 +492,7 @@
 								@click="numpadInput('.')"
 								:disabled="numpadDisplay.includes('.')"
 								:class="[
-									'h-16 text-2xl font-semibold rounded-xl transition-all active:scale-95',
+									isCompactMode ? 'h-12' : 'h-16', 'text-2xl font-semibold rounded-xl transition-all active:scale-95',
 									numpadDisplay.includes('.')
 										? 'bg-gray-100 border-2 border-gray-200 text-gray-400 cursor-not-allowed'
 										: 'bg-gray-50 border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-800'
@@ -489,7 +504,7 @@
 						</div>
 
 						<!-- Action Buttons - Below Keypad -->
-						<div class="flex items-center gap-2 mt-4">
+						<div :class="['flex items-center gap-2', isCompactMode ? 'mt-2' : 'mt-4']">
 							<!-- Pay on Account Button (if credit sales enabled) -->
 							<button
 								v-if="allowCreditSale"
@@ -497,7 +512,7 @@
 								:disabled="paymentEntries.length > 0"
 								:class="[
 									'flex-1 inline-flex items-center justify-center gap-2 transition-colors focus:outline-none',
-									'h-12 text-sm font-semibold px-4 rounded-lg',
+									dynamicButtonHeight, 'text-sm font-semibold px-4 rounded-lg',
 									paymentEntries.length > 0
 										? 'bg-orange-300 text-white cursor-not-allowed'
 										: 'bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 focus-visible:ring-2 focus-visible:ring-orange-400'
@@ -515,7 +530,7 @@
 								:disabled="!canComplete"
 								:class="[
 									'flex-1 inline-flex items-center justify-center gap-2 transition-colors focus:outline-none',
-									'h-12 text-sm font-semibold px-5 rounded-lg',
+									dynamicButtonHeight, 'text-sm font-semibold px-5 rounded-lg',
 									!canComplete
 										? 'bg-blue-300 text-white cursor-not-allowed'
 										: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-400'
@@ -544,7 +559,7 @@ import { getPaymentIcon } from "@/utils/payment"
 import { offlineWorker } from "@/utils/offline/workerClient"
 import { logger } from "@/utils/logger"
 import { Dialog, createResource } from "frappe-ui"
-import { computed, ref, watch, nextTick } from "vue"
+import { computed, ref, watch, nextTick, onMounted, onUnmounted } from "vue"
 import { useToast } from "@/composables/useToast"
 
 const log = logger.create('PaymentDialog')
@@ -622,15 +637,97 @@ const loadingCredit = ref(false)
 
 // Column refs for height matching
 const rightColumnRef = ref(null)
-const leftColumnMaxHeight = ref('auto')
 const rightColumnMinHeight = ref('auto')
+
+// Viewport dimension tracking for dynamic sizing
+const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1200)
+const viewportHeight = ref(typeof window !== 'undefined' ? window.innerHeight : 800)
+
+function updateViewportDimensions() {
+	viewportWidth.value = window.innerWidth
+	viewportHeight.value = window.innerHeight
+}
+
+onMounted(() => {
+	updateViewportDimensions()
+	window.addEventListener('resize', updateViewportDimensions)
+})
+
+onUnmounted(() => {
+	window.removeEventListener('resize', updateViewportDimensions)
+})
+
+// Dynamic dialog size based on viewport
+const dynamicDialogSize = computed(() => {
+	const width = viewportWidth.value
+	if (width < 640) return 'full' // Mobile: full screen
+	if (width < 1024) return '4xl' // Tablet
+	if (width < 1280) return '5xl' // Small desktop
+	return '6xl' // Large desktop
+})
+
+// Dynamic content max height based on viewport
+const dialogContentMaxHeight = computed(() => {
+	const height = viewportHeight.value
+	// Reserve space for dialog header (~60px) and padding (~40px)
+	const availableHeight = height - 100
+	// On mobile, use more of the screen
+	if (viewportWidth.value < 640) {
+		return `${Math.max(400, availableHeight)}px`
+	}
+	// On tablet/desktop, cap at reasonable max
+	return `${Math.min(Math.max(500, availableHeight), height - 80)}px`
+})
+
+// Dynamic column heights based on viewport
+const dynamicLeftColumnHeight = computed(() => {
+	const height = viewportHeight.value
+	if (viewportWidth.value < 1024) {
+		// Mobile/tablet: auto height, will stack
+		return 'auto'
+	}
+	// Desktop: calculate based on available space
+	const availableHeight = height - 160 // Header + padding + action buttons
+	return `${Math.max(400, Math.min(availableHeight, height - 120))}px`
+})
+
+// Check if we're in compact mode (small screens)
+const isCompactMode = computed(() => viewportHeight.value < 700 || viewportWidth.value < 1024)
+
+// Dynamic gap and padding based on screen size
+const dynamicGap = computed(() => {
+	if (viewportWidth.value < 640) return 'gap-1.5'
+	if (viewportWidth.value < 1024) return 'gap-2'
+	return 'gap-3'
+})
+
+// Dynamic text sizes
+const dynamicTextSize = computed(() => ({
+	header: viewportWidth.value < 640 ? 'text-xs' : 'text-sm',
+	body: viewportWidth.value < 640 ? 'text-xs' : 'text-sm',
+	amount: viewportWidth.value < 640 ? 'text-lg' : viewportHeight.value < 700 ? 'text-lg' : 'text-xl',
+	grandTotal: viewportWidth.value < 640 ? 'text-lg' : viewportHeight.value < 700 ? 'text-xl' : 'text-2xl',
+}))
+
+// Dynamic button heights
+const dynamicButtonHeight = computed(() => {
+	if (viewportWidth.value < 640) return 'h-10'
+	if (viewportHeight.value < 700) return 'h-10'
+	return 'h-12'
+})
+
+// Dynamic numpad key size
+const dynamicNumpadSize = computed(() => {
+	if (viewportHeight.value < 600) return { key: 'h-10', addBtn: 'h-[6.5rem]' }
+	if (viewportHeight.value < 700) return { key: 'h-10', addBtn: 'h-[7rem]' }
+	return { key: 'h-12', addBtn: 'h-[8.5rem]' }
+})
 
 // Calculate and sync column heights when dialog opens
 function syncColumnHeights() {
 	nextTick(() => {
 		if (rightColumnRef.value) {
 			const rightHeight = rightColumnRef.value.offsetHeight
-			leftColumnMaxHeight.value = `${rightHeight}px`
 			// Preserve initial height to prevent shrinking when Quick Amounts is hidden
 			rightColumnMinHeight.value = `${rightHeight}px`
 		}
@@ -643,7 +740,7 @@ watch(() => props.modelValue, (isOpen) => {
 		// Reset min height when dialog opens so we can measure fresh
 		rightColumnMinHeight.value = 'auto'
 		// Small delay to ensure DOM is rendered
-		setTimeout(syncColumnHeights, 50)
+		setTimeout(syncColumnHeights, 100)
 	}
 })
 
