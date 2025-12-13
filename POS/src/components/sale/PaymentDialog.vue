@@ -259,7 +259,7 @@
 									<div :class="['font-bold text-orange-600', dynamicTextSize.amount]">{{ formatCurrency(remainingAmount) }}</div>
 								</div>
 								<div v-else-if="changeAmount > 0" :class="['bg-green-50 text-center', isCompactMode ? 'p-2' : 'p-3']">
-									<div class="text-xs font-medium text-green-600 uppercase tracking-wide mb-1">{{ __('Change') }}</div>
+									<div class="text-xs font-medium text-green-600 uppercase tracking-wide mb-1">{{ __('Change Due') }}</div>
 									<div :class="['font-bold text-green-600', dynamicTextSize.amount]">{{ formatCurrency(changeAmount) }}</div>
 								</div>
 								<div v-else :class="['bg-green-50 flex flex-col items-center justify-center', isCompactMode ? 'p-2' : 'p-3']">
@@ -277,12 +277,12 @@
 				<!-- Right Column (3/5): Payment Methods + Quick Amounts + Numpad -->
 				<div
 					ref="rightColumnRef"
-					:class="['lg:col-span-3 bg-gray-50 rounded-lg border border-gray-200', isCompactMode ? 'p-2' : 'p-3']"
+					:class="['lg:col-span-3 bg-gray-50 rounded-lg border border-gray-200 flex flex-col', 'p-2 lg:p-3']"
 					:style="{ minHeight: rightColumnMinHeight }"
 				>
 					<!-- Payment Methods -->
-					<div :class="isCompactMode ? 'mb-2' : 'mb-3'">
-						<div class="flex items-center justify-between mb-2">
+					<div class="mb-1.5 lg:mb-3">
+						<div class="flex items-center justify-between mb-1 lg:mb-2">
 							<div class="text-start text-xs font-semibold text-gray-500 uppercase tracking-wide">{{ __('Payment Method') }}</div>
 							<!-- Clear All Payments Button -->
 							<button
@@ -300,28 +300,25 @@
 							<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
 							<span class="text-sm text-gray-500">{{ __('Loading...') }}</span>
 						</div>
-						<div v-else-if="paymentMethods.length > 0" class="flex flex-wrap gap-2">
+						<div v-else-if="paymentMethods.length > 0" class="flex flex-wrap gap-1.5 lg:gap-2">
 							<button
 								v-for="method in paymentMethods"
 								:key="method.mode_of_payment"
-								@click="selectPaymentMethod(method)"
-								@mousedown="startLongPress(method)"
-								@mouseup="cancelLongPress"
-								@mouseleave="cancelLongPress"
-								@touchstart.prevent="startLongPress(method)"
-								@touchend="cancelLongPress"
-								@touchcancel="cancelLongPress"
+								@pointerdown="onPaymentMethodDown(method, $event)"
+								@pointerup="onPaymentMethodUp(method)"
+								@pointerleave="onPaymentMethodCancel"
+								@pointercancel="onPaymentMethodCancel"
 								:class="[
-									'inline-flex items-center gap-2 px-4 rounded-lg border-2 transition-all font-medium select-none',
-									isCompactMode ? 'h-9 text-xs' : 'h-11 text-sm',
+									'inline-flex items-center gap-1 lg:gap-2 px-2.5 lg:px-4 rounded-lg border-2 transition-all font-medium select-none touch-none',
+									'h-8 text-xs lg:h-11 lg:text-sm',
 									lastSelectedMethod?.mode_of_payment === method.mode_of_payment
 										? 'border-blue-500 bg-blue-50 text-blue-700'
 										: 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 text-gray-700'
 								]"
 							>
-								<span :class="isCompactMode ? 'text-base' : 'text-lg'">{{ getPaymentIcon(method.type) }}</span>
+								<span class="text-sm lg:text-lg">{{ getPaymentIcon(method.type) }}</span>
 								<span>{{ __(method.mode_of_payment) }}</span>
-								<span v-if="getMethodTotal(method.mode_of_payment) > 0" class="text-xs font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded">
+								<span v-if="getMethodTotal(method.mode_of_payment) > 0" class="text-xs font-bold text-blue-600 bg-blue-100 px-1 py-0.5 rounded">
 									{{ formatCurrency(getMethodTotal(method.mode_of_payment)) }}
 								</span>
 							</button>
@@ -331,17 +328,17 @@
 								@click="applyCustomerCredit"
 								:disabled="remainingAmount === 0 || remainingAvailableCredit === 0"
 								:class="[
-									'inline-flex items-center gap-2 px-4 rounded-lg border-2 transition-all font-medium',
-									isCompactMode ? 'h-9 text-xs' : 'h-11 text-sm',
+									'inline-flex items-center gap-1 lg:gap-2 px-2.5 lg:px-4 rounded-lg border-2 transition-all font-medium',
+									'h-8 text-xs lg:h-11 lg:text-sm',
 									remainingAmount === 0 || remainingAvailableCredit === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
 									getMethodTotal('Customer Credit') > 0
 										? 'border-emerald-500 bg-emerald-50 text-emerald-700'
 										: 'border-emerald-300 bg-emerald-50 hover:border-emerald-500 hover:bg-emerald-100 text-emerald-700'
 								]"
 							>
-								<span :class="isCompactMode ? 'text-base' : 'text-lg'">💳</span>
+								<span class="text-sm lg:text-lg">💳</span>
 								<span>{{ __('Credit Balance') }}</span>
-								<span v-if="getMethodTotal('Customer Credit') > 0" class="text-xs font-bold text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded">
+								<span v-if="getMethodTotal('Customer Credit') > 0" class="text-xs font-bold text-emerald-600 bg-emerald-100 px-1 py-0.5 rounded">
 									{{ formatCurrency(getMethodTotal('Customer Credit')) }}
 								</span>
 							</button>
@@ -349,57 +346,67 @@
 						<div v-else class="text-sm text-gray-500">{{ __('No payment methods available') }}</div>
 					</div>
 
-					<!-- Quick Amounts Area -->
-					<div v-if="lastSelectedMethod && remainingAmount > 0" :class="isCompactMode ? 'mb-2' : 'mb-3'">
+					<!-- Quick Amounts Area (Desktop) -->
+					<div v-if="lastSelectedMethod && remainingAmount > 0" class="hidden lg:block" :class="isCompactMode ? 'mb-2' : 'mb-3'">
 						<div class="text-start text-xs font-medium text-gray-600 mb-1.5">
 							{{ __('Quick amounts for {0}', [__(lastSelectedMethod.mode_of_payment)]) }}
 						</div>
-						<div class="grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-1.5">
+						<div class="grid grid-cols-4 gap-1.5">
 							<button
 								v-for="amount in quickAmounts"
 								:key="amount"
 								@click="addCustomPayment(lastSelectedMethod, amount)"
 								:class="[
 									'font-semibold rounded-lg bg-white border-2 border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-all',
-									isCompactMode ? 'px-2 py-2 text-xs lg:text-sm' : 'px-3 py-3 lg:px-2 lg:py-2 text-base lg:text-sm'
+									isCompactMode ? 'px-2 py-2 text-sm' : 'px-2 py-2 text-sm'
 								]"
 							>
 								{{ formatCurrency(amount) }}
 							</button>
 						</div>
 					</div>
-					<div v-else-if="!lastSelectedMethod && remainingAmount > 0" :class="['bg-blue-50 rounded-lg text-center', isCompactMode ? 'mb-2 p-2' : 'mb-3 p-3 lg:p-2']">
-						<p class="text-sm lg:text-xs text-blue-600">{{ __('Select a payment method to start') }}</p>
+					<div v-else-if="!lastSelectedMethod && remainingAmount > 0" class="hidden lg:block" :class="['bg-blue-50 rounded-lg text-center', isCompactMode ? 'mb-2 p-2' : 'mb-3 p-3 lg:p-2']">
+						<p class="text-xs text-blue-600">{{ __('Select a payment method to start') }}</p>
 					</div>
 
-					<!-- Keypad and Actions Container -->
-					<div>
-						<!-- Mobile Custom Amount Input (visible only on mobile) -->
-						<div v-if="lastSelectedMethod" class="lg:hidden mb-3">
-							<div class="text-start text-xs font-medium text-gray-600 mb-1.5">
-								{{ __('Custom Amount') }}
+					<!-- Mobile Payment Section - Compact & Clear -->
+					<div class="lg:hidden">
+						<!-- Mobile Quick Amounts + Custom Input -->
+						<div v-if="lastSelectedMethod && remainingAmount > 0" class="space-y-1.5 mb-2">
+							<!-- Quick Amounts Row (4 columns, compact) -->
+							<div class="grid grid-cols-4 gap-1">
+								<button
+									v-for="amount in quickAmounts"
+									:key="amount"
+									@click="addCustomPayment(lastSelectedMethod, amount)"
+									class="py-1.5 text-xs font-semibold rounded bg-white border border-gray-200 text-gray-700 active:bg-blue-50 active:border-blue-400"
+								>
+									{{ formatCurrency(amount) }}
+								</button>
 							</div>
-							<div class="flex gap-2">
+
+							<!-- Custom Amount Row -->
+							<div class="flex gap-1">
 								<div class="relative flex-1">
-									<span class="absolute start-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">{{ currencySymbol }}</span>
+									<span class="absolute start-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">{{ currencySymbol }}</span>
 									<input
 										v-model="mobileCustomAmount"
 										type="number"
 										inputmode="decimal"
-										:placeholder="__('Enter amount')"
+										:placeholder="__('Custom')"
 										min="0"
 										step="0.01"
-										class="w-full h-12 ps-10 pe-3 text-lg font-semibold border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+										class="w-full h-8 ps-6 pe-2 text-sm font-semibold border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white"
 									/>
 								</div>
 								<button
 									@click="addMobileCustomPayment"
 									:disabled="!mobileCustomAmount || mobileCustomAmount <= 0"
 									:class="[
-										'h-12 px-6 text-base font-bold rounded-lg transition-all',
+										'h-8 px-3 text-xs font-semibold rounded transition-all',
 										!mobileCustomAmount || mobileCustomAmount <= 0
-											? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-											: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
+											? 'bg-gray-100 text-gray-400'
+											: 'bg-blue-500 text-white active:bg-blue-600'
 									]"
 								>
 									{{ __('Add') }}
@@ -407,8 +414,66 @@
 							</div>
 						</div>
 
-						<!-- Numeric Keypad (hidden on mobile) -->
-						<div :class="['hidden lg:block bg-white rounded-lg border border-gray-200', isCompactMode ? 'p-2' : 'p-3']">
+						<!-- Mobile: Select payment method prompt -->
+						<div v-else-if="!lastSelectedMethod && remainingAmount > 0" class="bg-blue-50 rounded text-center p-2 mb-2">
+							<p class="text-xs text-blue-600">{{ __('Select a payment method') }}</p>
+						</div>
+
+						<!-- Mobile Action Buttons -->
+						<div class="space-y-1.5">
+							<!-- Two buttons side by side when both needed -->
+							<div v-if="lastSelectedMethod && remainingAmount > 0 && allowCreditSale && paymentEntries.length === 0" class="grid grid-cols-2 gap-1.5">
+								<!-- Pay Full Amount Button -->
+								<button
+									@click="addCustomPayment(lastSelectedMethod, remainingAmount)"
+									class="h-10 text-sm font-bold rounded-lg bg-green-500 text-white active:bg-green-600 flex items-center justify-center gap-1"
+								>
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+									</svg>
+									<span>{{ formatCurrency(remainingAmount) }}</span>
+								</button>
+								<!-- Pay on Account Button -->
+								<button
+									@click="addCreditAccountPayment"
+									class="h-10 text-sm font-semibold rounded-lg bg-orange-500 text-white active:bg-orange-600 flex items-center justify-center gap-1"
+								>
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+									</svg>
+									<span>{{ __('On Account') }}</span>
+								</button>
+							</div>
+
+							<!-- Single Pay button (when no credit sale option) -->
+							<button
+								v-else-if="lastSelectedMethod && remainingAmount > 0"
+								@click="addCustomPayment(lastSelectedMethod, remainingAmount)"
+								class="w-full h-10 text-sm font-bold rounded-lg bg-green-500 text-white active:bg-green-600 flex items-center justify-center gap-2"
+							>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+								</svg>
+								<span>{{ __('Pay') }} {{ formatCurrency(remainingAmount) }}</span>
+							</button>
+
+							<!-- Complete Payment Button -->
+							<button
+								v-if="remainingAmount === 0 && totalPaid > 0"
+								@click="completePayment"
+								class="w-full h-10 text-sm font-bold rounded-lg bg-blue-500 text-white active:bg-blue-600 flex items-center justify-center gap-2"
+							>
+								<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+									<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+								</svg>
+								<span>{{ __('Complete Payment') }}</span>
+							</button>
+						</div>
+					</div>
+					<!-- End Mobile Payment Section -->
+
+					<!-- Numeric Keypad (Desktop only) -->
+					<div :class="['hidden lg:block bg-white rounded-lg border border-gray-200', isCompactMode ? 'p-2' : 'p-3']">
 						<!-- Amount Display -->
 						<div :class="['bg-gray-100 rounded-lg', isCompactMode ? 'p-2 mb-2' : 'p-3 mb-3']">
 							<div dir="ltr" :class="['font-bold text-gray-900 text-center flex items-center justify-center gap-2', isCompactMode ? 'text-xl' : 'text-2xl']">
@@ -503,47 +568,45 @@
 							</div>
 						</div>
 
-						<!-- Action Buttons - Below Keypad -->
-						<div :class="['flex items-center gap-2', isCompactMode ? 'mt-2' : 'mt-4']">
-							<!-- Pay on Account Button (if credit sales enabled) -->
-							<button
-								v-if="allowCreditSale"
-								@click="addCreditAccountPayment"
-								:disabled="paymentEntries.length > 0"
-								:class="[
-									'flex-1 inline-flex items-center justify-center gap-2 transition-colors focus:outline-none',
-									dynamicButtonHeight, 'text-sm font-semibold px-4 rounded-lg',
-									paymentEntries.length > 0
-										? 'bg-orange-300 text-white cursor-not-allowed'
-										: 'bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 focus-visible:ring-2 focus-visible:ring-orange-400'
-								]"
-							>
-								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-								</svg>
-								<span>{{ __('Pay on Account') }}</span>
-							</button>
+					<!-- Action Buttons - Below Keypad (Desktop only) -->
+					<div :class="['hidden lg:flex items-center gap-2', isCompactMode ? 'mt-2' : 'mt-4']">
+						<!-- Pay on Account Button (if credit sales enabled) -->
+						<button
+							v-if="allowCreditSale"
+							@click="addCreditAccountPayment"
+							:disabled="paymentEntries.length > 0"
+							:class="[
+								'flex-1 inline-flex items-center justify-center gap-2 transition-colors focus:outline-none',
+								dynamicButtonHeight, 'text-sm font-semibold px-4 rounded-lg',
+								paymentEntries.length > 0
+									? 'bg-orange-300 text-white cursor-not-allowed'
+									: 'bg-orange-500 text-white hover:bg-orange-600 active:bg-orange-700 focus-visible:ring-2 focus-visible:ring-orange-400'
+							]"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+							</svg>
+							<span>{{ __('Pay on Account') }}</span>
+						</button>
 
-							<!-- Complete/Partial Payment Button -->
-							<button
-								@click="completePayment"
-								:disabled="!canComplete"
-								:class="[
-									'flex-1 inline-flex items-center justify-center gap-2 transition-colors focus:outline-none',
-									dynamicButtonHeight, 'text-sm font-semibold px-5 rounded-lg',
-									!canComplete
-										? 'bg-blue-300 text-white cursor-not-allowed'
-										: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-400'
-								]"
-							>
-								<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-									<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-								</svg>
-								<span>{{ paymentButtonText }}</span>
-							</button>
-						</div>
+						<!-- Complete/Partial Payment Button -->
+						<button
+							@click="completePayment"
+							:disabled="!canComplete"
+							:class="[
+								'flex-1 inline-flex items-center justify-center gap-2 transition-colors focus:outline-none',
+								dynamicButtonHeight, 'text-sm font-semibold px-5 rounded-lg',
+								!canComplete
+									? 'bg-blue-300 text-white cursor-not-allowed'
+									: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus-visible:ring-2 focus-visible:ring-blue-400'
+							]"
+						>
+							<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+								<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+							</svg>
+							<span>{{ paymentButtonText }}</span>
+						</button>
 					</div>
-					<!-- End Keypad and Actions Container -->
 				</div>
 				<!-- End Right Column -->
 			</div>
@@ -561,6 +624,7 @@ import { logger } from "@/utils/logger"
 import { Dialog, createResource } from "frappe-ui"
 import { computed, ref, watch, nextTick, onMounted, onUnmounted } from "vue"
 import { useToast } from "@/composables/useToast"
+import { useLongPress } from "@/composables/useLongPress"
 
 const log = logger.create('PaymentDialog')
 const settingsStore = usePOSSettingsStore()
@@ -1190,61 +1254,52 @@ watch(show, (newVal) => {
 	}
 })
 
-// Long press state for payment methods
-let longPressTimer = null
-let longPressTriggered = false
-const LONG_PRESS_DURATION = 500 // ms
+// ===========================================
+// Payment Method Press Handler (Long Press Support)
+// Uses composable for clean, reusable press handling
+// ===========================================
 
-// Select payment method (click) - just selects, doesn't add payment
+// Select payment method (tap action)
 function selectPaymentMethod(method) {
-	// If long press was triggered, don't also trigger click
-	if (longPressTriggered) {
-		longPressTriggered = false
-		return
-	}
-
-	log.debug('[PaymentDialog] Select payment method:', method.mode_of_payment)
 	lastSelectedMethod.value = method
+	log.debug('[PaymentDialog] Selected payment method:', method.mode_of_payment)
 }
 
-// Start long press timer
-function startLongPress(method) {
-	longPressTriggered = false
-
-	longPressTimer = setTimeout(() => {
-		longPressTriggered = true
-		quickAddPayment(method)
-	}, LONG_PRESS_DURATION)
-}
-
-// Cancel long press timer
-function cancelLongPress() {
-	if (longPressTimer) {
-		clearTimeout(longPressTimer)
-		longPressTimer = null
-	}
-}
-
-// Long press payment - adds remaining amount with selected method
+// Quick add payment (long press action)
 function quickAddPayment(method) {
-	log.debug('[PaymentDialog] Quick add payment (long press):', {
-		method: method.mode_of_payment,
-		remainingAmount: remainingAmount.value,
-		currentEntries: paymentEntries.value.length
-	})
-
-	if (remainingAmount.value === 0) return
+	if (remainingAmount.value <= 0) return
 
 	lastSelectedMethod.value = method
-
 	paymentEntries.value.push({
 		mode_of_payment: method.mode_of_payment,
 		amount: Number.parseFloat(remainingAmount.value.toFixed(2)),
 		type: method.type || __('Cash'),
 	})
+	log.debug('[PaymentDialog] Long press payment added:', method.mode_of_payment)
+}
 
-	log.debug('[PaymentDialog] Payment added, new entries:', paymentEntries.value)
-	customAmount.value = ""
+// Initialize long press composable with callbacks
+const {
+	onPointerDown: handlePointerDown,
+	onPointerUp: handlePointerUp,
+	onPointerCancel: handlePointerCancel,
+} = useLongPress({
+	duration: 500,
+	onTap: selectPaymentMethod,
+	onLongPress: quickAddPayment,
+})
+
+// Wrapper handlers to pass method to composable
+function onPaymentMethodDown(method, event) {
+	handlePointerDown(event, method)
+}
+
+function onPaymentMethodUp(method) {
+	handlePointerUp(method)
+}
+
+function onPaymentMethodCancel() {
+	handlePointerCancel()
 }
 
 // Add custom amount for a method
