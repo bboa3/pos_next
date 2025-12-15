@@ -4,6 +4,13 @@ Welcome to the POS Next documentation directory. This folder contains comprehens
 
 ## 📚 Available Documentation
 
+### User Guides
+- **[LOCALIZATION.md](LOCALIZATION.md)** - Language settings guide
+  - Configuring allowed languages
+  - Using the language switcher
+  - Available languages
+  - Troubleshooting
+
 ### Architecture
 - **[STARTUP_SEQUENCE.md](STARTUP_SEQUENCE.md)** - Application initialization flow
   - PWA service worker registration
@@ -59,6 +66,7 @@ yarn build
 ```
 docs/
 ├── README.md                    # This file
+├── LOCALIZATION.md              # Language settings user guide
 ├── STARTUP_SEQUENCE.md          # Application initialization flow
 ├── VERSION_CONTROL.md           # Comprehensive version control guide
 └── QUICKSTART_VERSION.md        # Quick reference guide
