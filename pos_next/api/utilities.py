@@ -66,3 +66,21 @@ def _parse_list_parameter(value, param_name):
 		return []
 	
 	return value
+
+def check_user_company():
+	"""
+	Check if the authenticated user has a company linked to them
+	"""
+	user = frappe.session.user
+
+	existing_permission = frappe.db.exists("User Permission", {"user": user, "allow": "Company"})
+	has_company = bool(existing_permission)
+
+	company_name = None
+	if has_company:
+		company_id = frappe.db.get_value("User Permission", existing_permission, "for_value")
+		company_name = frappe.db.get_value("Company", company_id, "company_name")
+
+	data = {"has_company": has_company, "company": company_name or ""}
+
+	return data

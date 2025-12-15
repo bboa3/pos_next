@@ -5,7 +5,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-from nexus.api.v1.utilities.endpoints import check_user_company
+from pos_next.api.utilities import check_user_company
 from pos_next.api.utilities import _parse_list_parameter
 
 
@@ -447,7 +447,7 @@ def create_pos_profile(*arg ,**parameters):
 	customer_groups = _parse_list_parameter(customer_groups, "customer_groups")
 	
 	# Get user's company
-	user_company_data = check_user_company(is_function=True)
+	user_company_data = check_user_company()
 	user_company = user_company_data.get("company")
 	
 	if not user_company:
