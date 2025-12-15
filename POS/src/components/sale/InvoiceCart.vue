@@ -1236,12 +1236,11 @@ function decrementQuantity(item) {
  * @param {Object} item - Cart item to update
  * @param {String} value - New quantity value from input
  */
-function updateQuantity(item, value) {
+const updateQuantity = ({ item_code, uom }, value) => {
 	const qty = Number.parseFloat(value)
-	// Allow any positive number during typing (don't round yet)
-	if (!isNaN(qty) && qty > 0) {
-		emit("update-quantity", item.item_code, qty, item.uom)
-	}
+	if (isNaN(qty)) return
+	if (qty <= 0) return emit("remove-item", item_code, uom)
+	emit("update-quantity", item_code, qty, uom)
 }
 
 /**
