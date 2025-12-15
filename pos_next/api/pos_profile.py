@@ -333,9 +333,14 @@ def get_create_pos_profile(*args, **kwargs):
 		- customer_groups: Available customer groups
 	"""
 	try:
+		user_company = check_user_company()
+		user_company = user_company.get("company")
+		if not user_company:
+			frappe.throw(_("User must have a company assigned"))
+
 		warehouses = frappe.get_list(
 			"Warehouse",
-			filters={"disabled": 0, "is_group": 0},
+			filters={"disabled": 0, "is_group": 0, "company": user_company},
 			fields=["name"],
 			order_by="name"
 		)
@@ -359,7 +364,8 @@ def get_create_pos_profile(*args, **kwargs):
 			filters={
 				"report_type": "Profit and Loss",
 				"disabled": 0,
-				"is_group": 0
+				"is_group": 0,
+				"company": user_company
 			},
 		)
 
@@ -367,7 +373,8 @@ def get_create_pos_profile(*args, **kwargs):
 			"Cost Center",
 			filters={
 				"is_group": 0,
-				"disabled": 0
+				"disabled": 0,
+				"company": user_company
 			},
 		)
 
