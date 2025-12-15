@@ -432,21 +432,24 @@
 			</div>
 
 			<!-- Payment Dialog -->
-			<PaymentDialog
-				v-model="uiStore.showPaymentDialog"
-				:grand-total="cartStore.grandTotal"
-				:subtotal="cartStore.subtotal"
-				:pos-profile="shiftStore.profileName"
-				:currency="shiftStore.profileCurrency"
-				:is-offline="offlineStore.isOffline"
-				:allow-partial-payment="posSettingsStore.allowPartialPayment"
-				:allow-credit-sale="posSettingsStore.allowCreditSale"
-				:customer="cartStore.customer"
-				:company="shiftStore.profileCompany"
-				:additional-discount="cartStore.additionalDiscount"
-				@payment-completed="handlePaymentCompleted"
-				@update-additional-discount="handleAdditionalDiscountUpdate"
-			/>
+		<PaymentDialog
+			v-model="uiStore.showPaymentDialog"
+			:grand-total="cartStore.grandTotal"
+			:subtotal="cartStore.subtotal"
+			:pos-profile="shiftStore.profileName"
+			:currency="shiftStore.profileCurrency"
+			:is-offline="offlineStore.isOffline"
+			:allow-partial-payment="posSettingsStore.allowPartialPayment"
+			:allow-credit-sale="posSettingsStore.allowCreditSale"
+			:customer="cartStore.customer"
+			:company="shiftStore.profileCompany"
+			:additional-discount="cartStore.additionalDiscount"
+			:items="cartStore.invoiceItems"
+			:tax-amount="cartStore.totalTax"
+			:discount-amount="cartStore.totalDiscount"
+			@payment-completed="handlePaymentCompleted"
+			@update-additional-discount="handleAdditionalDiscountUpdate"
+		/>
 
 			<!-- Customer Selection Dialog -->
 			<CustomerDialog
