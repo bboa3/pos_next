@@ -1460,194 +1460,193 @@ def get_stock_quantities(item_codes, warehouse):
 		frappe.throw(_("Error fetching stock quantities: {0}").format(str(e)))
 
 
+# =============================================================================
+# WAREHOUSE AVAILABILITY HELPERS
+# =============================================================================
+
+def _get_warehouse_display_name(warehouse_id, warehouse_map, fallback_company=None):
+	"""
+	Get display name for a warehouse with fallback logic.
+
+	Fallback order:
+	1. warehouse_name from cached map
+	2. warehouse.name (ID) from cached map
+	3. Fetch from DB if not in map (handles disabled/group warehouses)
+	4. Use warehouse_id as last resort
+	"""
+	warehouse = warehouse_map.get(warehouse_id)
+	if warehouse:
+		return warehouse.warehouse_name or warehouse.name, warehouse.company
+
+	# Fallback: fetch from DB if not in active warehouse map
+	wh_details = frappe.db.get_value("Warehouse", warehouse_id, ["warehouse_name", "company"], as_dict=True)
+	if wh_details:
+		return wh_details.warehouse_name or warehouse_id, wh_details.company
+	return warehouse_id, fallback_company or ""
+
+
+def _build_stock_entry(warehouse_id, actual_qty, reserved_qty, warehouse_map, item_code=None, fallback_company=None):
+	"""
+	Build a standardized stock entry dict with warehouse details.
+
+	Returns:
+		dict with warehouse, warehouse_name, actual_qty, reserved_qty, available_qty, company
+		and optionally item_code if provided
+	"""
+	wh_name, wh_company = _get_warehouse_display_name(warehouse_id, warehouse_map, fallback_company)
+	entry = {
+		"warehouse": warehouse_id,
+		"warehouse_name": wh_name,
+		"actual_qty": flt(actual_qty),
+		"reserved_qty": flt(reserved_qty),
+		"available_qty": flt(actual_qty) - flt(reserved_qty),
+		"company": wh_company
+	}
+	if item_code:
+		entry["item_code"] = item_code
+	return entry
+
+
+def _parse_item_codes_param(item_codes):
+	"""
+	Parse item_codes parameter from JSON string or list.
+	Handles: JSON string, list, tuple, or single value.
+	"""
+	if isinstance(item_codes, str):
+		try:
+			item_codes = json.loads(item_codes)
+		except (json.JSONDecodeError, ValueError):
+			return [item_codes]
+	return list(item_codes) if isinstance(item_codes, (list, tuple)) else [item_codes]
+
+
+# =============================================================================
+# WAREHOUSE AVAILABILITY API
+# =============================================================================
+
 @frappe.whitelist()
 def get_item_warehouse_availability(item_code=None, item_codes=None, company=None):
 	"""
-	Get stock availability for an item or multiple items across all warehouses.
+	Get stock availability for item(s) across all warehouses.
 	Useful for showing cashiers where out-of-stock items are available.
 
 	Handles:
 	- Regular items: Shows stock in all warehouses
 	- Item variants: Shows stock for the specific variant
 	- Template items (has_variants): Shows combined stock of all variants
+	- Product Bundles: Calculates availability based on component stock
 	- Multiple items: Shows stock for each item separately
 
 	Args:
-		item_code: Single item code (for backward compatibility)
+		item_code: Single item code (backward compatible)
 		item_codes: List of item codes (JSON string or list) - if provided, item_code is ignored
 		company: Optional company filter
 
 	Returns:
-		List of warehouses with stock (grouped by item_code if multiple items):
-		[
-			{
-				"item_code": str,  # Only present if item_codes provided
-				"warehouse": str,
-				"warehouse_name": str,
-				"actual_qty": float,
-				"reserved_qty": float,
-				"available_qty": float,
-				"company": str
-			}
-		]
+		List of warehouse stock entries:
+		[{
+			"item_code": str,      # Only present if item_codes provided
+			"warehouse": str,
+			"warehouse_name": str,
+			"actual_qty": float,
+			"reserved_qty": float,
+			"available_qty": float,
+			"company": str
+		}]
 	"""
 	try:
-		# Parse item_codes if provided (supports both JSON string and list)
+		# ---------------------------------------------------------------------
+		# STEP 1: Determine which items to check
+		# ---------------------------------------------------------------------
 		if item_codes:
-			if isinstance(item_codes, str):
-				try:
-					item_codes = json.loads(item_codes)
-				except (json.JSONDecodeError, ValueError):
-					item_codes = [item_codes]
-			if not isinstance(item_codes, list):
-				item_codes = [item_codes]
-			items_to_check = item_codes.copy()
-			include_item_code_in_result = True
+			items_to_check = _parse_item_codes_param(item_codes)
+			include_item_code = True
 		elif item_code:
-			# Check if item exists
 			item_doc = frappe.get_cached_doc("Item", item_code)
-
-			# Determine which items to check stock for
 			items_to_check = [item_code]
-
-			# If this is a template item, include all its variants
+			# If template item, include all its variants
 			if item_doc.has_variants:
-				variants = frappe.get_all(
-					"Item",
-					filters={"variant_of": item_code, "disabled": 0},
-					fields=["name"]
+				items_to_check += frappe.get_all(
+					"Item", filters={"variant_of": item_code, "disabled": 0}, pluck="name"
 				)
-				items_to_check.extend([v.name for v in variants])
-			include_item_code_in_result = False
+			include_item_code = False
 		else:
 			frappe.throw(_("Either item_code or item_codes must be provided"))
 
-		# Build warehouse filter
-		warehouse_filters = {
-			"disabled": 0,
-			"is_group": 0  # Only show leaf warehouses, not groups
-		}
+		# ---------------------------------------------------------------------
+		# STEP 2: Get active warehouses (non-disabled, non-group)
+		# ---------------------------------------------------------------------
+		wh_filters = {"disabled": 0, "is_group": 0}
 		if company:
-			warehouse_filters["company"] = company
+			wh_filters["company"] = company
 
-		# Get all active non-group warehouses
 		warehouses = frappe.get_list(
-			"Warehouse",
-			filters=warehouse_filters,
+			"Warehouse", filters=wh_filters,
 			fields=["name", "warehouse_name", "company"],
 			order_by="warehouse_name"
 		)
-
 		if not warehouses:
 			return []
 
-		# ===================================================================
-		# DETECT BUNDLES: Identify which items are Product Bundles
-		# ===================================================================
-		bundle_items = frappe.db.get_all(
+		warehouse_map = {w.name: w for w in warehouses}
+		warehouse_names = list(warehouse_map.keys())
+
+		# ---------------------------------------------------------------------
+		# STEP 3: Separate Product Bundles from regular stock items
+		# ---------------------------------------------------------------------
+		bundle_set = set(frappe.get_all(
 			"Product Bundle",
 			filters={"new_item_code": ["in", items_to_check]},
-			fields=["new_item_code"],
 			pluck="new_item_code"
-		)
-		bundle_set = set(bundle_items) if bundle_items else set()
-		regular_items = [item for item in items_to_check if item not in bundle_set]
+		) or [])
+		regular_items = [i for i in items_to_check if i not in bundle_set]
 
-		# Build warehouse map for quick lookup
-		warehouse_map = {w.name: w for w in warehouses}
 		result = []
 
-		# ===================================================================
-		# HANDLE REGULAR ITEMS: Query tabBin for stock items
-		# ===================================================================
+		# ---------------------------------------------------------------------
+		# STEP 4: Query stock for regular items from Bin table
+		# ---------------------------------------------------------------------
 		if regular_items:
-			bin = DocType("Bin")
-			warehouse_names = [w.name for w in warehouses]
-			
-			if include_item_code_in_result:
-				# When multiple items, group by both item_code and warehouse
-				stock_data = (
-					frappe.qb.from_(bin)
-					.select(
-						bin.item_code,
-						bin.warehouse,
-						fn.Sum(bin.actual_qty).as_("actual_qty"),
-						fn.Sum(bin.reserved_qty).as_("reserved_qty")
-					)
-					.where(bin.item_code.isin(regular_items))
-					.where(bin.warehouse.isin(warehouse_names))
-					.groupby(bin.item_code, bin.warehouse)
-					.having(fn.Sum(bin.actual_qty) > 0)
-					.run(as_dict=True)
+			bin_tbl = DocType("Bin")
+			query = (
+				frappe.qb.from_(bin_tbl)
+				.select(
+					bin_tbl.warehouse,
+					fn.Sum(bin_tbl.actual_qty).as_("actual_qty"),
+					fn.Sum(bin_tbl.reserved_qty).as_("reserved_qty")
 				)
-
-			else:
-				# Single item - group only by warehouse (backward compatible)
-				stock_data = (
-					frappe.qb.from_(bin)
-					.select(
-						bin.warehouse,
-						fn.Sum(bin.actual_qty).as_("actual_qty"),
-						fn.Sum(bin.reserved_qty).as_("reserved_qty")
-					)
-					.where(bin.item_code.isin(regular_items))
-					.where(bin.warehouse.isin(warehouse_names))
-					.groupby(bin.warehouse)
-					.having(fn.Sum(bin.actual_qty) > 0)
-					.run(as_dict=True)
-				)
-
-
-			# Enrich stock data with warehouse details
-			for stock in stock_data:
-				warehouse = warehouse_map.get(stock.warehouse)
-				if warehouse:
-					stock_entry = {
-						"warehouse": stock.warehouse,
-						"warehouse_name": warehouse.warehouse_name,
-						"actual_qty": flt(stock.actual_qty),
-						"reserved_qty": flt(stock.reserved_qty),
-						"available_qty": flt(stock.actual_qty) - flt(stock.reserved_qty),
-						"company": warehouse.company
-					}
-					# Add item_code if multiple items requested
-					if include_item_code_in_result:
-						stock_entry["item_code"] = stock.item_code
-					result.append(stock_entry)
-
-		# ===================================================================
-		# HANDLE PRODUCT BUNDLES: Calculate availability per warehouse (optimized)
-		# ===================================================================
-		# Use bulk calculation for all bundles across all warehouses efficiently
-		# This processes all bundles and warehouses in a single optimized pass
-		if bundle_set:
-			bundle_list = list(bundle_set)
-			warehouse_list = [{"name": w.name} for w in warehouses]
-			
-			# Bulk calculate bundle availability across all warehouses
-			bundle_warehouse_map = _get_bundle_warehouse_availability_bulk(
-				bundle_list,
-				warehouse_list
+				.where(bin_tbl.item_code.isin(regular_items))
+				.where(bin_tbl.warehouse.isin(warehouse_names))
+				.having(fn.Sum(bin_tbl.actual_qty) > 0)
 			)
-			
-			# Build result entries from the bulk calculation
-			for bundle_code in bundle_list:
-				bundle_warehouses = bundle_warehouse_map.get(bundle_code, {})
-				for wh_name, available_qty in bundle_warehouses.items():
-					warehouse = warehouse_map.get(wh_name)
-					if warehouse:
-						bundle_entry = {
-							"warehouse": warehouse.name,
-							"warehouse_name": warehouse.warehouse_name,
-							"actual_qty": flt(available_qty),
-							"reserved_qty": 0.0,  # Bundles don't have reserved qty
-							"available_qty": flt(available_qty),
-							"company": warehouse.company
-						}
-						# Add item_code if multiple items requested
-						if include_item_code_in_result:
-							bundle_entry["item_code"] = bundle_code
-						result.append(bundle_entry)
+
+			# Group by item_code too when multiple items requested
+			if include_item_code:
+				query = query.select(bin_tbl.item_code).groupby(bin_tbl.item_code, bin_tbl.warehouse)
+			else:
+				query = query.groupby(bin_tbl.warehouse)
+
+			for stock in query.run(as_dict=True):
+				result.append(_build_stock_entry(
+					stock.warehouse, stock.actual_qty, stock.reserved_qty,
+					warehouse_map, stock.get("item_code") if include_item_code else None, company
+				))
+
+		# ---------------------------------------------------------------------
+		# STEP 5: Calculate availability for Product Bundles
+		# Bundle availability = min(component_qty / required_qty) per warehouse
+		# ---------------------------------------------------------------------
+		if bundle_set:
+			bundle_availability = _get_bundle_warehouse_availability_bulk(
+				list(bundle_set), [{"name": w} for w in warehouse_names]
+			)
+			for bundle_code, wh_qtys in bundle_availability.items():
+				for wh_name, qty in wh_qtys.items():
+					if qty > 0:
+						result.append(_build_stock_entry(
+							wh_name, qty, 0, warehouse_map,
+							bundle_code if include_item_code else None, company
+						))
 
 		return result
 
