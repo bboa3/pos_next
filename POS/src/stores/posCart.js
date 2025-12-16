@@ -10,6 +10,117 @@ import { useToast } from "@/composables/useToast"
 import { defineStore } from "pinia"
 import { computed, nextTick, ref, toRaw, watch } from "vue"
 
+/**
+ * Creates a debounced function that delays invoking fn until after delay ms
+ * have elapsed since the last time it was invoked.
+ * Returns a function with .cancel() and .flush() methods.
+ */
+function createDebounce(fn, delay) {
+	let timeoutId = null
+	let pendingArgs = null
+
+	const debounced = (...args) => {
+		pendingArgs = args
+		if (timeoutId) {
+			clearTimeout(timeoutId)
+		}
+		timeoutId = setTimeout(() => {
+			timeoutId = null
+			const args = pendingArgs
+			pendingArgs = null
+			fn(...args)
+		}, delay)
+	}
+
+	debounced.cancel = () => {
+		if (timeoutId) {
+			clearTimeout(timeoutId)
+			timeoutId = null
+		}
+		pendingArgs = null
+	}
+
+	debounced.flush = () => {
+		if (timeoutId && pendingArgs) {
+			clearTimeout(timeoutId)
+			timeoutId = null
+			const args = pendingArgs
+			pendingArgs = null
+			fn(...args)
+		}
+	}
+
+	debounced.isPending = () => timeoutId !== null
+
+	return debounced
+}
+
+/**
+ * Creates an async task queue that ensures only one operation runs at a time.
+ * Subsequent calls while processing will be queued and the latest one executed.
+ */
+function createAsyncQueue() {
+	let isProcessing = false
+	let pendingTask = null
+	let currentAbortController = null
+
+	return {
+		/**
+		 * Enqueue a task. If already processing, replaces any pending task.
+		 * @param {Function} taskFn - Async function to execute
+		 * @returns {Promise} Resolves when task completes or is superseded
+		 */
+		async enqueue(taskFn) {
+			// If currently processing, queue this as the next task (replacing any pending)
+			if (isProcessing) {
+				pendingTask = taskFn
+				return
+			}
+
+			isProcessing = true
+			currentAbortController = new AbortController()
+
+			try {
+				await taskFn(currentAbortController.signal)
+			} finally {
+				isProcessing = false
+				currentAbortController = null
+
+				// Process pending task if any
+				if (pendingTask) {
+					const next = pendingTask
+					pendingTask = null
+					await this.enqueue(next)
+				}
+			}
+		},
+
+		/**
+		 * Cancel current operation and clear pending tasks
+		 */
+		cancel() {
+			if (currentAbortController) {
+				currentAbortController.abort()
+			}
+			pendingTask = null
+		},
+
+		/**
+		 * Check if queue is currently processing
+		 */
+		get isProcessing() {
+			return isProcessing
+		},
+
+		/**
+		 * Check if there's a pending task
+		 */
+		get hasPending() {
+			return pendingTask !== null
+		}
+	}
+}
+
 export const usePOSCartStore = defineStore("posCart", () => {
 	// Use the existing invoice composable for core functionality
 	const {
@@ -52,6 +163,20 @@ export const usePOSCartStore = defineStore("posCart", () => {
 	const selectionMode = ref("uom") // 'uom' or 'variant'
 	const suppressOfferReapply = ref(false)
 	const currentDraftId = ref(null)
+
+	// Offer processing state management
+	const offerProcessingState = ref({
+		isProcessing: false,      // True while any offer operation is running
+		isAutoProcessing: false,  // True during automatic offer processing
+		lastProcessedAt: 0,       // Timestamp of last successful processing
+		error: null,              // Last error if any
+	})
+
+	// Async queue for sequential offer processing
+	const offerQueue = createAsyncQueue()
+
+	// Computed for backward compatibility and UI binding
+	const isProcessingOffers = computed(() => offerProcessingState.value.isProcessing)
 
 	// Toast composable
 	const { showSuccess, showError, showWarning } = useToast()
@@ -311,84 +436,111 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			return false
 		}
 
-		try {
-			const invoiceData = buildInvoiceDataForOffers(currentProfile)
-			const offerNames = [...new Set([...existingCodes, offerCode])]
+		// Cancel any pending auto-processing since user is manually applying
+		debouncedProcessOffers.cancel()
+		offerQueue.cancel()
 
-			const response = await applyOffersResource.submit({
-				invoice_data: invoiceData,
-				selected_offers: offerNames,
-			})
+		let result = false
 
-			const { items: responseItems, freeItems, appliedRules } =
-				parseOfferResponse(response, existingCodes)
+		await offerQueue.enqueue(async (signal) => {
+			// Check if operation was cancelled
+			if (signal?.aborted) return
 
-			suppressOfferReapply.value = true
-			applyServerDiscounts(responseItems)
-			processFreeItems(freeItems)
+			try {
+				offerProcessingState.value.isProcessing = true
+				offerProcessingState.value.error = null
 
-			filterActiveOffers(appliedRules)
+				const invoiceData = buildInvoiceDataForOffers(currentProfile)
+				const offerNames = [...new Set([...existingCodes, offerCode])]
 
-			const offerApplied = appliedRules.includes(offerCode)
+				const response = await applyOffersResource.submit({
+					invoice_data: invoiceData,
+					selected_offers: offerNames,
+				})
 
-			if (!offerApplied) {
-				// No new offer applied - restore previous state without new offer
-				if (existingCodes.length) {
-					try {
-						const rollbackResponse = await applyOffersResource.submit({
-							invoice_data: invoiceData,
-							selected_offers: existingCodes,
-						})
-						const {
-							items: rollbackItems,
-							freeItems: rollbackFreeItems,
-							appliedRules: rollbackRules,
-						} = parseOfferResponse(rollbackResponse, existingCodes)
+				// Check if cancelled during API call
+				if (signal?.aborted) return
 
-						applyServerDiscounts(rollbackItems)
-						processFreeItems(rollbackFreeItems)
-						filterActiveOffers(rollbackRules)
-					} catch (rollbackError) {
-						console.error("Error rolling back offers:", rollbackError)
+				const { items: responseItems, freeItems, appliedRules } =
+					parseOfferResponse(response, existingCodes)
+
+				suppressOfferReapply.value = true
+				applyServerDiscounts(responseItems)
+				processFreeItems(freeItems)
+				filterActiveOffers(appliedRules)
+
+				const offerApplied = appliedRules.includes(offerCode)
+
+				if (!offerApplied) {
+					// No new offer applied - restore previous state without new offer
+					if (existingCodes.length) {
+						try {
+							const rollbackResponse = await applyOffersResource.submit({
+								invoice_data: invoiceData,
+								selected_offers: existingCodes,
+							})
+							const {
+								items: rollbackItems,
+								freeItems: rollbackFreeItems,
+								appliedRules: rollbackRules,
+							} = parseOfferResponse(rollbackResponse, existingCodes)
+
+							applyServerDiscounts(rollbackItems)
+							processFreeItems(rollbackFreeItems)
+							filterActiveOffers(rollbackRules)
+						} catch (rollbackError) {
+							console.error("Error rolling back offers:", rollbackError)
+						}
 					}
+
+					showWarning(__("Your cart doesn't meet the requirements for this offer."))
+					offersDialogRef?.resetApplyingState()
+					result = false
+					return
 				}
 
-				showWarning(__("Your cart doesn't meet the requirements for this offer."))
+				const offerRuleCodes = appliedRules.includes(offerCode)
+					? appliedRules.filter((ruleName) => ruleName === offerCode)
+					: [offerCode]
+
+				const updatedEntries = appliedOffers.value.filter(
+					(entry) => entry.code !== offerCode,
+				)
+				updatedEntries.push({
+					name: offer.title || offer.name,
+					code: offerCode,
+					offer, // Store full offer object for validation
+					source: "manual",
+					applied: true,
+					rules: offerRuleCodes,
+					// Store constraints for quick validation
+					min_qty: offer.min_qty,
+					max_qty: offer.max_qty,
+					min_amt: offer.min_amt,
+					max_amt: offer.max_amt,
+				})
+				appliedOffers.value = updatedEntries
+
+				offerProcessingState.value.lastProcessedAt = Date.now()
+
+				// Wait for Vue reactivity to propagate before showing toast
+				await nextTick()
+
+				showSuccess(__('{0} applied successfully', [(offer.title || offer.name)]))
+				result = true
+			} catch (error) {
+				if (signal?.aborted) return
+				console.error("Error applying offer:", error)
+				offerProcessingState.value.error = error.message
+				showError(__("Failed to apply offer. Please try again."))
 				offersDialogRef?.resetApplyingState()
-				return false
+				result = false
+			} finally {
+				offerProcessingState.value.isProcessing = false
 			}
+		})
 
-			const offerRuleCodes = appliedRules.includes(offerCode)
-				? appliedRules.filter((ruleName) => ruleName === offerCode)
-				: [offerCode]
-
-			const updatedEntries = appliedOffers.value.filter(
-				(entry) => entry.code !== offerCode,
-			)
-			updatedEntries.push({
-				name: offer.title || offer.name,
-				code: offerCode,
-				offer, // Store full offer object for validation
-				source: "manual",
-				applied: true,
-				rules: offerRuleCodes,
-				// Store constraints for quick validation
-				min_qty: offer.min_qty,
-				max_qty: offer.max_qty,
-				min_amt: offer.min_amt,
-				max_amt: offer.max_amt,
-			})
-			appliedOffers.value = updatedEntries
-
-			showSuccess(__('{0} applied successfully', [(offer.title || offer.name)]))
-
-			return true
-		} catch (error) {
-			console.error("Error applying offer:", error)
-			showError(__("Failed to apply offer. Please try again."))
-			offersDialogRef?.resetApplyingState()
-			return false
-		}
+		return result
 	}
 
 	async function removeOffer(
@@ -399,12 +551,17 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		const offerCode =
 			typeof offer === "string" ? offer : offer?.name || offer?.code
 
+		// Cancel any pending auto-processing
+		debouncedProcessOffers.cancel()
+
 		if (!offerCode) {
-			// Remove all offers
+			// Remove all offers - immediate operation, no queue needed
+			offerQueue.cancel()
 			suppressOfferReapply.value = true
 			appliedOffers.value = []
 			processFreeItems([]) // Remove all free items
 			removeDiscount()
+			await nextTick()
 			showSuccess(__("Offer has been removed from cart"))
 			offersDialogRef?.resetApplyingState()
 			return true
@@ -416,51 +573,76 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		const remainingCodes = remainingOffers.map((entry) => entry.code)
 
 		if (remainingCodes.length === 0) {
+			// All offers removed - immediate operation
+			offerQueue.cancel()
 			suppressOfferReapply.value = true
 			appliedOffers.value = []
 			processFreeItems([]) // Remove all free items
 			removeDiscount()
+			await nextTick()
 			showSuccess(__("Offer has been removed from cart"))
 			offersDialogRef?.resetApplyingState()
 			return true
 		}
 
-		try {
-			const invoiceData = buildInvoiceDataForOffers(currentProfile)
+		let result = false
 
-			const response = await applyOffersResource.submit({
-				invoice_data: invoiceData,
-				selected_offers: remainingCodes,
-			})
+		await offerQueue.enqueue(async (signal) => {
+			if (signal?.aborted) return
 
-			const { items: responseItems, freeItems, appliedRules } =
-				parseOfferResponse(response, remainingCodes)
+			try {
+				offerProcessingState.value.isProcessing = true
+				offerProcessingState.value.error = null
 
-			suppressOfferReapply.value = true
-			applyServerDiscounts(responseItems)
-			processFreeItems(freeItems)
-			filterActiveOffers(appliedRules)
+				const invoiceData = buildInvoiceDataForOffers(currentProfile)
 
-			appliedOffers.value = appliedOffers.value.filter((entry) =>
-				remainingCodes.includes(entry.code),
-			)
+				const response = await applyOffersResource.submit({
+					invoice_data: invoiceData,
+					selected_offers: remainingCodes,
+				})
 
-			showSuccess(__("Offer has been removed from cart"))
-			offersDialogRef?.resetApplyingState()
-			return true
-		} catch (error) {
-			console.error("Error removing offer:", error)
-			showError(__("Failed to update cart after removing offer."))
-			offersDialogRef?.resetApplyingState()
-			return false
-		}
+				if (signal?.aborted) return
+
+				const { items: responseItems, freeItems, appliedRules } =
+					parseOfferResponse(response, remainingCodes)
+
+				suppressOfferReapply.value = true
+				applyServerDiscounts(responseItems)
+				processFreeItems(freeItems)
+				filterActiveOffers(appliedRules)
+
+				appliedOffers.value = appliedOffers.value.filter((entry) =>
+					remainingCodes.includes(entry.code),
+				)
+
+				offerProcessingState.value.lastProcessedAt = Date.now()
+
+				await nextTick()
+				showSuccess(__("Offer has been removed from cart"))
+				offersDialogRef?.resetApplyingState()
+				result = true
+			} catch (error) {
+				if (signal?.aborted) return
+				console.error("Error removing offer:", error)
+				offerProcessingState.value.error = error.message
+				showError(__("Failed to update cart after removing offer."))
+				offersDialogRef?.resetApplyingState()
+				result = false
+			} finally {
+				offerProcessingState.value.isProcessing = false
+			}
+		})
+
+		return result
 	}
 
 	/**
 	 * Validates applied offers and removes invalid ones when cart changes
 	 * This function is called automatically when items are added/removed or quantities change
+	 * @param {Object} currentProfile - Current POS profile
+	 * @param {AbortSignal} signal - Optional abort signal for cancellation
 	 */
-	async function reapplyOffer(currentProfile) {
+	async function reapplyOffer(currentProfile, signal = null) {
 		// Clear offers if cart is empty
 		if (invoiceItems.value.length === 0 && appliedOffers.value.length) {
 			appliedOffers.value = []
@@ -470,6 +652,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 
 		// Skip revalidation if suppressed (e.g., during offer application)
 		if (suppressOfferReapply.value) {
+			// Reset the flag for next cycle
 			suppressOfferReapply.value = false
 			return
 		}
@@ -478,6 +661,9 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		if (appliedOffers.value.length === 0 || invoiceItems.value.length === 0) {
 			return
 		}
+
+		// Check if operation was cancelled
+		if (signal?.aborted) return
 
 		try {
 			// Build current cart snapshot for validation
@@ -501,15 +687,14 @@ export const usePOSCartStore = defineStore("posCart", () => {
 				}
 			}
 
+			// Check for cancellation
+			if (signal?.aborted) return
+
 			// If any offers are invalid, remove them and reapply remaining
 			if (invalidOffers.length > 0) {
 				const validOfferCodes = appliedOffers.value
 					.filter(o => !invalidOffers.find(inv => inv.code === o.code))
 					.map(o => o.code)
-
-				// Show warning about removed offers
-				const offerNames = invalidOffers.map(o => o.name).join(', ')
-				showWarning(__('Offer removed: {0}. Cart no longer meets requirements.', [offerNames]))
 
 				if (validOfferCodes.length === 0) {
 					// All offers invalid - clear everything
@@ -535,6 +720,8 @@ export const usePOSCartStore = defineStore("posCart", () => {
 						selected_offers: validOfferCodes,
 					})
 
+					if (signal?.aborted) return
+
 					const { items: responseItems, freeItems, appliedRules } =
 						parseOfferResponse(response, validOfferCodes)
 
@@ -548,9 +735,18 @@ export const usePOSCartStore = defineStore("posCart", () => {
 						appliedRules.includes(entry.code)
 					)
 				}
+
+				// Wait for Vue to update before showing toast
+				await nextTick()
+
+				// Show warning about removed offers
+				const offerNames = invalidOffers.map(o => o.name).join(', ')
+				showWarning(__('Offer removed: {0}. Cart no longer meets requirements.', [offerNames]))
 			}
 		} catch (error) {
+			if (signal?.aborted) return
 			console.error("Error validating offers:", error)
+			offerProcessingState.value.error = error.message
 		}
 	}
 
@@ -558,8 +754,9 @@ export const usePOSCartStore = defineStore("posCart", () => {
 	 * Automatically applies ALL eligible offers when cart changes
 	 * This function is called after cart updates to apply any new eligible offers
 	 * @param {Object} currentProfile - Current POS profile
+	 * @param {AbortSignal} signal - Optional abort signal for cancellation
 	 */
-	async function autoApplyEligibleOffers(currentProfile) {
+	async function autoApplyEligibleOffers(currentProfile, signal = null) {
 		// Skip if cart is empty or no offers available
 		if (invoiceItems.value.length === 0 || !offersStore.hasFetched) {
 			return
@@ -569,6 +766,9 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		if (suppressOfferReapply.value) {
 			return
 		}
+
+		// Check for cancellation
+		if (signal?.aborted) return
 
 		try {
 			// Build current cart snapshot
@@ -592,6 +792,9 @@ export const usePOSCartStore = defineStore("posCart", () => {
 				return
 			}
 
+			// Check for cancellation before API call
+			if (signal?.aborted) return
+
 			// Apply all new eligible offers in a single batch
 			const existingCodes = appliedOffers.value.map(entry => entry.code)
 			const newOfferCodes = newOffers.map(offer => offer.name)
@@ -604,6 +807,9 @@ export const usePOSCartStore = defineStore("posCart", () => {
 				selected_offers: allCodes,
 			})
 
+			// Check for cancellation after API call
+			if (signal?.aborted) return
+
 			const { items: responseItems, freeItems, appliedRules } =
 				parseOfferResponse(response, allCodes)
 
@@ -611,6 +817,9 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			applyServerDiscounts(responseItems)
 			processFreeItems(freeItems)
 			filterActiveOffers(appliedRules)
+
+			// Collect newly applied offers for notification
+			const newlyAppliedOffers = []
 
 			// Add newly applied offers to the list
 			for (const offer of newOffers) {
@@ -634,11 +843,27 @@ export const usePOSCartStore = defineStore("posCart", () => {
 					max_amt: offer.max_amt,
 				})
 
-				// Show success notification for auto-applied offer
-				showSuccess(__('Offer applied: {0}', [(offer.title || offer.name)]))
+				newlyAppliedOffers.push(offer.title || offer.name)
+			}
+
+			offerProcessingState.value.lastProcessedAt = Date.now()
+
+			// Wait for Vue reactivity to propagate before showing toast
+			// This ensures the UI reflects the discount when the toast appears
+			await nextTick()
+
+			// Show consolidated toast for all newly applied offers
+			if (newlyAppliedOffers.length > 0) {
+				if (newlyAppliedOffers.length === 1) {
+					showSuccess(__('Offer applied: {0}', [newlyAppliedOffers[0]]))
+				} else {
+					showSuccess(__('Offers applied: {0}', [newlyAppliedOffers.join(', ')]))
+				}
 			}
 		} catch (error) {
+			if (signal?.aborted) return
 			console.error("Error auto-applying offers:", error)
+			offerProcessingState.value.error = error.message
 		}
 	}
 
@@ -863,6 +1088,61 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		}
 	}
 
+	/**
+	 * Core offer processing function that validates and auto-applies offers.
+	 * Runs through the queue to ensure sequential execution.
+	 */
+	async function processOffersInternal(signal = null) {
+		// Check cancellation early
+		if (signal?.aborted) return
+
+		// Update offer snapshot for eligibility checking
+		syncOfferSnapshot()
+
+		// Only process offers if we have a POS profile
+		if (!posProfile.value) return
+
+		// Get current profile from posProfile
+		const currentProfile = {
+			customer: customer.value?.name || customer.value,
+			company: posProfile.value.company,
+			selling_price_list: posProfile.value.selling_price_list,
+			currency: posProfile.value.currency,
+		}
+
+		// Validate and auto-remove invalid offers (if any are applied)
+		if (appliedOffers.value.length > 0) {
+			await reapplyOffer(currentProfile, signal)
+		}
+
+		// Check cancellation before auto-apply
+		if (signal?.aborted) return
+
+		// Auto-apply eligible offers (always check for new eligible offers)
+		await autoApplyEligibleOffers(currentProfile, signal)
+	}
+
+	/**
+	 * Debounced offer processing to prevent race conditions.
+	 * Uses 200ms delay to batch rapid cart changes (e.g., quantity adjustments).
+	 * The delay allows multiple quick changes to be batched into a single processing run.
+	 */
+	const debouncedProcessOffers = createDebounce(() => {
+		// Enqueue the processing task - queue handles concurrency
+		offerQueue.enqueue(async (signal) => {
+			try {
+				offerProcessingState.value.isProcessing = true
+				offerProcessingState.value.isAutoProcessing = true
+				offerProcessingState.value.error = null
+
+				await processOffersInternal(signal)
+			} finally {
+				offerProcessingState.value.isProcessing = false
+				offerProcessingState.value.isAutoProcessing = false
+			}
+		})
+	}, 200)
+
 	// Watch for cart changes to update offer snapshot and validate offers
 	// Watch subtotal and create a reactive hash of items to detect any changes
 	watch(
@@ -870,31 +1150,11 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			subtotal,
 			() => invoiceItems.value.map(item => `${item.item_code}:${item.quantity}`).join(',')
 		],
-		async () => {
-			// Defer to next tick to prevent blocking UI
-			await nextTick()
-
-			// Update offer snapshot for eligibility checking
-			syncOfferSnapshot()
-
-			// Only process offers if we have a POS profile
-			if (posProfile.value) {
-				// Get current profile from posProfile
-				const currentProfile = {
-					customer: customer.value?.name || customer.value,
-					company: posProfile.value.company,
-					selling_price_list: posProfile.value.selling_price_list,
-					currency: posProfile.value.currency,
-				}
-
-				// Validate and auto-remove invalid offers (if any are applied)
-				if (appliedOffers.value.length > 0) {
-					await reapplyOffer(currentProfile)
-				}
-
-				// Auto-apply eligible offers (always check for new eligible offers)
-				await autoApplyEligibleOffers(currentProfile)
-			}
+		() => {
+			// Use debounced processing to prevent race conditions
+			// This batches rapid cart changes and ensures only one offer
+			// processing operation runs at a time
+			debouncedProcessOffers()
 		},
 		{ immediate: true, flush: "post" },
 	)
@@ -920,10 +1180,13 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		selectionMode,
 		suppressOfferReapply,
 		currentDraftId,
+		offerProcessingState, // Offer processing state for UI feedback
+
 		// Computed
 		itemCount,
 		isEmpty,
 		hasCustomer,
+		isProcessingOffers, // True when any offer operation is in progress
 
 		// Actions
 		addItem,
@@ -950,5 +1213,11 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		rebuildIncrementalCache,
 		applyOffersResource,
 		buildInvoiceDataForOffers,
+
+		// Utilities
+		cancelPendingOfferProcessing: () => {
+			debouncedProcessOffers.cancel()
+			offerQueue.cancel()
+		},
 	}
 })
