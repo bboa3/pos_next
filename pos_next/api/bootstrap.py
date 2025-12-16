@@ -150,7 +150,10 @@ def get_pos_settings(pos_profile):
 				"decimal_precision",
 				"allow_negative_stock",
 				"enable_sales_persons",
-				"silent_print"
+				"silent_print",
+				"allow_sales_order",
+				"allow_select_sales_order",
+				"create_only_sales_order"
 			],
 			as_dict=True
 		)
@@ -180,7 +183,10 @@ def get_default_pos_settings():
 		"decimal_precision": "2",
 		"allow_negative_stock": 0,
 		"enable_sales_persons": "Disabled",
-		"silent_print": 0
+		"silent_print": 0,
+		"allow_sales_order": 0,
+		"allow_select_sales_order": 0,
+		"create_only_sales_order": 0
 	}
 
 

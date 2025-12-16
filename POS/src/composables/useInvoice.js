@@ -3,9 +3,11 @@ import { computed, ref, toRaw } from "vue"
 import { isOffline } from "@/utils/offline"
 import { useSerialNumberStore } from "@/stores/serialNumber"
 
+
 export function useInvoice() {
 	// Serial Number Store for returning serials when items are removed
 	const serialStore = useSerialNumberStore()
+
 	// State
 	const invoiceItems = ref([])
 	const customer = ref(null)
@@ -642,7 +644,7 @@ export function useInvoice() {
 		}
 	}
 
-	async function saveDraft() {
+	async function saveDraft(targetDoctype = "Sales Invoice") {
 		/**
 		 * Save invoice as draft (Step 1)
 		 * This creates the invoice with docstatus=0
@@ -652,7 +654,7 @@ export function useInvoice() {
 		const rawPayments = toRaw(payments.value)
 
 		const invoiceData = {
-			doctype: "Sales Invoice",
+			doctype: targetDoctype,
 			pos_profile: posProfile.value,
 			posa_pos_opening_shift: posOpeningShift.value,
 			customer: customer.value?.name || customer.value,
@@ -689,11 +691,17 @@ export function useInvoice() {
 			update_stock: 1,
 		}
 
+		if (targetDoctype === "Sales Order") {
+			const today = new Date().toISOString().split('T')[0]
+			invoiceData.delivery_date = today
+			invoiceData.transaction_date = today
+		}
+
 		const result = await updateInvoiceResource.submit({ data: invoiceData })
 		return result?.data || result
 	}
 
-	async function submitInvoice() {
+	async function submitInvoice(targetDoctype = "Sales Invoice", deliveryDate = null) {
 		/**
 		 * Two-step submission process:
 		 * 1. Create/update draft invoice
@@ -707,7 +715,7 @@ export function useInvoice() {
 			const rawSalesTeam = toRaw(salesTeam.value)
 
 			const invoiceData = {
-				doctype: "Sales Invoice",
+				doctype: targetDoctype,
 				pos_profile: posProfile.value,
 				posa_pos_opening_shift: posOpeningShift.value,
 				customer: customer.value?.name || customer.value,
@@ -742,6 +750,10 @@ export function useInvoice() {
 				coupon_code: couponCode.value,
 				is_pos: 1,
 				update_stock: 1, // Critical: Ensures stock is updated
+			}
+
+			if (targetDoctype === "Sales Order" && deliveryDate) {
+				invoiceData.delivery_date = deliveryDate
 			}
 
 			// Add sales_team if provided

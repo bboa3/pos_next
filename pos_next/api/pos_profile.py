@@ -83,7 +83,10 @@ def get_pos_settings(pos_profile):
 				"allow_partial_payment",
 				"decimal_precision",
 				"allow_negative_stock",
-				"enable_sales_persons"
+				"enable_sales_persons",
+				"allow_sales_order",
+				"allow_select_sales_order",
+				"create_only_sales_order"
 			],
 			as_dict=True
 		)
@@ -103,7 +106,10 @@ def get_pos_settings(pos_profile):
 				"allow_partial_payment": 0,
 				"decimal_precision": "2",
 				"allow_negative_stock": 0,
-				"enable_sales_persons": "Disabled"
+				"enable_sales_persons": "Disabled",
+				"allow_sales_order": 0,
+				"allow_select_sales_order": 0,
+				"create_only_sales_order": 0
 			}
 
 		return pos_settings

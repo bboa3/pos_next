@@ -139,7 +139,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		addItem: addItemToInvoice,
 		removeItem,
 		updateItemQuantity,
-		submitInvoice,
+		submitInvoice: baseSubmitInvoice,
 		clearCart: clearInvoiceCart,
 		loadTaxRules,
 		setTaxInclusive,
@@ -150,6 +150,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		getItemDetailsResource,
 		recalculateItem,
 		rebuildIncrementalCache,
+		saveDraft,
 	} = useInvoice()
 
 	const offersStore = usePOSOffersStore()
@@ -163,6 +164,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 	const selectionMode = ref("uom") // 'uom' or 'variant'
 	const suppressOfferReapply = ref(false)
 	const currentDraftId = ref(null)
+	const targetDoctype = ref("Sales Invoice")
 
 	// Offer processing state management
 	const offerProcessingState = ref({
@@ -267,6 +269,7 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		appliedOffers.value = []
 		appliedCoupon.value = null
 		currentDraftId.value = null
+		targetDoctype.value = "Sales Invoice"
 
 		// Reset offer processing state
 		suppressOfferReapply.value = false
@@ -277,6 +280,35 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		// Sync the empty snapshot
 		syncOfferSnapshot()
 	}
+
+	function setTargetDoctype(doctype) {
+		targetDoctype.value = doctype
+	}
+
+	const deliveryDate = ref("")
+
+	function setDeliveryDate(date) {
+		deliveryDate.value = date
+	}
+
+	async function submitInvoice() {
+		if (invoiceItems.value.length === 0) {
+			showWarning(__("Cart is empty"))
+			return
+		}
+		if (!customer.value) {
+			showWarning(__("Please select a customer"))
+			return
+		}
+
+		return await baseSubmitInvoice(targetDoctype.value, deliveryDate.value)
+	}
+
+	async function createSalesOrder() {
+		return await submitInvoice()
+	}
+
+
 
 	function setCustomer(selectedCustomer) {
 		customer.value = selectedCustomer
@@ -1351,6 +1383,13 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		rebuildIncrementalCache,
 		applyOffersResource,
 		buildInvoiceDataForOffers,
+
+		// Sales Order feature
+		targetDoctype,
+		setTargetDoctype,
+		createSalesOrder,
+		deliveryDate,
+		setDeliveryDate,
 
 		// Utilities
 		cancelPendingOfferProcessing: () => {
