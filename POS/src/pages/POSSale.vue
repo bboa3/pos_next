@@ -328,6 +328,7 @@
 								"
 								@select-customer="handleCustomerSelected"
 								@create-customer="handleCreateCustomer"
+								@edit-customer="handleEditCustomer"
 								@proceed-to-payment="handleProceedToPayment"
 								@clear-cart="handleClearCart"
 								@save-draft="handleSaveDraft"
@@ -565,12 +566,14 @@
 				@refresh="offlineStore.loadPendingInvoices"
 			/>
 
-			<!-- Create Customer Dialog -->
+			<!-- Create/Edit Customer Dialog -->
 			<CreateCustomerDialog
 				v-model="uiStore.showCreateCustomerDialog"
 				:pos-profile="shiftStore.profileName"
 				:initial-name="uiStore.initialCustomerName"
+				:customer="editCustomer"
 				@customer-created="handleCustomerCreated"
+				@customer-updated="handleCustomerUpdated"
 			/>
 
 			<!-- Promotion Management -->
@@ -1015,6 +1018,7 @@ const containerRef = ref(null);
 const dividerRef = ref(null);
 const pendingPaymentAfterCustomer = ref(false);
 const logoutAfterClose = ref(false);
+const editCustomer = ref(null); // Customer being edited (null for create mode)
 const showClearCacheDialog = ref(false);
 const clearCacheOverlayRef = ref(null);
 
@@ -1725,7 +1729,14 @@ function handleCustomerSelected(selectedCustomer) {
 }
 
 function handleCreateCustomer(searchValue) {
+	editCustomer.value = null; // Clear edit mode
 	uiStore.setInitialCustomerName(searchValue || "");
+	uiStore.showCreateCustomerDialog = true;
+}
+
+function handleEditCustomer(customer) {
+	editCustomer.value = customer; // Set customer for edit mode
+	uiStore.setInitialCustomerName("");
 	uiStore.showCreateCustomerDialog = true;
 }
 
@@ -2113,7 +2124,15 @@ function handleCreateReturnFromHistory(invoice) {
 function handleCustomerCreated(newCustomer) {
 	cartStore.setCustomer(newCustomer);
 	uiStore.showCreateCustomerDialog = false;
+	editCustomer.value = null; // Clear edit mode
 	showSuccess(__("{0} created and selected", [newCustomer.customer_name]));
+}
+
+function handleCustomerUpdated(updatedCustomer) {
+	cartStore.setCustomer(updatedCustomer);
+	uiStore.showCreateCustomerDialog = false;
+	editCustomer.value = null; // Clear edit mode
+	showSuccess(__("{0} updated", [updatedCustomer.customer_name]));
 }
 
 async function handleRefresh() {

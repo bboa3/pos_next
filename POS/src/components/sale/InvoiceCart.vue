@@ -67,173 +67,96 @@
 		<div class="px-2.5 py-2 border-b border-gray-200 bg-gray-50">
 			<!-- Inline Customer Search/Selection -->
 			<div ref="customerSearchContainer" class="relative">
-				<div
-					v-if="customer"
-					class="flex items-center justify-between bg-white border border-gray-200 rounded-xl p-2.5 shadow-sm"
-				>
-					<div
-						class="flex items-center gap-2 min-w-0 flex-1 cursor-pointer"
-						@click.stop="editCustomer"
-						:title="__('Click to change customer')"
-					>
-						<div
-							class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm"
-						>
-							<svg
-								class="w-4 h-4 text-white"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-								/>
-							</svg>
-						</div>
-						<div class="min-w-0 flex-1">
-							<p class="text-xs font-semibold text-gray-900 truncate">
-								{{ customer.customer_name || customer.name }}
-							</p>
-							<p
-								v-if="customer.mobile_no"
-								class="text-[10px] text-gray-500 truncate"
-							>
-								{{ customer.mobile_no }}
-							</p>
-						</div>
-					</div>
-					<div class="flex items-center gap-1">
-						<!-- Create New Customer Button -->
-						<button
-							type="button"
-							@click="$emit('create-customer', '')"
-							class="flex items-center justify-center w-8 h-8 bg-green-500 hover:bg-green-600 active:bg-green-700 rounded-lg text-white transition-colors shadow-sm hover:shadow touch-manipulation flex-shrink-0"
-							:title="__('Create new customer')"
-						>
-							<svg
-								class="w-4 h-4"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-								stroke-width="2"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-								/>
-							</svg>
-						</button>
-						<!-- Remove Customer Button -->
-						<button
-							type="button"
-							@click="removeCustomer"
-							class="flex items-center justify-center w-8 h-8 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg flex-shrink-0 transition-colors touch-manipulation"
-							:title="__('Remove customer')"
-						>
-							<svg
-								class="w-4 h-4"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-								stroke-width="2.5"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									d="M6 18L18 6M6 6l12 12"
-								/>
-							</svg>
-						</button>
-
-						<!-- Sales Order Dropdown -->
-						<div
-							v-if="settingsStore.allowSalesOrder"
-							class="js-doctype-dropdown relative"
-						>
-							<button
-								type="button"
-								@click="toggleDocTypeDropdown"
-								class="flex items-center justify-center w-8 h-8 bg-white border border-gray-200 hover:bg-gray-50 active:bg-gray-100 rounded-lg text-gray-700 transition-colors shadow-sm hover:shadow touch-manipulation flex-shrink-0"
-								:title="__('Select Document Type')"
-							>
-								<svg
-									class="w-4 h-4"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-									/>
-								</svg>
-								<div
-									class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-blue-500 rounded-full flex items-center justify-center text-[7px] text-white font-bold"
-								>
-									{{ cartStore.targetDoctype === "Sales Order" ? "SO" : "SI" }}
+				<div v-if="customer">
+					<!-- Two Cards Layout: Customer Card + Document Type Card -->
+					<div class="flex items-stretch gap-2">
+						<!-- Customer Card -->
+						<div class="flex-1 flex items-center gap-1.5 bg-white border border-gray-200 rounded-xl p-1.5 shadow-sm min-w-0">
+							<!-- Customer Avatar & Info -->
+							<div class="flex items-center gap-2 min-w-0 flex-1 px-1.5 py-1">
+								<div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+									<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+									</svg>
 								</div>
-							</button>
+								<div class="min-w-0 flex-1">
+									<p class="text-xs font-semibold text-gray-900 truncate leading-tight">
+										{{ customer.customer_name || customer.name }}
+									</p>
+									<p v-if="customer.mobile_no" class="text-[10px] text-gray-500 truncate leading-tight">
+										{{ customer.mobile_no }}
+									</p>
+								</div>
+							</div>
 
-							<!-- Dropdown Menu -->
-							<div
-								v-if="showDocTypeDropdown"
-								class="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden"
-							>
+							<!-- Action Buttons -->
+							<div class="flex items-center gap-0.5 flex-shrink-0" @click.stop>
 								<button
 									type="button"
-									@click="selectDocType('Sales Invoice')"
-									class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center justify-between"
-									:class="{
-										'bg-blue-50 text-blue-700':
-											cartStore.targetDoctype === 'Sales Invoice',
-									}"
+									@click.stop="$emit('edit-customer', customer)"
+									class="w-7 h-7 flex items-center justify-center text-blue-500 hover:bg-blue-50 active:bg-blue-100 rounded-lg transition-colors touch-manipulation"
+									:title="__('Edit customer details')"
 								>
-									<span>{{ __("Sales Invoice") }}</span>
-									<svg
-										v-if="cartStore.targetDoctype === 'Sales Invoice'"
-										class="w-4 h-4"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M5 13l4 4L19 7"
-										/>
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
 									</svg>
 								</button>
 								<button
 									type="button"
-									@click="selectDocType('Sales Order')"
-									class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center justify-between"
-									:class="{
-										'bg-blue-50 text-blue-700':
-											cartStore.targetDoctype === 'Sales Order',
-									}"
+									@click.stop="$emit('create-customer', '')"
+									class="w-7 h-7 flex items-center justify-center text-green-600 hover:bg-green-50 active:bg-green-100 rounded-lg transition-colors touch-manipulation"
+									:title="__('Create new customer')"
 								>
-									<span>{{ __("Sales Order") }}</span>
-									<svg
-										v-if="cartStore.targetDoctype === 'Sales Order'"
-										class="w-4 h-4"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M5 13l4 4L19 7"
-										/>
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
 									</svg>
+								</button>
+								<button
+									type="button"
+									@click.stop="removeCustomer"
+									class="w-7 h-7 flex items-center justify-center text-red-500 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors touch-manipulation"
+									:title="__('Remove customer')"
+								>
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+									</svg>
+								</button>
+							</div>
+						</div>
+
+						<!-- Document Type Card -->
+						<div
+							v-if="settingsStore.allowSalesOrder"
+							class="flex items-center bg-white border border-gray-200 rounded-xl p-1.5 shadow-sm flex-shrink-0"
+						>
+							<div class="flex items-center bg-gray-100 rounded-lg p-0.5">
+								<button
+									type="button"
+									@click="selectDocType('Sales Invoice')"
+									class="px-2.5 py-1.5 text-[11px] font-semibold rounded-md transition-all duration-200 flex items-center gap-1"
+									:class="cartStore.targetDoctype === 'Sales Invoice'
+										? 'bg-white text-blue-600 shadow-sm'
+										: 'text-gray-500 hover:text-gray-700'"
+									:title="__('Sales Invoice')"
+								>
+									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+									</svg>
+									<span>{{ __("Invoice") }}</span>
+								</button>
+								<button
+									type="button"
+									@click="selectDocType('Sales Order')"
+									class="px-2.5 py-1.5 text-[11px] font-semibold rounded-md transition-all duration-200 flex items-center gap-1"
+									:class="cartStore.targetDoctype === 'Sales Order'
+										? 'bg-white text-orange-600 shadow-sm'
+										: 'text-gray-500 hover:text-gray-700'"
+									:title="__('Sales Order')"
+								>
+									<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+									</svg>
+									<span>{{ __("Order") }}</span>
 								</button>
 							</div>
 						</div>
@@ -305,93 +228,39 @@
 							</svg>
 						</button>
 
-						<!-- Sales Order Dropdown -->
+						<!-- Document Type Toggle (Sales Invoice / Sales Order) -->
 						<div
 							v-if="settingsStore.allowSalesOrder"
-							class="js-doctype-dropdown relative"
+							class="flex items-center bg-gray-100 rounded-xl p-0.5 h-10"
 						>
 							<button
 								type="button"
-								@click="toggleDocTypeDropdown"
-								class="flex items-center justify-center w-10 h-10 bg-white border border-gray-200 hover:bg-gray-50 active:bg-gray-100 rounded-xl text-gray-700 transition-colors shadow-sm hover:shadow touch-manipulation flex-shrink-0"
-								:title="__('Select Document Type')"
+								@click="selectDocType('Sales Invoice')"
+								class="h-full px-2.5 text-xs font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5"
+								:class="cartStore.targetDoctype === 'Sales Invoice'
+									? 'bg-white text-blue-600 shadow-sm'
+									: 'text-gray-500 hover:text-gray-700'"
+								:title="__('Sales Invoice')"
 							>
-								<svg
-									class="w-5 h-5"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-									/>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 								</svg>
-								<div
-									class="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[8px] text-white font-bold"
-								>
-									{{ cartStore.targetDoctype === "Sales Order" ? "SO" : "SI" }}
-								</div>
+								<span class="hidden sm:inline">{{ __("Invoice") }}</span>
 							</button>
-
-							<!-- Dropdown Menu -->
-							<div
-								v-if="showDocTypeDropdown"
-								class="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden"
+							<button
+								type="button"
+								@click="selectDocType('Sales Order')"
+								class="h-full px-2.5 text-xs font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5"
+								:class="cartStore.targetDoctype === 'Sales Order'
+									? 'bg-white text-orange-600 shadow-sm'
+									: 'text-gray-500 hover:text-gray-700'"
+								:title="__('Sales Order')"
 							>
-								<button
-									type="button"
-									@click="selectDocType('Sales Invoice')"
-									class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center justify-between"
-									:class="{
-										'bg-blue-50 text-blue-700':
-											cartStore.targetDoctype === 'Sales Invoice',
-									}"
-								>
-									<span>{{ __("Sales Invoice") }}</span>
-									<svg
-										v-if="cartStore.targetDoctype === 'Sales Invoice'"
-										class="w-4 h-4"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M5 13l4 4L19 7"
-										/>
-									</svg>
-								</button>
-								<button
-									type="button"
-									@click="selectDocType('Sales Order')"
-									class="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 flex items-center justify-between"
-									:class="{
-										'bg-blue-50 text-blue-700':
-											cartStore.targetDoctype === 'Sales Order',
-									}"
-								>
-									<span>{{ __("Sales Order") }}</span>
-									<svg
-										v-if="cartStore.targetDoctype === 'Sales Order'"
-										class="w-4 h-4"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M5 13l4 4L19 7"
-										/>
-									</svg>
-								</button>
-							</div>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+								</svg>
+								<span class="hidden sm:inline">{{ __("Order") }}</span>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -1333,6 +1202,7 @@ const emit = defineEmits([
 	"update-quantity", // (itemCode, newQty, uom?) - Update item quantity
 	"remove-item", // (itemCode, uom?) - Remove item from cart
 	"select-customer", // (customer) - Select/change customer
+	"edit-customer", // (customer) - Open edit customer dialog
 	"create-customer", // (searchText) - Open create customer dialog
 	"proceed-to-payment", // () - Navigate to payment screen
 	"clear-cart", // () - Clear all items from cart
@@ -1636,17 +1506,8 @@ function selectCustomer(cust) {
 }
 
 /**
- * Switch to edit/search mode for customer.
- * Saves current customer to allow restoring on blur.
- */
-async function editCustomer() {
-	previousCustomer.value = props.customer;
-	await clearCustomer();
-}
-
-/**
- * Remove customer permanently.
- * Does not save for restore.
+ * Remove the selected customer.
+ * Clears the customer and focuses the search input.
  */
 async function removeCustomer() {
 	previousCustomer.value = null;
@@ -1884,22 +1745,14 @@ async function handleUpdateItem(updatedItem) {
 // Event Handlers & Lifecycle
 // ─────────────────────────────────────────────────────────────────────────────
 
-const showDocTypeDropdown = ref(false);
-
-function toggleDocTypeDropdown() {
-	showDocTypeDropdown.value = !showDocTypeDropdown.value;
-}
-
 function selectDocType(type) {
 	cartStore.setTargetDoctype(type);
-	showDocTypeDropdown.value = false;
 }
 
 /**
  * Handle clicks outside interactive elements.
  * - Closes customer search dropdown when clicking outside
  * - Closes UOM dropdown when clicking outside
- * - Closes DocType dropdown when clicking outside
  *
  * @param {MouseEvent} event - Click event
  */
@@ -1928,15 +1781,6 @@ function handleOutsideClick(event) {
 			target instanceof Element && target.closest(".group\\/uom");
 		if (!clickedInsideUomDropdown) {
 			openUomDropdown.value = null;
-		}
-	}
-
-	// Close DocType dropdown if clicking outside
-	if (showDocTypeDropdown.value) {
-		const clickedInsideDocTypeDropdown =
-			target instanceof Element && target.closest(".js-doctype-dropdown");
-		if (!clickedInsideDocTypeDropdown) {
-			showDocTypeDropdown.value = false;
 		}
 	}
 }

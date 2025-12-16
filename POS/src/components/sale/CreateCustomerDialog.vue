@@ -1,5 +1,5 @@
 <template>
-	<Dialog v-model="show" :options="{ title: __('Create New Customer'), size: 'md' }">
+	<Dialog v-model="show" :options="{ title: isEditMode ? __('Edit Customer') : __('Create New Customer'), size: 'md' }">
 		<template #body-content>
 			<div class="flex flex-col gap-6">
 				<!-- Customer Name (Required) -->
@@ -158,10 +158,10 @@
 					<Button
 						variant="solid"
 						@click="handleCreate"
-						:loading="createCustomerResource.loading || checkingPermission"
+						:loading="createCustomerResource.loading || updateCustomerResource.loading || checkingPermission"
 						:disabled="!customerData.customer_name || !hasPermission"
 					>
-						{{ __("Create Customer") }}
+						{{ isEditMode ? __("Save Changes") : __("Create Customer") }}
 					</Button>
 					<Button variant="subtle" @click="show = false">
 						{{ __("Cancel") }}
@@ -208,9 +208,10 @@ const props = defineProps({
 	modelValue: Boolean,
 	posProfile: String,
 	initialName: String,
+	customer: Object, // Customer object for edit mode
 })
 
-const emit = defineEmits(["update:modelValue", "customer-created"])
+const emit = defineEmits(["update:modelValue", "customer-created", "customer-updated"])
 
 // =============================================================================
 // State
@@ -244,6 +245,8 @@ const show = computed({
 	get: () => props.modelValue,
 	set: (val) => emit("update:modelValue", val),
 })
+
+const isEditMode = computed(() => !!props.customer?.name)
 
 const currentCountryCode = computed(() => {
 	const country = countriesStore.countries.find((c) => c.isd === selectedCountryCode.value)
@@ -352,6 +355,30 @@ const createCustomerResource = createResource({
 	},
 })
 
+const updateCustomerResource = createResource({
+	url: "frappe.client.set_value",
+	makeParams: () => ({
+		doctype: "Customer",
+		name: props.customer?.name,
+		fieldname: {
+			customer_name: customerData.value.customer_name,
+			customer_group: customerData.value.customer_group || __("Individual"),
+			territory: customerData.value.territory || __("All Territories"),
+			mobile_no: customerData.value.mobile_no || "",
+			email_id: customerData.value.email_id || "",
+		},
+	}),
+	onSuccess: (data) => {
+		showSuccess(__("Customer {0} updated successfully", [data.customer_name]))
+		emit("customer-updated", data)
+		show.value = false
+	},
+	onError: (error) => {
+		log.error("Error updating customer", error)
+		showError(error.message || __("Failed to update customer"))
+	},
+})
+
 /** Helper to create list fetch resources */
 const createListResource = (doctype, onSuccess) =>
 	createResource({
@@ -422,7 +449,11 @@ const handleCreate = async () => {
 	if (!customerData.value.customer_name) {
 		return showError(__("Customer Name is required"))
 	}
-	await createCustomerResource.submit()
+	if (isEditMode.value) {
+		await updateCustomerResource.submit()
+	} else {
+		await createCustomerResource.submit()
+	}
 }
 
 const resetForm = () => {
@@ -444,6 +475,31 @@ const resetForm = () => {
 watch(
 	() => props.initialName,
 	(name) => name && (customerData.value.customer_name = name)
+)
+
+// Pre-fill form when customer prop changes (edit mode)
+watch(
+	() => props.customer,
+	(customer) => {
+		if (customer?.name) {
+			customerData.value.customer_name = customer.customer_name || ""
+			customerData.value.email_id = customer.email_id || ""
+			customerData.value.customer_group = customer.customer_group || "Individual"
+			customerData.value.territory = customer.territory || "All Territories"
+			// Handle mobile_no with country code
+			if (customer.mobile_no) {
+				customerData.value.mobile_no = customer.mobile_no
+				if (customer.mobile_no.includes("-")) {
+					const [code, ...rest] = customer.mobile_no.split("-")
+					selectedCountryCode.value = code
+					phoneNumber.value = rest.join("-")
+				} else {
+					phoneNumber.value = customer.mobile_no
+				}
+			}
+		}
+	},
+	{ immediate: true }
 )
 
 watch(
