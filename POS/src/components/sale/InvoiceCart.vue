@@ -1784,12 +1784,18 @@ function decrementQuantity(item) {
  * @param {Object} item - Cart item to update
  * @param {String} value - New quantity value from input
  */
+  
 function updateQuantity(item, value) {
 	const qty = Number.parseFloat(value);
-	// Allow any positive number during typing (don't round yet)
-	if (!isNaN(qty) && qty > 0) {
-		emit("update-quantity", item.item_code, qty, item.uom);
-	}
+
+	// If the input isn't a valid number (e.g., user cleared the field), do nothing
+	if (isNaN(qty)) return;
+
+	// If quantity is zero or negative, remove the item from the cart
+	if (qty <= 0) return emit("remove-item", item.item_code, item.uom);
+
+	// For positive numbers, update quantity immediately (no rounding here while typing)
+	emit("update-quantity", item.item_code, qty, item.uom);
 }
 
 /**
