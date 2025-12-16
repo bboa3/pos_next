@@ -1087,11 +1087,6 @@
 			@update-item="handleUpdateItem"
 		/>
 
-		<!-- Delivery Date Dialog -->
-		<DeliveryDateDialog
-			v-model="showDeliveryDateDialog"
-			@confirm="handleDeliveryDateConfirm"
-		/>
 	</div>
 </template>
 
@@ -1112,7 +1107,6 @@ import { offlineWorker } from "@/utils/offline/workerClient";
 import { createResource } from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from "vue";
 import EditItemDialog from "./EditItemDialog.vue";
-import DeliveryDateDialog from "./DeliveryDateDialog.vue";
 
 /**
  * ============================================================================
@@ -1124,19 +1118,7 @@ const settingsStore = usePOSSettingsStore(); // Pinia store for POS settings
 const offersStore = usePOSOffersStore(); // Pinia store for offers/promotions
 const { formatQuantity } = useFormatters(); // Quantity formatting utilities
 
-// Delivery Date Dialog State
-const showDeliveryDateDialog = ref(false);
-
 function handleProceedToPayment() {
-	if (cartStore.targetDoctype === "Sales Order") {
-		showDeliveryDateDialog.value = true;
-	} else {
-		emit("proceed-to-payment");
-	}
-}
-
-function handleDeliveryDateConfirm(date) {
-	cartStore.setDeliveryDate(date);
 	emit("proceed-to-payment");
 }
 

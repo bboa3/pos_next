@@ -1,5 +1,5 @@
 <template>
-	<Dialog v-model="show" :options="{ title: __('Complete Payment'), size: dynamicDialogSize }">
+	<Dialog v-model="show" :options="{ title: isSalesOrder ? __('Complete Sales Order') : __('Complete Payment'), size: dynamicDialogSize }">
 		<template #body-content>
 			<!-- Two Column Layout - constrained to viewport height -->
 			<div
@@ -11,6 +11,22 @@
 					class="lg:col-span-2 flex flex-col gap-1.5 min-h-0 overflow-hidden"
 					:style="{ maxHeight: dynamicLeftColumnHeight }"
 				>
+					<!-- Delivery Date for Sales Orders -->
+					<div v-if="isSalesOrder" class="bg-orange-50 border border-orange-200 rounded-lg p-2">
+						<div class="flex items-center gap-2">
+							<svg class="w-4 h-4 text-orange-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+							</svg>
+							<label class="text-xs font-medium text-orange-700 flex-shrink-0">{{ __("Delivery Date") }}</label>
+							<input
+								type="date"
+								v-model="deliveryDate"
+								:min="today"
+								class="flex-1 h-8 border border-orange-300 rounded-lg px-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-white"
+							/>
+						</div>
+					</div>
+
 					<!-- Sales Person Selection (Compact) -->
 					<div v-if="settingsStore.enableSalesPersons" class="bg-purple-50 border border-purple-200 rounded-lg p-2">
 						<!-- Search Input with inline selected badge -->
@@ -681,6 +697,10 @@ const props = defineProps({
 		type: Number,
 		default: 0,
 	},
+	targetDoctype: {
+		type: String,
+		default: "Sales Invoice",
+	},
 })
 
 const emit = defineEmits(["update:modelValue", "payment-completed", "update-additional-discount"])
@@ -698,6 +718,11 @@ const paymentEntries = ref([])
 const customerCredit = ref([])
 const customerBalance = ref({ total_outstanding: 0, total_credit: 0, net_balance: 0 })
 const loadingCredit = ref(false)
+
+// Delivery date for Sales Orders
+const deliveryDate = ref("")
+const today = new Date().toISOString().split("T")[0]
+const isSalesOrder = computed(() => props.targetDoctype === "Sales Order")
 
 // Column refs for height matching
 const rightColumnRef = ref(null)
@@ -1223,6 +1248,8 @@ watch(show, (newVal) => {
 		customerBalance.value = { total_outstanding: 0, total_credit: 0, net_balance: 0 }
 		selectedSalesPersons.value = []
 		salesPersonSearch.value = ''
+		// Set default delivery date to today for Sales Orders
+		deliveryDate.value = isSalesOrder.value ? today : ""
 
 		// Debug logging
 		log.debug('[PaymentDialog] Dialog opened with props:', {
@@ -1404,6 +1431,7 @@ function completePayment() {
 		paid_amount: totalPaid.value,
 		outstanding_amount: isPartial ? remainingAmount.value : 0,
 		sales_team: selectedSalesPersons.value.length > 0 ? selectedSalesPersons.value : null,
+		delivery_date: isSalesOrder.value ? deliveryDate.value : null,
 	}
 
 	log.debug('[PaymentDialog] Emitting payment-completed:', paymentData)

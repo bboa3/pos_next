@@ -448,6 +448,7 @@
 			:items="cartStore.invoiceItems"
 			:tax-amount="cartStore.totalTax"
 			:discount-amount="cartStore.totalDiscount"
+			:target-doctype="cartStore.targetDoctype"
 			@payment-completed="handlePaymentCompleted"
 			@update-additional-discount="handleAdditionalDiscountUpdate"
 		/>
@@ -1810,6 +1811,11 @@ async function handlePaymentCompleted(paymentData) {
 			cartStore.salesTeam = paymentData.sales_team;
 		} else {
 			cartStore.salesTeam = [];
+		}
+
+		// Set delivery date for Sales Orders
+		if (paymentData.delivery_date) {
+			cartStore.setDeliveryDate(paymentData.delivery_date);
 		}
 
 		// Delete draft if it exists (since we're submitting/saving invoice)
