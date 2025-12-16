@@ -169,14 +169,40 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		isProcessing: false,      // True while any offer operation is running
 		isAutoProcessing: false,  // True during automatic offer processing
 		lastProcessedAt: 0,       // Timestamp of last successful processing
+		lastCartHash: '',         // Hash of cart state when last processed
 		error: null,              // Last error if any
+		retryCount: 0,            // Number of consecutive failures
 	})
+
+	// Generation counter to track cart changes and invalidate stale operations
+	let cartGeneration = 0
 
 	// Async queue for sequential offer processing
 	const offerQueue = createAsyncQueue()
 
 	// Computed for backward compatibility and UI binding
 	const isProcessingOffers = computed(() => offerProcessingState.value.isProcessing)
+
+	/**
+	 * Generates a comprehensive hash of the current cart state.
+	 * Used to detect ANY change that might affect offer eligibility.
+	 */
+	function generateCartHash() {
+		const items = invoiceItems.value
+		const parts = [
+			// Item details: code, quantity, uom, discount
+			items.map(i => `${i.item_code}:${i.quantity}:${i.uom || ''}:${i.discount_percentage || 0}`).join('|'),
+			// Total item count
+			items.length.toString(),
+			// Subtotal (rounded to avoid floating point issues)
+			Math.round((subtotal.value || 0) * 100).toString(),
+			// Customer
+			customer.value?.name || customer.value || 'none',
+			// Applied offers count
+			appliedOffers.value.length.toString(),
+		]
+		return parts.join('::')
+	}
 
 	// Toast composable
 	const { showSuccess, showError, showWarning } = useToast()
@@ -232,11 +258,24 @@ export const usePOSCartStore = defineStore("posCart", () => {
 	}
 
 	function clearCart() {
+		// Cancel any pending offer processing
+		debouncedProcessOffers.cancel()
+		offerQueue.cancel()
+
 		clearInvoiceCart()
 		customer.value = null
 		appliedOffers.value = []
 		appliedCoupon.value = null
 		currentDraftId.value = null
+
+		// Reset offer processing state
+		suppressOfferReapply.value = false
+		offerProcessingState.value.lastCartHash = ''
+		offerProcessingState.value.error = null
+		offerProcessingState.value.retryCount = 0
+
+		// Sync the empty snapshot
+		syncOfferSnapshot()
 	}
 
 	function setCustomer(selectedCustomer) {
@@ -1091,10 +1130,26 @@ export const usePOSCartStore = defineStore("posCart", () => {
 	/**
 	 * Core offer processing function that validates and auto-applies offers.
 	 * Runs through the queue to ensure sequential execution.
+	 * @param {AbortSignal} signal - Abort signal for cancellation
+	 * @param {number} generation - Cart generation when this was triggered
+	 * @param {boolean} force - If true, process even if cart hash matches
 	 */
-	async function processOffersInternal(signal = null) {
+	async function processOffersInternal(signal = null, generation = 0, force = false) {
 		// Check cancellation early
 		if (signal?.aborted) return
+
+		// Check if this operation is stale (cart changed since this was queued)
+		if (generation > 0 && generation < cartGeneration) {
+			return // Skip stale operation
+		}
+
+		// Generate current cart hash
+		const currentHash = generateCartHash()
+
+		// Skip if cart hasn't changed since last successful processing (unless forced)
+		if (!force && currentHash === offerProcessingState.value.lastCartHash) {
+			return
+		}
 
 		// Update offer snapshot for eligibility checking
 		syncOfferSnapshot()
@@ -1110,6 +1165,10 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			currency: posProfile.value.currency,
 		}
 
+		// Always reset suppression flag at the start of processing
+		// This ensures we don't get stuck in a suppressed state
+		suppressOfferReapply.value = false
+
 		// Validate and auto-remove invalid offers (if any are applied)
 		if (appliedOffers.value.length > 0) {
 			await reapplyOffer(currentProfile, signal)
@@ -1118,16 +1177,28 @@ export const usePOSCartStore = defineStore("posCart", () => {
 		// Check cancellation before auto-apply
 		if (signal?.aborted) return
 
+		// Check again if stale after reapply
+		if (generation > 0 && generation < cartGeneration) {
+			return
+		}
+
 		// Auto-apply eligible offers (always check for new eligible offers)
 		await autoApplyEligibleOffers(currentProfile, signal)
+
+		// Update last processed hash on success
+		offerProcessingState.value.lastCartHash = generateCartHash()
+		offerProcessingState.value.lastProcessedAt = Date.now()
+		offerProcessingState.value.retryCount = 0
 	}
 
 	/**
-	 * Debounced offer processing to prevent race conditions.
-	 * Uses 200ms delay to batch rapid cart changes (e.g., quantity adjustments).
-	 * The delay allows multiple quick changes to be batched into a single processing run.
+	 * Triggers offer processing with proper state management.
+	 * @param {boolean} force - If true, bypass hash check and force processing
 	 */
-	const debouncedProcessOffers = createDebounce(() => {
+	function triggerOfferProcessing(force = false) {
+		// Increment generation to invalidate any in-flight operations
+		const currentGen = ++cartGeneration
+
 		// Enqueue the processing task - queue handles concurrency
 		offerQueue.enqueue(async (signal) => {
 			try {
@@ -1135,28 +1206,95 @@ export const usePOSCartStore = defineStore("posCart", () => {
 				offerProcessingState.value.isAutoProcessing = true
 				offerProcessingState.value.error = null
 
-				await processOffersInternal(signal)
+				await processOffersInternal(signal, currentGen, force)
+			} catch (error) {
+				if (!signal?.aborted) {
+					console.error("Error in offer processing:", error)
+					offerProcessingState.value.error = error.message
+					offerProcessingState.value.retryCount++
+
+					// Auto-retry on failure (max 3 times)
+					if (offerProcessingState.value.retryCount < 3) {
+						setTimeout(() => {
+							triggerOfferProcessing(true)
+						}, 500 * offerProcessingState.value.retryCount)
+					}
+				}
 			} finally {
 				offerProcessingState.value.isProcessing = false
 				offerProcessingState.value.isAutoProcessing = false
 			}
 		})
-	}, 200)
+	}
 
-	// Watch for cart changes to update offer snapshot and validate offers
-	// Watch subtotal and create a reactive hash of items to detect any changes
+	/**
+	 * Force refresh offers - clears state and reprocesses from scratch.
+	 * Call this when you suspect offers are out of sync.
+	 */
+	function forceRefreshOffers() {
+		// Cancel any pending operations
+		debouncedProcessOffers.cancel()
+		offerQueue.cancel()
+
+		// Clear the hash to force reprocessing
+		offerProcessingState.value.lastCartHash = ''
+		offerProcessingState.value.error = null
+		offerProcessingState.value.retryCount = 0
+
+		// Reset suppression
+		suppressOfferReapply.value = false
+
+		// Trigger immediate processing
+		triggerOfferProcessing(true)
+	}
+
+	/**
+	 * Debounced offer processing to prevent race conditions.
+	 * Uses 150ms delay to batch rapid cart changes (e.g., quantity adjustments).
+	 * The delay allows multiple quick changes to be batched into a single processing run.
+	 */
+	const debouncedProcessOffers = createDebounce(() => {
+		triggerOfferProcessing(false)
+	}, 150)
+
+	// Watch for ANY cart changes that might affect offer eligibility
+	// This includes: items, quantities, customer, subtotal, etc.
 	watch(
 		[
+			// Watch item count (additions/removals)
+			() => invoiceItems.value.length,
+			// Watch item details (quantity, code, uom changes)
+			() => invoiceItems.value.map(item =>
+				`${item.item_code}:${item.quantity}:${item.uom || ''}:${item.discount_percentage || 0}`
+			).join(','),
+			// Watch subtotal changes
 			subtotal,
-			() => invoiceItems.value.map(item => `${item.item_code}:${item.quantity}`).join(',')
+			// Watch customer changes (some offers are customer-specific)
+			() => customer.value?.name || customer.value,
 		],
-		() => {
+		(_newVals, oldVals) => {
+			// Skip if this is initial render with empty cart
+			if (!oldVals && invoiceItems.value.length === 0) {
+				return
+			}
+
 			// Use debounced processing to prevent race conditions
 			// This batches rapid cart changes and ensures only one offer
 			// processing operation runs at a time
 			debouncedProcessOffers()
 		},
 		{ immediate: true, flush: "post" },
+	)
+
+	// Additional watcher for applied offers changes (to handle removal edge cases)
+	watch(
+		() => appliedOffers.value.length,
+		(newLen, oldLen) => {
+			// If offers were removed externally, sync the snapshot
+			if (newLen < oldLen) {
+				syncOfferSnapshot()
+			}
+		}
 	)
 
 	return {
@@ -1219,5 +1357,6 @@ export const usePOSCartStore = defineStore("posCart", () => {
 			debouncedProcessOffers.cancel()
 			offerQueue.cancel()
 		},
+		forceRefreshOffers, // Force reprocess offers from scratch
 	}
 })
