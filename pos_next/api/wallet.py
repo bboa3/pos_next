@@ -74,8 +74,8 @@ def process_loyalty_to_wallet(doc, method=None):
 	if not loyalty_entry or loyalty_entry.loyalty_points <= 0:
 		return
 
-	# Get conversion rate
-	conversion_rate = flt(pos_settings.get("loyalty_conversion_rate")) or 1.0
+	# Get conversion rate from Loyalty Program (standard ERPNext field)
+	conversion_rate = flt(frappe.db.get_value("Loyalty Program", loyalty_program, "conversion_factor")) or 1.0
 
 	# Calculate wallet credit amount
 	credit_amount = flt(loyalty_entry.loyalty_points) * conversion_rate

@@ -11,10 +11,10 @@
   "section_break_wallet",
   "enable_wallet",
   "wallet_account",
+  "default_loyalty_program",
   "column_break_wallet",
   "auto_create_wallet",
   "loyalty_to_wallet",
-  "loyalty_conversion_rate",
   "section_break_general",
   "allow_user_to_edit_additional_discount",
   "allow_user_to_edit_item_discount",
@@ -119,6 +119,13 @@
    "description": "Default receivable account for customer wallets"
   },
   {
+   "fieldname": "default_loyalty_program",
+   "fieldtype": "Link",
+   "label": "Default Loyalty Program",
+   "options": "Loyalty Program",
+   "description": "Loyalty program to auto-assign to new customers. Leave empty to disable auto-assignment."
+  },
+  {
    "fieldname": "column_break_wallet",
    "fieldtype": "Column Break"
   },
@@ -136,16 +143,7 @@
    "fieldtype": "Check",
    "label": "Convert Loyalty Points to Wallet",
    "depends_on": "enable_wallet",
-   "description": "Automatically convert earned loyalty points to wallet balance"
-  },
-  {
-   "default": "1",
-   "fieldname": "loyalty_conversion_rate",
-   "fieldtype": "Float",
-   "label": "Loyalty Conversion Rate",
-   "precision": "2",
-   "depends_on": "loyalty_to_wallet",
-   "description": "1 Loyalty Point = X currency units"
+   "description": "Automatically convert earned loyalty points to wallet balance. Uses Conversion Factor from Loyalty Program."
   },
   {
    "collapsible": 0,

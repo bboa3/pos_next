@@ -189,6 +189,9 @@ doc_events = {
 	"Item": {
 		"validate": "pos_next.validations.validate_item"
 	},
+	"Customer": {
+		"after_insert": "pos_next.api.customers.auto_assign_loyalty_program"
+	},
 	"Sales Invoice": {
 		"validate": [
 			"pos_next.api.sales_invoice_hooks.validate",
