@@ -1383,6 +1383,43 @@ function selectPaymentMethod(method) {
 	log.debug('[PaymentDialog] Selected payment method:', method.mode_of_payment)
 }
 
+// Helper to get default non-wallet payment method
+function getDefaultNonWalletMethod() {
+	// First try to find the default method that's not a wallet payment
+	const defaultMethod = paymentMethods.value.find(m => m.default && !isWalletPaymentMethod(m.mode_of_payment))
+	if (defaultMethod) return defaultMethod
+
+	// Otherwise, find any non-wallet method (preferably Cash)
+	const cashMethod = paymentMethods.value.find(m =>
+		!isWalletPaymentMethod(m.mode_of_payment) &&
+		(m.mode_of_payment.toLowerCase().includes('cash') || m.type?.toLowerCase() === 'cash')
+	)
+	if (cashMethod) return cashMethod
+
+	// Fall back to first non-wallet method
+	return paymentMethods.value.find(m => !isWalletPaymentMethod(m.mode_of_payment))
+}
+
+// Helper to switch to next payment method after partial wallet payment
+function switchToNextPaymentMethod(partialAmount) {
+	const nextMethod = getDefaultNonWalletMethod()
+	if (nextMethod) {
+		lastSelectedMethod.value = nextMethod
+		// Pre-fill numpad with remaining amount for convenience
+		const newRemaining = round2(remainingAmount.value)
+		if (newRemaining > 0) {
+			numpadDisplay.value = newRemaining.toFixed(2)
+			// Also set mobile custom amount
+			mobileCustomAmount.value = newRemaining.toFixed(2)
+		}
+		frappe.show_alert({
+			message: __('Points applied: {0}. Please pay remaining {1} with {2}',
+				[formatCurrency(partialAmount), formatCurrency(newRemaining), __(nextMethod.mode_of_payment)]),
+			indicator: 'blue'
+		})
+	}
+}
+
 // Quick add payment (long press action)
 function quickAddPayment(method) {
 	if (remainingAmount.value <= 0) return
@@ -1390,6 +1427,7 @@ function quickAddPayment(method) {
 	lastSelectedMethod.value = method
 
 	let amt = remainingAmount.value
+	let isPartialWalletPayment = false
 
 	// Wallet payment validation: limit to available balance
 	if (isWalletPaymentMethod(method.mode_of_payment)) {
@@ -1404,10 +1442,7 @@ function quickAddPayment(method) {
 		if (amt > walletAvailable) {
 			// Limit payment to available redeemable points
 			amt = walletAvailable
-			frappe.show_alert({
-				message: __('Payment limited to available points: {0}', [formatCurrency(amt)]),
-				indicator: 'blue'
-			})
+			isPartialWalletPayment = true
 		}
 	}
 
@@ -1418,6 +1453,13 @@ function quickAddPayment(method) {
 		is_wallet_payment: isWalletPaymentMethod(method.mode_of_payment),
 	})
 	log.debug('[PaymentDialog] Long press payment added:', method.mode_of_payment)
+
+	// If this was a partial wallet payment, switch to another payment method
+	if (isPartialWalletPayment) {
+		nextTick(() => {
+			switchToNextPaymentMethod(amt)
+		})
+	}
 }
 
 // Initialize long press composable with callbacks
@@ -1455,6 +1497,8 @@ function addCustomPayment(method, amount) {
 	let amt = Number.parseFloat(amount)
 	if (!amt || amt <= 0) return
 
+	let isPartialWalletPayment = false
+
 	// Wallet payment validation: limit to available balance
 	if (isWalletPaymentMethod(method.mode_of_payment)) {
 		const walletAvailable = availableWalletBalance.value
@@ -1468,10 +1512,7 @@ function addCustomPayment(method, amount) {
 		if (amt > walletAvailable) {
 			// Limit payment to available redeemable points
 			amt = walletAvailable
-			frappe.show_alert({
-				message: __('Payment limited to available points: {0}', [formatCurrency(amt)]),
-				indicator: 'blue'
-			})
+			isPartialWalletPayment = true
 		}
 	}
 
@@ -1484,6 +1525,13 @@ function addCustomPayment(method, amount) {
 
 	log.debug('[PaymentDialog] Payment added, new entries:', paymentEntries.value)
 	customAmount.value = ""
+
+	// If this was a partial wallet payment, switch to another payment method
+	if (isPartialWalletPayment) {
+		nextTick(() => {
+			switchToNextPaymentMethod(amt)
+		})
+	}
 }
 
 // Apply existing customer credit to payment
