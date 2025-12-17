@@ -8,6 +8,13 @@
   "enabled",
   "section_break_localization",
   "allowed_locales",
+  "section_break_wallet",
+  "enable_wallet",
+  "wallet_account",
+  "column_break_wallet",
+  "auto_create_wallet",
+  "loyalty_to_wallet",
+  "loyalty_conversion_rate",
   "section_break_general",
   "allow_user_to_edit_additional_discount",
   "allow_user_to_edit_item_discount",
@@ -89,6 +96,56 @@
    "label": "Allowed Languages",
    "options": "POS Allowed Locale",
    "description": "Select languages available in the POS language switcher. If empty, defaults to English and Arabic."
+  },
+  {
+   "collapsible": 0,
+   "fieldname": "section_break_wallet",
+   "fieldtype": "Section Break",
+   "label": "Wallet & Loyalty"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_wallet",
+   "fieldtype": "Check",
+   "label": "Enable Wallet Payment",
+   "description": "Allow customers to pay using their wallet balance"
+  },
+  {
+   "fieldname": "wallet_account",
+   "fieldtype": "Link",
+   "label": "Default Wallet Account",
+   "options": "Account",
+   "depends_on": "enable_wallet",
+   "description": "Default receivable account for customer wallets"
+  },
+  {
+   "fieldname": "column_break_wallet",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "auto_create_wallet",
+   "fieldtype": "Check",
+   "label": "Auto Create Wallet",
+   "depends_on": "enable_wallet",
+   "description": "Automatically create wallet for new customers"
+  },
+  {
+   "default": "0",
+   "fieldname": "loyalty_to_wallet",
+   "fieldtype": "Check",
+   "label": "Convert Loyalty Points to Wallet",
+   "depends_on": "enable_wallet",
+   "description": "Automatically convert earned loyalty points to wallet balance"
+  },
+  {
+   "default": "1",
+   "fieldname": "loyalty_conversion_rate",
+   "fieldtype": "Float",
+   "label": "Loyalty Conversion Rate",
+   "precision": "2",
+   "depends_on": "loyalty_to_wallet",
+   "description": "1 Loyalty Point = X currency units"
   },
   {
    "collapsible": 0,

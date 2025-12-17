@@ -99,7 +99,8 @@ fixtures = [
 					"Item-custom_company",
 					"POS Profile-posa_cash_mode_of_payment",
 					"POS Profile-posa_allow_delete",
-					"POS Profile-posa_block_sale_beyond_available_qty"
+					"POS Profile-posa_block_sale_beyond_available_qty",
+					"Mode of Payment-is_wallet_payment"
 				]
 			]
 		]
@@ -189,9 +190,15 @@ doc_events = {
 		"validate": "pos_next.validations.validate_item"
 	},
 	"Sales Invoice": {
-		"validate": "pos_next.api.sales_invoice_hooks.validate",
+		"validate": [
+			"pos_next.api.sales_invoice_hooks.validate",
+			"pos_next.api.wallet.validate_wallet_payment"
+		],
 		"before_cancel": "pos_next.api.sales_invoice_hooks.before_cancel",
-		"on_submit": "pos_next.realtime_events.emit_stock_update_event",
+		"on_submit": [
+			"pos_next.realtime_events.emit_stock_update_event",
+			"pos_next.api.wallet.process_loyalty_to_wallet"
+		],
 		"on_cancel": "pos_next.realtime_events.emit_stock_update_event",
 		"after_insert": "pos_next.realtime_events.emit_invoice_created_event"
 	},
