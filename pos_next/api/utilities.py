@@ -6,6 +6,8 @@ from __future__ import unicode_literals
 import frappe
 import json
 from frappe import _
+from frappe.utils import cint
+
 
 @frappe.whitelist()
 def get_csrf_token():
@@ -17,26 +19,20 @@ def get_csrf_token():
 	- User must be authenticated (not Guest)
 	- Session must be valid
 	- User must be enabled
-
-	Note: frappe.sessions.get_csrf_token() handles session updates and commits internally.
 	"""
-	# Check if user is authenticated
 	if frappe.session.user == "Guest":
-		frappe.throw("Authentication required", frappe.AuthenticationError)
+		frappe.throw(_("Authentication required"), frappe.AuthenticationError)
 
-	# Verify user is enabled
 	if not frappe.db.get_value("User", frappe.session.user, "enabled"):
-		frappe.throw("User is disabled", frappe.AuthenticationError)
+		frappe.throw(_("User is disabled"), frappe.AuthenticationError)
 
-	# Verify session exists and is valid
 	if not frappe.session.sid or frappe.session.sid == "Guest":
-		frappe.throw("Invalid session", frappe.AuthenticationError)
+		frappe.throw(_("Invalid session"), frappe.AuthenticationError)
 
-	# Get CSRF token for valid, authenticated session
 	csrf_token = frappe.sessions.get_csrf_token()
 
 	if not csrf_token:
-		frappe.throw("Failed to generate CSRF token", frappe.ValidationError)
+		frappe.throw(_("Failed to generate CSRF token"), frappe.ValidationError)
 
 	return {
 		"csrf_token": csrf_token,
@@ -44,14 +40,14 @@ def get_csrf_token():
 	}
 
 
-def _parse_list_parameter(value, param_name):
+def _parse_list_parameter(value, param_name="parameter"):
 	"""
 	Parse a list parameter that may come as JSON string or list.
-	
+
 	Args:
 		value: Value to parse (string or list)
 		param_name: Name of parameter for error messages
-		
+
 	Returns:
 		list: Parsed list value
 	"""
@@ -59,28 +55,58 @@ def _parse_list_parameter(value, param_name):
 		try:
 			value = value.strip()
 			return json.loads(value) if value else []
-		except json.JSONDecodeError as json_err:
-			frappe.throw(_("Could not parse '{0}' as JSON: {1}").format(param_name, str(json_err)))
-	
+		except json.JSONDecodeError as e:
+			frappe.throw(_("Could not parse '{0}' as JSON: {1}").format(param_name, str(e)))
+
 	if not isinstance(value, list):
 		return []
-	
+
 	return value
 
+
 def check_user_company():
-	"""
-	Check if the authenticated user has a company linked to them
-	"""
+	"""Check if the authenticated user has a company linked to them."""
 	user = frappe.session.user
 
-	existing_permission = frappe.db.exists("User Permission", {"user": user, "allow": "Company"})
-	has_company = bool(existing_permission)
+	permission = frappe.db.get_value(
+		"User Permission",
+		{"user": user, "allow": "Company"},
+		["for_value"],
+		as_dict=True
+	)
 
-	company_name = None
-	if has_company:
-		company_id = frappe.db.get_value("User Permission", existing_permission, "for_value")
-		company_name = frappe.db.get_value("Company", company_id, "company_name")
+	if permission:
+		company_name = frappe.db.get_value("Company", permission.for_value, "company_name")
+		return {"has_company": True, "company": company_name or ""}
 
-	data = {"has_company": has_company, "company": company_name or ""}
+	return {"has_company": False, "company": ""}
 
-	return data
+
+def get_wallet_payment_modes():
+	"""
+	Get list of Mode of Payment names that are marked as wallet payments.
+
+	Returns:
+		list: List of Mode of Payment names with is_wallet_payment=1
+	"""
+	return frappe.get_all(
+		"Mode of Payment",
+		filters={"is_wallet_payment": 1},
+		pluck="name"
+	)
+
+
+def is_wallet_payment_mode(mode_of_payment):
+	"""
+	Check if a Mode of Payment is a wallet payment.
+
+	Args:
+		mode_of_payment: Mode of Payment name
+
+	Returns:
+		bool: True if the mode is a wallet payment
+	"""
+	if not mode_of_payment:
+		return False
+
+	return cint(frappe.get_cached_value("Mode of Payment", mode_of_payment, "is_wallet_payment"))
