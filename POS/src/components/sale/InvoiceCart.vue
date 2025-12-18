@@ -271,7 +271,7 @@
 				<!-- Customer Dropdown -->
 				<div
 					v-if="customerSearchFocused || customerSearch.trim().length >= 2"
-					class="absolute z-50 mt-0.5 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-hidden"
+					class="absolute z-50 mt-0.5 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-hidden will-change-transform"
 				>
 					<!-- Frequent Customers Header (when showing suggestions) -->
 					<div
@@ -284,25 +284,25 @@
 					</div>
 
 					<!-- Customer Results -->
-					<div v-if="customerResults.length > 0" class="max-h-48 overflow-y-auto">
+					<div v-if="customerResults.length > 0" class="max-h-48 overflow-y-auto overscroll-contain">
 						<button
 							type="button"
 							v-for="(cust, index) in customerResults"
 							:key="cust.name"
-							@click="selectCustomer(cust)"
+							@mousedown.prevent="selectCustomer(cust)"
 							:class="[
-								'w-full text-start px-2 py-1.5 flex items-center gap-1.5 border-b border-gray-100 last:border-0 transition-colors duration-75',
-								index === selectedIndex ? 'bg-blue-100' : 'hover:bg-blue-50',
+								'w-full text-start px-2 py-1.5 flex items-center gap-1.5 border-b border-gray-100 last:border-0 touch-manipulation select-none cursor-pointer active:bg-blue-200',
+								index === selectedIndex ? 'bg-blue-100' : 'hover:bg-blue-50 active:bg-blue-100',
 							]"
 						>
 							<div
-								class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0"
+								class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 pointer-events-none"
 							>
 								<span class="text-[10px] font-bold text-blue-600">{{
 									getInitials(cust.customer_name)
 								}}</span>
 							</div>
-							<div class="flex-1 min-w-0">
+							<div class="flex-1 min-w-0 pointer-events-none">
 								<p class="text-[11px] font-semibold text-gray-900 truncate">
 									{{ cust.customer_name }}
 								</p>
@@ -326,11 +326,11 @@
 					<button
 						type="button"
 						v-if="customerSearch.trim().length >= 2"
-						@click="createNewCustomer"
-						class="w-full text-start px-2 py-1.5 hover:bg-green-50 flex items-center gap-1.5 transition-colors border-t border-gray-200"
+						@mousedown.prevent="createNewCustomer"
+						class="w-full text-start px-2 py-1.5 hover:bg-green-50 active:bg-green-100 flex items-center gap-1.5 border-t border-gray-200 touch-manipulation select-none cursor-pointer"
 					>
 						<div
-							class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0"
+							class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 pointer-events-none"
 						>
 							<svg
 								class="w-3 h-3 text-green-600"
@@ -346,7 +346,7 @@
 								/>
 							</svg>
 						</div>
-						<div class="flex-1">
+						<div class="flex-1 pointer-events-none">
 							<p class="text-[11px] font-medium text-green-700">
 								{{ __("Create New Customer") }}
 							</p>
@@ -1350,6 +1350,18 @@ watch(
 const appliedOfferCount = computed(() => (props.appliedOffers || []).length);
 
 /**
+ * Pre-computed customer lookup map for O(1) access by ID.
+ * Rebuilt when allCustomers changes.
+ */
+const customerMap = computed(() => {
+	const map = new Map();
+	for (const cust of allCustomers.value) {
+		map.set(cust.name, cust);
+	}
+	return map;
+});
+
+/**
  * Instant customer search results with in-memory filtering.
  *
  * Performs zero-latency filtering on the cached customer list.
@@ -1367,10 +1379,12 @@ const customerResults = computed(() => {
 			// Get frequent customer IDs from the store
 			const frequentIds = customerSearchStore.frequentCustomers.slice(0, 5);
 			if (frequentIds.length > 0) {
-				// Map IDs to full customer objects
-				const frequentCustomers = frequentIds
-					.map(id => allCustomers.value.find(c => c.name === id))
-					.filter(Boolean);
+				// O(1) lookup using pre-computed map instead of O(n) find
+				const frequentCustomers = [];
+				for (const id of frequentIds) {
+					const cust = customerMap.value.get(id);
+					if (cust) frequentCustomers.push(cust);
+				}
 				return frequentCustomers;
 			}
 			// If no frequent customers, show first 5 from the list
@@ -1435,24 +1449,30 @@ function handleSearchInput(event) {
 	customerSearch.value = event.target.value;
 }
 
+// Track if customer history has been loaded this session
+const customerHistoryLoaded = ref(false);
+
 /**
  * Handle search input focus - shows frequent customers dropdown.
  */
 function handleSearchFocus() {
 	customerSearchFocused.value = true;
-	// Load customer history for frequent customers
-	customerSearchStore.loadCustomerHistory();
+	// Load customer history only once per session for faster subsequent focuses
+	if (!customerHistoryLoaded.value) {
+		customerSearchStore.loadCustomerHistory();
+		customerHistoryLoaded.value = true;
+	}
 }
 
 /**
  * Handle search input blur - hides dropdown after a short delay.
- * Delay allows clicking on dropdown items before it closes.
+ * Short delay as fallback for keyboard/tab navigation (mousedown.prevent handles click cases).
  */
 function handleSearchBlur() {
-	// Delay to allow click events on dropdown items to fire first
+	// Reduced delay - mousedown.prevent handles most cases, this is just for keyboard nav
 	setTimeout(() => {
 		customerSearchFocused.value = false;
-	}, 200);
+	}, 100);
 }
 
 /**
@@ -1489,12 +1509,16 @@ function handleKeydown(event) {
 /**
  * Select a customer from search results.
  * Emits select-customer event and resets search state.
+ * Tracks customer selection for frequency-based suggestions.
  * @param {Object} cust - Customer object to select
  */
 function selectCustomer(cust) {
+	// Track selection for frequent customers feature
+	customerSearchStore.trackCustomerSelection(cust.name);
 	emit("select-customer", cust);
 	customerSearch.value = "";
 	selectedIndex.value = -1;
+	customerSearchFocused.value = false;
 	previousCustomer.value = null;
 }
 
@@ -1525,9 +1549,12 @@ async function clearCustomer() {
  * Pre-fills the new customer name with the search query.
  */
 function createNewCustomer() {
-	// Emit event to open customer creation dialog
-	emit("create-customer", customerSearch.value);
+	const searchValue = customerSearch.value;
+	// Close dropdown immediately
 	customerSearch.value = "";
+	customerSearchFocused.value = false;
+	// Emit event to open customer creation dialog
+	emit("create-customer", searchValue);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
