@@ -1,8 +1,11 @@
 import { call } from "@/utils/apiWrapper"
 import { isOffline } from "@/utils/offline"
 import { offlineWorker } from "@/utils/offline/workerClient"
+import { logger } from "@/utils/logger"
 import { defineStore } from "pinia"
 import { computed, ref } from "vue"
+
+const log = logger.create("CustomerSearch")
 
 export const useCustomerSearchStore = defineStore("customerSearch", () => {
 	// State
@@ -65,7 +68,6 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 
 	// Getters - ULTRA OPTIMIZED for zero delay
 	const filteredCustomers = computed(() => {
-		const startTime = performance.now()
 		const term = searchTerm.value.trim()
 
 		// Show recent/frequent customers when no search term (CACHED)
@@ -93,10 +95,6 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 				resultCache.value.set(cacheKey, cached)
 			}
 
-			const elapsed = performance.now() - startTime
-			console.log(
-				`⚡⚡ Showing ${cached.length} customers in ${elapsed.toFixed(3)}ms (CACHED)`,
-			)
 			return cached
 		}
 
@@ -104,10 +102,6 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 		const cacheKey = term.toLowerCase()
 		const cachedResult = resultCache.value.get(cacheKey)
 		if (cachedResult) {
-			const elapsed = performance.now() - startTime
-			console.log(
-				`⚡⚡⚡ INSTANT ${cachedResult.length} results in ${elapsed.toFixed(3)}ms (FROM CACHE: "${term}")`,
-			)
 			return cachedResult
 		}
 
@@ -154,10 +148,6 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 			resultCache.value.delete(firstKey)
 		}
 
-		const elapsed = performance.now() - startTime
-		console.log(
-			`⚡⚡ Ultra-fast ${final.length} results in ${elapsed.toFixed(3)}ms (search: "${term}")`,
-		)
 		return final
 	})
 
@@ -202,32 +192,35 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 	})
 
 	// Actions
-	async function loadAllCustomers(posProfile) {
+	async function loadAllCustomers(posProfile, forceReload = false) {
 		if (!posProfile) {
+			return
+		}
+
+		// Skip if already loaded (unless forceReload)
+		if (!forceReload && allCustomers.value.length > 0) {
 			return
 		}
 
 		loading.value = true
 		try {
-                        // Try to get from worker cache first
-                        const cachedCustomers = await offlineWorker.searchCachedCustomers(
-                                "",
-                                0,
-                        )
+			// Try to get from worker cache first
+			const cachedCustomers = await offlineWorker.searchCachedCustomers(
+				"",
+				0,
+			)
 
 			if (cachedCustomers && cachedCustomers.length > 0) {
 				allCustomers.value = cachedCustomers
-				console.log(
-					`✓ Loaded ${cachedCustomers.length} customers from cache`,
-				)
+				log.debug(`Loaded ${cachedCustomers.length} customers from cache`)
 			} else if (!isOffline()) {
 				// Fetch from server if cache is empty and online
-                                const response = await call("pos_next.api.customers.get_customers", {
-                                        pos_profile: posProfile,
-                                        search_term: "",
-                                        start: 0,
-                                        limit: 0,
-                                })
+				const response = await call("pos_next.api.customers.get_customers", {
+					pos_profile: posProfile,
+					search_term: "",
+					start: 0,
+					limit: 0,
+				})
 				const list = response?.message || response || []
 				allCustomers.value = list
 
@@ -235,10 +228,10 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 				if (list.length) {
 					await offlineWorker.cacheCustomers(list)
 				}
-				console.log(`✓ Loaded ${list.length} customers from server`)
+				log.debug(`Loaded ${list.length} customers from server`)
 			} else {
-				// Offline and cache is empty - show warning
-				console.warn("⚠️ Offline mode: No cached customers available. Please sync data when online.")
+				// Offline and cache is empty
+				log.warn("Offline mode: No cached customers available")
 				allCustomers.value = []
 			}
 
@@ -246,7 +239,7 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 			searchIndex.value.clear()
 			resultCache.value.clear()
 		} catch (error) {
-			console.error("Error loading customers:", error)
+			log.error("Error loading customers:", error)
 			allCustomers.value = []
 		} finally {
 			loading.value = false
@@ -255,21 +248,22 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 
 	async function addCustomerToCache(customer) {
 		try {
-			// Add to local array
+			// Add to local array (at the beginning for visibility)
 			const existingWithoutNew = allCustomers.value.filter(
 				(cust) => cust.name !== customer.name,
 			)
 			allCustomers.value = [customer, ...existingWithoutNew]
 
-			// Cache in worker
+			// Cache in worker (IndexedDB)
 			await offlineWorker.cacheCustomers([customer])
 
-			// Clear result cache to include new customer
+			// Clear BOTH caches to ensure new customer appears in search
+			searchIndex.value.clear()
 			resultCache.value.clear()
 
-			console.log("✓ New customer cached for instant search")
+			log.success(`New customer cached: ${customer.customer_name}`)
 		} catch (error) {
-			console.error("Error caching newly created customer:", error)
+			log.error("Error caching newly created customer:", error)
 		}
 	}
 
@@ -321,7 +315,7 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 				JSON.stringify(frequentCustomers.value),
 			)
 		} catch (e) {
-			console.warn("Failed to persist customer history:", e)
+			log.warn("Failed to persist customer history:", e)
 		}
 	}
 
@@ -333,7 +327,7 @@ export const useCustomerSearchStore = defineStore("customerSearch", () => {
 			if (recent) recentSearches.value = JSON.parse(recent)
 			if (frequent) frequentCustomers.value = JSON.parse(frequent)
 		} catch (e) {
-			console.warn("Failed to load customer history:", e)
+			log.warn("Failed to load customer history:", e)
 		}
 	}
 

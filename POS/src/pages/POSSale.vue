@@ -965,6 +965,7 @@ import { call } from "@/utils/apiWrapper";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useToast } from "@/composables/useToast";
 
+import { useCustomerSearchStore } from "@/stores/customerSearch";
 import { useItemSearchStore } from "@/stores/itemSearch";
 import { useStockStore } from "@/stores/stock";
 // Pinia Stores
@@ -985,6 +986,7 @@ const draftsStore = usePOSDraftsStore();
 const posSettingsStore = usePOSSettingsStore();
 const itemStore = useItemSearchStore();
 const stockStore = useStockStore();
+const customerSearchStore = useCustomerSearchStore();
 // Note: settingsStore is an alias to posSettingsStore (same Pinia store singleton)
 const settingsStore = posSettingsStore;
 
@@ -2127,17 +2129,25 @@ function handleCreateReturnFromHistory(invoice) {
 	showWarning(__("Creating return for invoice {0}", [invoice.name]));
 }
 
-function handleCustomerCreated(newCustomer) {
+async function handleCustomerCreated(newCustomer) {
 	cartStore.setCustomer(newCustomer);
 	uiStore.showCreateCustomerDialog = false;
 	editCustomer.value = null; // Clear edit mode
+
+	// Add new customer to IndexedDB cache for instant search availability
+	await customerSearchStore.addCustomerToCache(newCustomer);
+
 	showSuccess(__("{0} created and selected", [newCustomer.customer_name]));
 }
 
-function handleCustomerUpdated(updatedCustomer) {
+async function handleCustomerUpdated(updatedCustomer) {
 	cartStore.setCustomer(updatedCustomer);
 	uiStore.showCreateCustomerDialog = false;
 	editCustomer.value = null; // Clear edit mode
+
+	// Update customer in IndexedDB cache for instant search availability
+	await customerSearchStore.addCustomerToCache(updatedCustomer);
+
 	showSuccess(__("{0} updated", [updatedCustomer.customer_name]));
 }
 

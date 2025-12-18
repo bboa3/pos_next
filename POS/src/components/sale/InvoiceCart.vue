@@ -196,11 +196,14 @@
 								name="cart-customer-search"
 								:value="customerSearch"
 								@input="handleSearchInput"
+								@focus="handleSearchFocus"
+								@blur="handleSearchBlur"
 								type="text"
 								:placeholder="__('Search or add customer...')"
 								class="w-full h-10 ps-9 pe-3 text-xs border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-shadow"
 								:disabled="!customersLoaded"
 								@keydown="handleKeydown"
+								autocomplete="off"
 								:aria-label="__('Search customer in cart')"
 							/>
 						</div>
@@ -267,9 +270,19 @@
 
 				<!-- Customer Dropdown -->
 				<div
-					v-if="customerSearch.trim().length >= 2"
+					v-if="customerSearchFocused || customerSearch.trim().length >= 2"
 					class="absolute z-50 mt-0.5 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-hidden"
 				>
+					<!-- Frequent Customers Header (when showing suggestions) -->
+					<div
+						v-if="customerSearchFocused && customerSearch.trim().length < 2 && customerResults.length > 0"
+						class="px-2 py-1 bg-gray-50 border-b border-gray-200"
+					>
+						<span class="text-[10px] font-medium text-gray-500 uppercase tracking-wide">
+							{{ __('Frequent Customers') }}
+						</span>
+					</div>
+
 					<!-- Customer Results -->
 					<div v-if="customerResults.length > 0" class="max-h-48 overflow-y-auto">
 						<button
@@ -1099,11 +1112,14 @@
 import { usePOSCartStore } from "@/stores/posCart";
 import { usePOSSettingsStore } from "@/stores/posSettings";
 import { usePOSOffersStore } from "@/stores/posOffers";
+import { useCustomerSearchStore } from "@/stores/customerSearch";
 import { formatCurrency as formatCurrencyUtil } from "@/utils/currency";
 import { useFormatters } from "@/composables/useFormatters";
 import { isOffline } from "@/utils/offline";
+import { logger } from "@/utils/logger";
 import { FeatherIcon } from "frappe-ui";
-import { offlineWorker } from "@/utils/offline/workerClient";
+
+const log = logger.create("InvoiceCart");
 import { createResource } from "frappe-ui";
 import { computed, onBeforeUnmount, onMounted, ref, watch, nextTick } from "vue";
 import EditItemDialog from "./EditItemDialog.vue";
@@ -1116,6 +1132,7 @@ import EditItemDialog from "./EditItemDialog.vue";
 const cartStore = usePOSCartStore(); // Pinia store for cart state management
 const settingsStore = usePOSSettingsStore(); // Pinia store for POS settings
 const offersStore = usePOSOffersStore(); // Pinia store for offers/promotions
+const customerSearchStore = useCustomerSearchStore(); // Pinia store for customer search
 const { formatQuantity } = useFormatters(); // Quantity formatting utilities
 
 function handleProceedToPayment() {
@@ -1211,8 +1228,10 @@ const emit = defineEmits([
 // Customer search state
 const customerSearch = ref(""); // Current search query
 const customerSearchContainer = ref(null); // Ref to search container for click-outside detection
-const allCustomers = ref([]); // All customers loaded in memory for instant filtering
-const customersLoaded = ref(false); // Flag indicating customers are ready
+const customerSearchFocused = ref(false); // Track if search input is focused
+// Use Pinia store for allCustomers (shared with CustomerDialog, synced on customer creation)
+const allCustomers = computed(() => customerSearchStore.allCustomers);
+const customersLoaded = computed(() => customerSearchStore.allCustomers.length > 0);
 const selectedIndex = ref(-1); // Keyboard navigation index for search results
 const availableGiftCards = ref([]); // Available gift cards for current customer
 const previousCustomer = ref(null); // Store previous customer for restore on blur
@@ -1233,58 +1252,16 @@ const openUomDropdown = ref(null);
  */
 
 /**
- * Customers Resource
+ * Customer Loading
  *
- * Fetches all customers for the current POS Profile.
- * - Loads all customers into memory for instant in-memory filtering
- * - Caches customers in service worker for offline support
- * - On mount: First checks cache, then refreshes from server if online
- *
- * @endpoint pos_next.api.customers.get_customers
- * @cache Service Worker IndexedDB
+ * Uses the shared customerSearchStore for customer data.
+ * This ensures customers are synced across all components (InvoiceCart, CustomerDialog).
+ * New customers are immediately available after creation without page refresh.
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const customersResource = createResource({
-	url: "pos_next.api.customers.get_customers",
-	makeParams() {
-		return {
-			search_term: "", // Empty to get all customers
-			pos_profile: props.posProfile,
-			limit: 0, // Get all customers
-		};
-	},
-	auto: false, // Don't auto-load - check offline status first
-	async onSuccess(data) {
-		const customers = data?.message || data || [];
-		allCustomers.value = customers;
-		customersLoaded.value = true;
-
-		// Also cache in worker for offline support
-		await offlineWorker.cacheCustomers(customers);
-	},
-	onError(error) {
-		console.error("Error loading customers:", error);
-	},
-});
-
-// Load customers from cache first (instant), then from server if online
-(async () => {
-	try {
-		// Always try cache first for instant load
-		const cachedCustomers = await offlineWorker.searchCachedCustomers("", 0);
-		if (cachedCustomers && cachedCustomers.length > 0) {
-			allCustomers.value = cachedCustomers;
-			customersLoaded.value = true;
-		}
-	} catch (error) {
-		console.error("Error loading customers from cache:", error);
-	}
-
-	// Only fetch from server if online (to refresh cache)
-	if (!isOffline()) {
-		customersResource.reload();
-	}
-})();
+// Load customers via the shared Pinia store (if not already loaded)
+if (props.posProfile) {
+	customerSearchStore.loadAllCustomers(props.posProfile);
+}
 
 /**
  * Offers Resource
@@ -1310,7 +1287,7 @@ const offersResource = createResource({
 		offersStore.setAvailableOffers(offers);
 	},
 	onError(error) {
-		console.error("Error loading offers:", error);
+		log.error("Error loading offers:", error);
 	},
 });
 
@@ -1384,7 +1361,21 @@ const appliedOfferCount = computed(() => (props.appliedOffers || []).length);
 const customerResults = computed(() => {
 	const searchValue = customerSearch.value.trim().toLowerCase();
 
+	// When focused with no/short search term, show frequent customers (top 5)
 	if (searchValue.length < 2) {
+		if (customerSearchFocused.value) {
+			// Get frequent customer IDs from the store
+			const frequentIds = customerSearchStore.frequentCustomers.slice(0, 5);
+			if (frequentIds.length > 0) {
+				// Map IDs to full customer objects
+				const frequentCustomers = frequentIds
+					.map(id => allCustomers.value.find(c => c.name === id))
+					.filter(Boolean);
+				return frequentCustomers;
+			}
+			// If no frequent customers, show first 5 from the list
+			return allCustomers.value.slice(0, 5);
+		}
 		return [];
 	}
 
@@ -1442,6 +1433,26 @@ const totalQuantity = computed(() => {
  */
 function handleSearchInput(event) {
 	customerSearch.value = event.target.value;
+}
+
+/**
+ * Handle search input focus - shows frequent customers dropdown.
+ */
+function handleSearchFocus() {
+	customerSearchFocused.value = true;
+	// Load customer history for frequent customers
+	customerSearchStore.loadCustomerHistory();
+}
+
+/**
+ * Handle search input blur - hides dropdown after a short delay.
+ * Delay allows clicking on dropdown items before it closes.
+ */
+function handleSearchBlur() {
+	// Delay to allow click events on dropdown items to fire first
+	setTimeout(() => {
+		customerSearchFocused.value = false;
+	}, 200);
 }
 
 /**
