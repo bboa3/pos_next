@@ -7,6 +7,104 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.0] - 2025-12-18
+
+### Added
+- **Wallet & Loyalty Program System**
+  - Implement wallet functionality with loyalty points conversion
+  - Auto-assignment of loyalty programs for new customers
+  - Auto-assignment of loyalty program on sales invoice validation
+  - Partial payment support for wallet/loyalty points redemption
+  - Enable Loyalty Program as master switch in Wallet & Loyalty settings
+  - Comprehensive technical documentation for Wallet System
+
+- **Customer Search Enhancements**
+  - Enhanced customer search with autocomplete functionality
+  - Frequent customers display for quick selection
+  - Optimized click handler for instant response on frequent customers
+
+- **Sales Order Support in POS**
+  - Sales order settings and store methods exposure
+  - Delivery date selection integrated into payment flow
+  - Delivery date dialogue for order scheduling
+  - Dropdown menu for selecting between sales order and sales invoice
+
+- **POS Profile Management**
+  - Create, update, and delete POS profiles via API
+  - Whitelist decorators for POS profile functions
+  - Enforce user company association on profile creation
+  - Enhanced parameter parsing for profile operations
+
+- **Customer Management**
+  - Edit customer functionality directly from cart
+
+- **Payment Dialog Improvements**
+  - Two-column layout redesign with invoice summary
+  - Long-press payment with new composable
+  - Dynamic sizing and responsive design adjustments
+  - Enhanced credit balance and additional discount display
+  - Improved mobile UX
+
+- **Localization**
+  - Configurable language settings
+  - Brazilian Portuguese (pt-BR) support
+  - RTL-friendly SelectInput component
+
+- **Warehouse & Stock**
+  - Loading state and improved stock availability logic in WarehouseAvailabilityDialog
+  - Optimized bundle availability calculation across warehouses
+  - Improved stock visibility and translation in warehouse dialogs
+
+- **Draft Invoice Features**
+  - Print button for draft invoices
+  - Auto-save active cart when switching drafts
+
+- **Coupon Management**
+  - Validate coupon endpoint for gift cards
+  - Enhanced customer selection in coupon management
+
+- **Settings Organization**
+  - Split POS Settings into organized tabs
+
+### Changed
+- **Cart Operations**
+  - Refactored updateQuantity function to improve item removal logic
+  - Improved UOM selection UI and cart item handling
+
+- **POS Profile Handling**
+  - User company check utility moved to pos_next utilities
+  - Refactored payment, user, item group, and customer group handling in profile update
+  - Simplified profile creation with enhanced parameter parsing
+  - Cleaned up imports in POS profile API
+
+### Fixed
+- **Offers & Promotions**
+  - Race condition causing offers applied but cart not updating
+  - Made offer processing more dynamic and robust
+  - Enhanced offer management with automatic application and improved notifications
+
+- **Stock Validation**
+  - Fixed stock validation and double-add issue in ItemsSelector
+  - Skip stock validation for non-stock items
+
+- **RTL & Translation**
+  - RTL alignment and translation in ShiftOpeningDialog
+  - RTL overlap in OffersDialog badge positioning
+
+- **Drafts**
+  - Prevent draft deletion on load
+  - Populate drafts store to show drafts in Invoice Management
+
+- **Sales Order Compatibility**
+  - Fixed 'SalesOrder' object attribute errors (outstanding_amount, is_return, payments)
+  - Fixed "Value missing for Sales Order: Customer" error
+  - Fixed ReferenceError issues (usePOSCartStore, cartStore not defined)
+  - Fixed TypeError for NoneType multiplication with float
+  - Fixed sales order submission on checkout
+
+- **Payment Dialog RTL**
+  - Improved RTL support and mobile responsiveness in PaymentDialog
+
 ## [1.11.0] - 2025-12-07
 
 ### Added

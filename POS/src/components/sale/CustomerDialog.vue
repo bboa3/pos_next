@@ -34,6 +34,7 @@
 						class="w-full border border-gray-300 rounded-md ps-6 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 						@keydown="handleKeydown"
 						autofocus
+						autocomplete="off"
 						:aria-label="__('Search customers')"
 					/>
 					<!-- Clear Button -->
@@ -223,16 +224,14 @@ const showingRecent = computed(
 watch(show, (newVal) => {
 	if (newVal) {
 		customerStore.clearSearch()
-		if (allCustomers.value.length === 0) {
-			customerStore.loadAllCustomers(props.posProfile)
-		}
+		// loadAllCustomers will skip if already loaded (unless forceReload=true)
+		customerStore.loadAllCustomers(props.posProfile)
 	}
 })
 
 // Handle search input with instant reactivity
 function handleSearchInput(event) {
 	const value = event.target.value
-	console.log("🔍 Search input:", value) // Debug log
 	customerStore.setSearchTerm(value)
 }
 

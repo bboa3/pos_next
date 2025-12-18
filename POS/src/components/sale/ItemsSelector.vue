@@ -288,22 +288,22 @@
 							'group relative bg-white border border-gray-200 rounded-lg p-1.5 sm:p-2.5 touch-manipulation transition-[border-color,box-shadow] duration-100 cursor-pointer hover:border-blue-400 hover:shadow-md',
 						]"
 					>
-						<!-- Stock Badge - Positioned at top right of card -->
-						<!-- Show for stock items and bundles (bundles now have calculated actual_qty) -->
-						<!-- Click to view warehouse availability -->
+						<!-- Stock Badge - Tap to select, long press to view warehouse availability -->
 						<div
 							v-if="item.is_stock_item || item.is_bundle"
-							@click.stop="showWarehouseAvailability(item)"
+							@pointerdown="onLongPressStart(item)"
+							@pointerup="onLongPressEnd"
+							@pointercancel="clearLongPress"
+							@pointerleave="clearLongPress"
 							:class="[
 								'absolute -top-1.5 -end-1.5 sm:-top-2 sm:-end-2 rounded-md shadow-lg z-10',
-								'px-2 sm:px-2.5 py-1 sm:py-1',
-								'text-[10px] sm:text-xs font-bold',
-								'border-2 border-white cursor-pointer',
+								'px-2 sm:px-2.5 py-1 sm:py-1 text-[10px] sm:text-xs font-bold',
+								'border-2 border-white cursor-pointer select-none',
 								'hover:scale-110 hover:shadow-xl transition-all duration-200',
 								getStockStatus((item.actual_qty ?? item.stock_qty ?? 0)).color,
 								getStockStatus((item.actual_qty ?? item.stock_qty ?? 0)).textColor
 							]"
-							:title="__('Click to view availability in other warehouses')"
+							:title="__('Check availability in other warehouses')"
 						>
 							{{ Math.floor((item.actual_qty ?? item.stock_qty ?? 0)) }}
 						</div>
@@ -356,20 +356,22 @@
 								</div>
 							</div>
 
-							<!-- Warehouse Availability Info Icon - Minimal centered overlay that appears on hover for out of stock items -->
-							<button
+							<!-- Info Icon Overlay - Tap to select, long press to show warehouse availability -->
+							<div
 								v-if="(item.is_stock_item || item.is_bundle) && (item.actual_qty ?? item.stock_qty ?? 0) <= 0"
-								@click.stop="showWarehouseAvailability(item)"
-								class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+								@pointerdown="onLongPressStart(item)"
+								@pointerup="onLongPressEnd"
+								@pointercancel="clearLongPress"
+								@pointerleave="clearLongPress"
+								class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 cursor-pointer select-none"
 								:title="__('Check availability in other warehouses')"
-								:aria-label="__('Check warehouse availability')"
 							>
-								<div class="p-2.5 bg-white/80 backdrop-blur-sm rounded-full">
+								<div class="p-2.5 bg-white/80 backdrop-blur-sm rounded-full pointer-events-none">
 									<svg class="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
 										<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
 									</svg>
 								</div>
-							</button>
+							</div>
 						</div>
 
 						<!-- Item Details -->
@@ -551,21 +553,24 @@
 								<div class="text-xs sm:text-sm font-semibold text-blue-600">{{ formatCurrency(item.rate || item.price_list_rate || 0) }}</div>
 							</td>
 							<td class="px-2 sm:px-3 py-2 whitespace-nowrap w-[70px] sm:w-[100px]">
-								<!-- Stock Badge - Click to view warehouse availability -->
-								<button
+								<!-- Stock Badge - Tap to select, long press to view warehouse availability -->
+								<div
 									v-if="item.is_stock_item || item.is_bundle"
-									@click.stop="showWarehouseAvailability(item)"
+									@pointerdown="onLongPressStart(item)"
+									@pointerup="onLongPressEnd"
+									@pointercancel="clearLongPress"
+									@pointerleave="clearLongPress"
 									:class="[
 										'inline-block px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-md shadow-sm',
-										'text-[10px] sm:text-sm font-bold cursor-pointer',
+										'text-[10px] sm:text-sm font-bold cursor-pointer select-none',
 										'hover:scale-105 hover:shadow-md transition-all duration-200',
 										getStockStatus((item.actual_qty ?? item.stock_qty ?? 0)).color,
 										getStockStatus((item.actual_qty ?? item.stock_qty ?? 0)).textColor
 									]"
-									:title="__('Click to view availability in other warehouses')"
+									:title="__('Check availability in other warehouses')"
 								>
 									{{ Math.floor((item.actual_qty ?? item.stock_qty ?? 0)) }}
-								</button>
+								</div>
 								<span
 									v-else
 									class="text-xs sm:text-sm text-gray-400 italic"
@@ -986,8 +991,9 @@ onUnmounted(() => {
 	scrollCleanupFns.value.forEach(cleanup => cleanup())
 	scrollCleanupFns.value = []
 
-	// Clear optimized click handlers
+	// Clear handlers and timers
 	optimizedClickHandlers.clear()
+	clearLongPress()
 
 	// Remove click outside listener for sort dropdown
 	document.removeEventListener('click', handleClickOutside)
@@ -1073,7 +1079,6 @@ const optimizedClickHandlers = new Map()
 function getOptimizedClickHandler(item) {
 	const key = item.item_code
 	if (!optimizedClickHandlers.has(key)) {
-		// Pass item_code instead of item reference to avoid closure issues
 		const handler = createOptimizedClickHandler(() => {
 			handleItemClick(item.item_code)
 		}, {
@@ -1084,25 +1089,76 @@ function getOptimizedClickHandler(item) {
 	return optimizedClickHandlers.get(key)
 }
 
-function handleItemClick(itemCode) {
-	// Find the current item by code to get latest stock values
-	const item = filteredItems.value.find(i => i.item_code === itemCode)
-	if (!item) return
+// Long press handler for stock badge/info icon
+// Short tap = select item (with validation), Long press = show warehouse availability
+let longPressTimer = null
+let longPressItem = null
+let longPressTriggered = false
+let itemHandledByLongPress = false // Flag to prevent double handling
 
-	// Check stock availability and show error if needed, but still emit the event
-	// Skip validation for:
-	// - Batch/serial items - they have their own validation in the dialog
-	// - Item templates (has_variants) - variants have their own stock, template shouldn't be checked
-	// Check stock for stock items AND Product Bundles (bundles now have calculated stock)
-	const qty = Math.floor((item.actual_qty ?? item.stock_qty ?? 0))
-	if ((item.is_stock_item || item.is_bundle) && !item.has_variants && !item.has_serial_no && !item.has_batch_no && qty <= 0 && settingsStore.shouldEnforceStockValidation()) {
-		showError(item.is_bundle 
+function onLongPressStart(item) {
+	clearTimeout(longPressTimer)
+	longPressItem = item
+	longPressTriggered = false
+	longPressTimer = setTimeout(() => {
+		longPressTriggered = true
+		itemHandledByLongPress = true
+		showWarehouseAvailability(item)
+	}, 500)
+}
+
+function onLongPressEnd() {
+	clearTimeout(longPressTimer)
+	// If not a long press, trigger item selection
+	if (!longPressTriggered && longPressItem) {
+		itemHandledByLongPress = true
+		selectItem(longPressItem)
+	}
+	longPressTimer = null
+	longPressItem = null
+	longPressTriggered = false
+}
+
+function clearLongPress() {
+	clearTimeout(longPressTimer)
+	longPressTimer = null
+	longPressItem = null
+	longPressTriggered = false
+}
+
+/**
+ * Validates stock and emits item-selected if valid
+ * @param {Object} item - Item to select
+ * @param {boolean} autoAdd - Auto-add flag for barcode scanning
+ * @returns {boolean} - True if item was emitted, false if blocked
+ */
+function selectItem(item, autoAdd = false) {
+	if (!item) return false
+
+	// Skip stock validation for: variants (template), serial items, batch items (they have own validation)
+	const skipValidation = item.has_variants || item.has_serial_no || item.has_batch_no
+	const isStockTracked = item.is_stock_item || item.is_bundle
+	const qty = Math.floor(item.actual_qty ?? item.stock_qty ?? 0)
+
+	if (!skipValidation && isStockTracked && qty <= 0 && settingsStore.shouldEnforceStockValidation()) {
+		showError(item.is_bundle
 			? __('"{0}" cannot be added to cart. Bundle is out of stock. Allow Negative Stock is disabled.', [item.item_name])
 			: __('"{0}" cannot be added to cart. Item is out of stock. Allow Negative Stock is disabled.', [item.item_name]))
-		return
+		return false
 	}
 
-	emit("item-selected", item)
+	emit("item-selected", item, autoAdd)
+	return true
+}
+
+function handleItemClick(itemCode) {
+	// Skip if already handled by long press handler (prevents double-add)
+	if (itemHandledByLongPress) {
+		itemHandledByLongPress = false
+		return
+	}
+	const item = filteredItems.value.find(i => i.item_code === itemCode)
+	selectItem(item)
 }
 
 async function handleBarcodeSearch(forceAutoAdd = false) {
@@ -1122,9 +1178,10 @@ async function handleBarcodeSearch(forceAutoAdd = false) {
 		const item = await itemStore.searchByBarcode(barcode)
 
 		if (item) {
-			// Item found by barcode - add to cart immediately with auto-add flag
-			emit("item-selected", item, shouldAutoAdd)
-			itemStore.clearSearch()
+			// Item found by barcode - validate stock and add to cart
+			if (selectItem(item, shouldAutoAdd)) {
+				itemStore.clearSearch()
+			}
 			return
 		}
 	} catch (error) {
@@ -1133,8 +1190,9 @@ async function handleBarcodeSearch(forceAutoAdd = false) {
 
 	// Fallback: If only one item matches in filtered results, auto-select it
 	if (filteredItems.value.length === 1) {
-		emit("item-selected", filteredItems.value[0], shouldAutoAdd)
-		itemStore.clearSearch()
+		if (selectItem(filteredItems.value[0], shouldAutoAdd)) {
+			itemStore.clearSearch()
+		}
 	} else if (filteredItems.value.length === 0) {
 		showWarning(__('Item Not Found: No item found with barcode: {0}', [barcode]))
 

@@ -202,7 +202,7 @@ def _auto_set_return_batches(invoice_doc):
     available batch in FIFO order. If no batches exist in the selected
     warehouse, an informative error is raised.
     """
-    if not invoice_doc.is_return or invoice_doc.get("return_against"):
+    if not invoice_doc.get("is_return") or invoice_doc.get("return_against"):
         return
 
     for d in invoice_doc.items:
@@ -310,7 +310,7 @@ def update_invoice(data):
         data = json.loads(data) if isinstance(data, str) else data
 
         pos_profile = data.get("pos_profile")
-        doctype = "Sales Invoice"
+        doctype = data.get("doctype", "Sales Invoice")
 
         # Ensure the document type is set
         data.setdefault("doctype", doctype)
@@ -347,19 +347,20 @@ def update_invoice(data):
             pos_profile_doc.company if pos_profile_doc else None
         )
 
-        if company and invoice_doc.get("payments"):
+        if company and invoice_doc.get("payments") and doctype == "Sales Invoice":
             for payment in invoice_doc.payments:
-                if payment.mode_of_payment and not payment.get("account"):
+                mode_of_payment = payment.get("mode_of_payment")
+                if mode_of_payment and not payment.get("account"):
                     try:
                         account_info = get_payment_account(
-                            payment.mode_of_payment, company
+                            mode_of_payment, company
                         )
-                        payment.account = account_info.get("account")
+                        payment["account"] = account_info.get("account")
                     except Exception:
                         pass  # Will be handled during save
 
         # Validate return items if this is a return invoice
-        if (data.get("is_return") or invoice_doc.is_return) and invoice_doc.get(
+        if (data.get("is_return") or invoice_doc.get("is_return")) and invoice_doc.get(
             "return_against"
         ):
             validation = validate_return_items(
@@ -428,8 +429,9 @@ def update_invoice(data):
             # prevents rounding issues and ensures UI matches invoice
 
         # Set invoice flags BEFORE calculations
-        invoice_doc.is_pos = 1
-        invoice_doc.update_stock = 1
+        if doctype == "Sales Invoice":
+            invoice_doc.is_pos = 1
+            invoice_doc.update_stock = 1
 
         # ========================================================================
         # ROUNDING CONFIGURATION
@@ -460,29 +462,36 @@ def update_invoice(data):
 
         # Calculate totals and apply discounts (with rounding disabled)
         invoice_doc.calculate_taxes_and_totals()
+        if invoice_doc.grand_total is None:
+            invoice_doc.grand_total = 0.0
+        if invoice_doc.base_grand_total is None:
+            invoice_doc.base_grand_total = 0.0
 
         # Set accounts for payment methods before saving
         for payment in invoice_doc.payments:
-            if payment.mode_of_payment and not payment.get("account"):
+            mode_of_payment = payment.get("mode_of_payment")
+            if mode_of_payment and not payment.get("account"):
                 try:
                     account_info = get_payment_account(
-                        payment.mode_of_payment, invoice_doc.company
+                        mode_of_payment, invoice_doc.company
                     )
                     payment.account = account_info["account"]
                 except Exception:
                     pass  # Will be handled during save
 
         # For return invoices, ensure payments are negative
-        if invoice_doc.is_return:
-            for payment in invoice_doc.payments:
-                payment.amount = -abs(payment.amount)
-                if payment.base_amount:
-                    payment.base_amount = -abs(payment.base_amount)
+        if invoice_doc.get("is_return"):
+            # Return handling is primarily for Sales Invoice
+            if doctype == "Sales Invoice" and invoice_doc.get("payments"):
+                for payment in invoice_doc.payments:
+                    payment.amount = -abs(payment.amount)
+                    if payment.base_amount:
+                        payment.base_amount = -abs(payment.base_amount)
 
-            invoice_doc.paid_amount = flt(sum(p.amount for p in invoice_doc.payments))
-            invoice_doc.base_paid_amount = flt(
-                sum(p.base_amount or 0 for p in invoice_doc.payments)
-            )
+                invoice_doc.paid_amount = flt(sum(p.amount for p in invoice_doc.payments))
+                invoice_doc.base_paid_amount = flt(
+                    sum(p.base_amount or 0 for p in invoice_doc.payments)
+                )
 
         # Validate and track POS Coupon if coupon_code is provided
         coupon_code = data.get("coupon_code")
@@ -553,7 +562,7 @@ def submit_invoice(invoice=None, data=None):
             invoice = json.loads(invoice)
 
         pos_profile = invoice.get("pos_profile")
-        doctype = "Sales Invoice"
+        doctype = invoice.get("doctype", "Sales Invoice")
 
         invoice_name = invoice.get("name")
 
@@ -566,8 +575,9 @@ def submit_invoice(invoice=None, data=None):
             invoice_doc = frappe.get_doc(doctype, invoice_name)
             invoice_doc.update(invoice)
 
-        # Ensure update_stock is set
-        invoice_doc.update_stock = 1
+        # Ensure update_stock is set for Sales Invoice
+        if doctype == "Sales Invoice":
+            invoice_doc.update_stock = 1
 
         # Copy accounting dimensions from POS Profile if not already set
         if pos_profile and not invoice_doc.get("branch"):
@@ -583,12 +593,13 @@ def submit_invoice(invoice=None, data=None):
                 pass  # Branch is optional, continue without it
 
         # Set accounts for all payment methods before saving
-        for payment in invoice_doc.payments:
-            if payment.mode_of_payment:
-                account_info = get_payment_account(
-                    payment.mode_of_payment, invoice_doc.company
-                )
-                payment.account = account_info["account"]
+        if doctype == "Sales Invoice" and hasattr(invoice_doc, "payments"):
+            for payment in invoice_doc.payments:
+                if payment.mode_of_payment:
+                    account_info = get_payment_account(
+                        payment.mode_of_payment, invoice_doc.company
+                    )
+                    payment.account = account_info["account"]
 
         # Handle sales team (multiple sales persons)
         sales_team_data = invoice.get("sales_team") or data.get("sales_team")
@@ -698,8 +709,8 @@ def submit_invoice(invoice=None, data=None):
             "grand_total": invoice_doc.grand_total,
             "total": invoice_doc.total,
             "net_total": invoice_doc.net_total,
-            "outstanding_amount": invoice_doc.outstanding_amount,
-            "paid_amount": invoice_doc.paid_amount,
+            "outstanding_amount": getattr(invoice_doc, "outstanding_amount", 0),
+            "paid_amount": getattr(invoice_doc, "paid_amount", 0),
             "change_amount": getattr(invoice_doc, "change_amount", 0),
         }
     except Exception as e:

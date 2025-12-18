@@ -7,6 +7,7 @@ import json
 import frappe
 from frappe import _
 from frappe.utils import nowdate, nowtime, get_datetime
+from pos_next.api.utilities import get_wallet_payment_modes
 
 
 @frappe.whitelist()
@@ -36,13 +37,20 @@ def get_opening_dialog_data():
 			company_names.append(profile.company)
 	data["companies"] = [{"name": c} for c in company_names]
 
-	# Get payment methods for POS profiles
+	# Get payment methods for POS profiles (exclude wallet payment methods)
 	pos_profiles_list = [p.name for p in pos_profiles_data]
 
 	if pos_profiles_list:
+		# Exclude wallet payment modes from opening balance
+		wallet_modes = get_wallet_payment_modes()
+
+		payment_filters = {"parent": ["in", pos_profiles_list]}
+		if wallet_modes:
+			payment_filters["mode_of_payment"] = ["not in", wallet_modes]
+
 		data["payments_method"] = frappe.get_list(
 			"POS Payment Method",
-			filters={"parent": ["in", pos_profiles_list]},
+			filters=payment_filters,
 			fields=["*"],
 			limit_page_length=0,
 			order_by="parent",

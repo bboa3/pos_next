@@ -1,6 +1,6 @@
 @import "./styles/brand.css";
 @import "./assets/Inter/inter.css";
-@import "frappe-ui/src/style.css";
+@import "frappe-ui/style.css";
 @import "@abdulrysr/saudi-riyal-new-symbol-font/style.css";
 
 /* Apply Saudi Riyal symbol font to body for currency support */

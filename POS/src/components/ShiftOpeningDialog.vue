@@ -24,7 +24,7 @@
                 ]"
               >
                 <div class="flex justify-between items-start">
-                  <div>
+                  <div class="text-start">
                     <h3 class="font-medium text-gray-900">{{ profile.name }}</h3>
                     <p class="text-sm text-gray-500 mt-1">{{ profile.company }}</p>
                   </div>
@@ -48,7 +48,7 @@
         <div v-if="step === 2" class="flex flex-col gap-4">
           <div class="mb-4">
             <div class="flex items-center justify-between">
-              <div>
+              <div class="text-start">
                 <h3 class="font-medium text-gray-900">{{ selectedProfile?.name }}</h3>
                 <p class="text-sm text-gray-500">{{ selectedProfile?.company }}</p>
               </div>
@@ -69,10 +69,10 @@
               <div
                 v-for="method in paymentMethods"
                 :key="method.name"
-                class="flex items-center justify-between p-3 border rounded-lg"
+                class="flex items-center gap-3 p-3 border rounded-lg"
               >
-                <div class="flex-1">
-                  <label class="text-sm font-medium text-gray-700 text-start">
+                <div class="flex-1 text-start">
+                  <label class="text-sm font-medium text-gray-700">
                     {{ method.mode_of_payment }}
                   </label>
                 </div>

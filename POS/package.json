@@ -1,7 +1,7 @@
 {
 	"name": "pos-next-frontend",
 	"private": true,
-	"version": "1.11.0",
+	"version": "1.12.0",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
@@ -21,7 +21,7 @@
 		"@vue/test-utils": "^2.4.6",
 		"dexie": "^4.2.0",
 		"feather-icons": "^4.29.2",
-		"frappe-ui": "0.1.192",
+		"frappe-ui": "^0.1.240",
 		"pinia": "^3.0.3",
 		"socket.io-client": "^4.7.2",
 		"vue": "3.5.13",

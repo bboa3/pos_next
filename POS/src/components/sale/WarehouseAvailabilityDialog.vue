@@ -4,6 +4,21 @@
 			<h3 class="text-lg font-semibold text-gray-900">{{ __('Stock Lookup') }}</h3>
 		</template>
 		<template #body-content>
+			<!-- Initial Loading State - shown before any content is ready -->
+			<div v-if="!isReady && loading" class="flex flex-col items-center justify-center py-12">
+				<div class="text-center">
+					<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+					<p class="mt-4 text-sm text-gray-500">{{ __('Loading stock information...') }}</p>
+				</div>
+				<button
+					@click="closeDialog"
+					class="mt-6 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+				>
+					{{ __('Cancel') }}
+				</button>
+			</div>
+
+			<template v-else>
 			<!-- Subtitle -->
 			<div class="mb-4 -mt-2 text-start">
 				<p class="text-sm text-gray-500">
@@ -431,9 +446,10 @@
 					</div>
 				</div>
 			</div>
+			</template>
 
 			<!-- Footer -->
-			<div class="pt-4 mt-4 border-t border-gray-200">
+			<div v-if="isReady" class="pt-4 mt-4 border-t border-gray-200">
 				<div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
 					<div v-if="(selectedItemCode || itemCode) && warehouses.length > 0" class="text-sm text-gray-600 text-start">
 						<span class="font-medium">{{ __('Total Available') }}:</span>
@@ -543,6 +559,7 @@ const showVariantSelection = ref(false)
 const loading = ref(false)
 const error = ref(null)
 const warehouses = ref([])
+const isReady = ref(false) // Gate to prevent showing content before data is ready
 
 // Computed display values
 const displayItemName = computed(() => {
@@ -593,9 +610,16 @@ function getVariantUom(itemCode) {
 // Initialize and load based on mode
 watch(() => props.modelValue, async (newVal) => {
 	if (newVal) {
+		// Set loading immediately to prevent flash of empty content
+		loading.value = true
+		isReady.value = false
+		error.value = null
+
 		if (isSearchMode.value) {
 			// Search mode - clear state and focus search
 			resetSearchState()
+			isReady.value = true
+			loading.value = false
 			await nextTick()
 			focusSearch()
 		} else if (props.itemCode) {
@@ -613,22 +637,30 @@ watch(() => props.modelValue, async (newVal) => {
 					selectedItemCode.value = props.itemCode
 					selectedItemName.value = props.itemName || props.itemCode
 					selectedItemHasVariants.value = true
+					isReady.value = true
 					await loadVariants()
 				} else {
 					// No variants, directly load availability
-					loadAvailability()
+					isReady.value = true
+					await loadAvailability()
 				}
 			} catch (err) {
 				console.error('Error checking item variants:', err)
 				// Fallback to direct load
-				loadAvailability()
+				isReady.value = true
+				await loadAvailability()
 			}
+		} else {
+			// No item code provided
+			isReady.value = true
+			loading.value = false
 		}
 	} else {
 		// Reset when dialog closes
 		resetSearchState()
 		warehouses.value = []
 		error.value = null
+		isReady.value = false
 	}
 }, { immediate: true })
 
@@ -647,6 +679,7 @@ function resetSearchState() {
 	showVariantSelection.value = false
 	warehouses.value = []
 	error.value = null
+	// Don't reset isReady here - it's managed by the watch
 }
 
 function focusSearch() {
@@ -732,6 +765,9 @@ function selectFirstResult() {
 }
 
 async function selectItem(item) {
+	// Set loading state before clearing search results
+	loading.value = true
+
 	selectedItemCode.value = item.item_code
 	selectedItemName.value = item.item_name
 	selectedItemImage.value = item.image || ''
@@ -741,13 +777,13 @@ async function selectItem(item) {
 	searchResults.value = []
 	showSearchResults.value = false
 	selectedResultIndex.value = -1
-	
+
 	// Check if item has variants
 	if (selectedItemHasVariants.value) {
 		await loadVariants()
 	} else {
 		// No variants, directly load availability
-		loadAvailability()
+		await loadAvailability()
 	}
 }
 
