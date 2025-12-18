@@ -1,4 +1,4 @@
-import { deleteDraft, getDraftsCount, saveDraft } from "@/utils/draftManager"
+import { deleteDraft, getDraftsCount, saveDraft, getAllDrafts, updateDraft } from "@/utils/draftManager"
 import { useToast } from "@/composables/useToast"
 import { defineStore } from "pinia"
 import { ref } from "vue"
@@ -9,6 +9,7 @@ export const usePOSDraftsStore = defineStore("posDrafts", () => {
 
 	// State
 	const draftsCount = ref(0)
+	const drafts = ref([])
 
 	// Actions
 	async function updateDraftsCount() {
@@ -19,15 +20,25 @@ export const usePOSDraftsStore = defineStore("posDrafts", () => {
 		}
 	}
 
+	async function loadDrafts() {
+		try {
+			drafts.value = await getAllDrafts()
+			draftsCount.value = drafts.value.length
+		} catch (error) {
+			console.error("Error loading drafts:", error)
+		}
+	}
+
 	async function saveDraftInvoice(
 		invoiceItems,
 		customer,
 		posProfile,
 		appliedOffers = [],
+		draftId = null,
 	) {
 		if (invoiceItems.length === 0) {
 			showWarning(__("Cannot save an empty cart as draft"))
-			return false
+			return null
 		}
 
 		try {
@@ -38,25 +49,27 @@ export const usePOSDraftsStore = defineStore("posDrafts", () => {
 				applied_offers: appliedOffers, // Save applied offers
 			}
 
-			await saveDraft(draftData)
-			await updateDraftsCount()
+			let savedDraft
+			if (draftId) {
+				savedDraft = await updateDraft(draftId, draftData)
+			} else {
+				savedDraft = await saveDraft(draftData)
+			}
+
+			await loadDrafts() // Refresh drafts list and count
 
 			showSuccess(__("Invoice saved as draft successfully"))
 
-			return true
+			return savedDraft
 		} catch (error) {
 			console.error("Error saving draft:", error)
 			showError(__("Failed to save draft"))
-			return false
+			return null
 		}
 	}
 
 	async function loadDraft(draft) {
 		try {
-			// Delete the draft after loading (to prevent duplicates)
-			await deleteDraft(draft.draft_id)
-			await updateDraftsCount()
-
 			showSuccess(__("Draft invoice loaded successfully"))
 
 			return {
@@ -71,13 +84,27 @@ export const usePOSDraftsStore = defineStore("posDrafts", () => {
 		}
 	}
 
+	async function deleteDraftById(draftId) {
+		try {
+			await deleteDraft(draftId)
+			await loadDrafts() // Refresh drafts list and count
+			showSuccess(__("Draft deleted successfully"))
+		} catch (error) {
+			console.error("Error deleting draft:", error)
+			showError(__("Failed to delete draft"))
+		}
+	}
+
 	return {
 		// State
 		draftsCount,
+		drafts,
 
 		// Actions
 		updateDraftsCount,
+		loadDrafts,
 		saveDraftInvoice,
 		loadDraft,
+		deleteDraft: deleteDraftById,
 	}
 })

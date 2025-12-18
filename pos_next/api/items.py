@@ -9,6 +9,7 @@ import frappe
 from erpnext.stock.doctype.batch.batch import get_batch_qty
 from erpnext.stock.get_item_details import get_item_details as erpnext_get_item_details
 from frappe import _, as_json
+from frappe.query_builder import DocType, functions as fn
 from frappe.utils import flt, nowdate
 
 ITEM_RESULT_FIELDS = [
@@ -704,15 +705,20 @@ def _calculate_bundle_availability_bulk(bundle_codes, warehouse):
 	#   {"bundle_code": "LAPTOP-COMBO", "component_code": "MOUSE", "required_qty": 1},
 	#   {"bundle_code": "LAPTOP-COMBO", "component_code": "KEYBOARD", "required_qty": 1}
 	# ]
-	bundle_components = frappe.db.sql("""
-		SELECT
-			pb.new_item_code as bundle_code,
-			pbi.item_code as component_code,
-			pbi.qty as required_qty
-		FROM `tabProduct Bundle` pb
-		INNER JOIN `tabProduct Bundle Item` pbi ON pbi.parent = pb.name
-		WHERE pb.new_item_code IN %(bundles)s
-	""", {"bundles": bundle_codes}, as_dict=1)
+	pb = DocType("Product Bundle")
+	pbi = DocType("Product Bundle Item")
+	
+	bundle_components = (
+		frappe.qb.from_(pb)
+		.inner_join(pbi).on(pbi.parent == pb.name)
+		.select(
+			pb.new_item_code.as_("bundle_code"),
+			pbi.item_code.as_("component_code"),
+			pbi.qty.as_("required_qty")
+		)
+		.where(pb.new_item_code.isin(bundle_codes))
+		.run(as_dict=True)
+	)
 
 	if not bundle_components:
 		# No bundle definitions found - items are not configured as bundles
@@ -757,14 +763,19 @@ def _calculate_bundle_availability_bulk(bundle_codes, warehouse):
 	#   {"item_code": "MOUSE", "available_qty": 30.0},
 	#   {"item_code": "KEYBOARD", "available_qty": 100.0}
 	# ]
-	component_stock = frappe.db.sql("""
-		SELECT
-			item_code,
-			COALESCE(SUM(actual_qty - reserved_qty), 0) as available_qty
-		FROM `tabBin`
-		WHERE item_code IN %(items)s AND warehouse IN %(warehouses)s
-		GROUP BY item_code
-	""", {"items": component_codes, "warehouses": warehouses}, as_dict=1)
+	bin = DocType("Bin")
+	
+	component_stock = (
+		frappe.qb.from_(bin)
+		.select(
+			bin.item_code,
+			fn.Coalesce(fn.Sum(bin.actual_qty - bin.reserved_qty), 0).as_("available_qty")
+		)
+		.where(bin.item_code.isin(component_codes))
+		.where(bin.warehouse.isin(warehouses))
+		.groupby(bin.item_code)
+		.run(as_dict=True)
+	)
 
 	# Build fast lookup map: item_code -> available_qty
 	# Components not in map are treated as having 0 stock
@@ -805,6 +816,132 @@ def _calculate_bundle_availability_bulk(bundle_codes, warehouse):
 				bundle_availability[bundle_code] = min(bundle_availability[bundle_code], possible)
 
 	return bundle_availability
+
+
+def _get_bundle_warehouse_availability_bulk(bundle_codes, warehouses):
+	"""
+	Calculate Product Bundle availability across multiple warehouses efficiently.
+	
+	Args:
+		bundle_codes (list): List of bundle item codes
+		warehouses (list): List of warehouse dicts with 'name' key
+		
+	Returns:
+		dict: Nested mapping of bundle_code -> warehouse_name -> available_qty
+			  Example: {
+				  "BUNDLE-001": {"Warehouse A": 30, "Warehouse B": 15},
+				  "BUNDLE-002": {"Warehouse A": 10}
+			  }
+	"""
+	if not bundle_codes or not warehouses:
+		return {}
+	
+	warehouse_names = [w["name"] if isinstance(w, dict) else w for w in warehouses]
+	
+	# ===========================================================================
+	# Fetch Bundle Component Definitions (once for all bundles)
+	# ===========================================================================
+	pb = DocType("Product Bundle")
+	pbi = DocType("Product Bundle Item")
+	
+	bundle_components = (
+		frappe.qb.from_(pb)
+		.inner_join(pbi).on(pbi.parent == pb.name)
+		.select(
+			pb.new_item_code.as_("bundle_code"),
+			pbi.item_code.as_("component_code"),
+			pbi.qty.as_("required_qty")
+		)
+		.where(pb.new_item_code.isin(bundle_codes))
+		.run(as_dict=True)
+	)
+	
+	if not bundle_components:
+		return {}
+
+	component_codes = list(set(c["component_code"] for c in bundle_components))
+	warehouse_resolution_map = {}
+	all_resolved_warehouses = set()
+	
+	for wh_name in warehouse_names:
+		resolved = [wh_name]
+		if frappe.db.get_value("Warehouse", wh_name, "is_group"):
+			children = frappe.db.get_descendants("Warehouse", wh_name)
+			if children:
+				resolved = children
+		warehouse_resolution_map[wh_name] = resolved
+		all_resolved_warehouses.update(resolved)
+	
+	# ===========================================================================
+	# Fetch Component Stock Across All Warehouses (single bulk query)
+	# ===========================================================================
+	bin = DocType("Bin")
+	
+	component_stock_data = (
+		frappe.qb.from_(bin)
+		.select(
+			bin.item_code,
+			bin.warehouse,
+			fn.Coalesce(fn.Sum(bin.actual_qty - bin.reserved_qty), 0).as_("available_qty")
+		)
+		.where(bin.item_code.isin(component_codes))
+		.where(bin.warehouse.isin(list(all_resolved_warehouses)))
+		.groupby(bin.item_code, bin.warehouse)
+		.run(as_dict=True)
+	)
+	
+	# Build lookup: (item_code, warehouse) -> available_qty
+	# For group warehouses, sum stock from all child warehouses
+	component_stock_map = defaultdict(lambda: defaultdict(float))
+	for row in component_stock_data:
+		component_stock_map[row["item_code"]][row["warehouse"]] = flt(row["available_qty"])
+	
+	# ===========================================================================
+	# Calculate Bundle Availability Per Warehouse
+	# ===========================================================================
+	# For each bundle and each warehouse, calculate availability
+	# Availability = min(floor(component_available / component_required)) across all components
+	result = defaultdict(dict)
+	
+	# Group components by bundle (build once, reuse for all warehouses)
+	bundles_map = defaultdict(list)
+	for comp in bundle_components:
+		bundles_map[comp["bundle_code"]].append(comp)
+	
+	# Calculate availability for each bundle in each warehouse
+	for wh_name in warehouse_names:
+		resolved_whs = warehouse_resolution_map[wh_name]
+		
+		for bundle_code, components in bundles_map.items():
+			min_possible = None
+			
+			for comp in components:
+				component_code = comp["component_code"]
+				required_qty = flt(comp["required_qty"])
+				
+				if required_qty <= 0:
+					continue
+				
+				# Sum stock across all resolved warehouses (for group warehouse support)
+				total_available = sum(
+					component_stock_map[component_code].get(wh, 0)
+					for wh in resolved_whs
+				)
+				
+				# Calculate how many bundles this component can supply
+				possible = int(total_available / required_qty) if required_qty > 0 else 0
+				
+				# Track minimum (most constrained component)
+				if min_possible is None:
+					min_possible = possible
+				else:
+					min_possible = min(min_possible, possible)
+			
+			# Only include if bundle is available (min_possible > 0)
+			if min_possible is not None and min_possible > 0:
+				result[bundle_code][wh_name] = min_possible
+	
+	return dict(result)
 
 
 @frappe.whitelist()
@@ -1394,70 +1531,123 @@ def get_item_warehouse_availability(item_code=None, item_codes=None, company=Non
 			warehouse_filters["company"] = company
 
 		# Get all active non-group warehouses
-		warehouses = frappe.get_all(
+		warehouses = frappe.get_list(
 			"Warehouse",
 			filters=warehouse_filters,
 			fields=["name", "warehouse_name", "company"],
 			order_by="warehouse_name"
 		)
 
-		# Get stock for all items in all warehouses
-		if include_item_code_in_result:
-			# When multiple items, group by both item_code and warehouse
-			stock_data = frappe.db.sql("""
-				SELECT
-					item_code,
-					warehouse,
-					SUM(actual_qty) AS actual_qty,
-					SUM(reserved_qty) AS reserved_qty
-				FROM `tabBin`
-				WHERE item_code IN %(items)s
-				AND warehouse IN %(warehouses)s
-				GROUP BY item_code, warehouse
-				HAVING actual_qty > 0
-				ORDER BY item_code, actual_qty DESC
-			""", {
-				"items": tuple(items_to_check),
-				"warehouses": tuple(w.name for w in warehouses)
-			}, as_dict=True)
-		else:
-			# Single item - group only by warehouse (backward compatible)
-			stock_data = frappe.db.sql("""
-				SELECT
-					warehouse,
-					SUM(actual_qty) as actual_qty,
-					SUM(reserved_qty) as reserved_qty
-				FROM `tabBin`
-				WHERE item_code IN %(items)s
-				AND warehouse IN %(warehouses)s
-				GROUP BY warehouse
-				HAVING SUM(actual_qty) > 0
-				ORDER BY SUM(actual_qty) DESC
-			""", {
-				"items": items_to_check,
-				"warehouses": [w.name for w in warehouses]
-			}, as_dict=1)
+		if not warehouses:
+			return []
+
+		# ===================================================================
+		# DETECT BUNDLES: Identify which items are Product Bundles
+		# ===================================================================
+		bundle_items = frappe.db.get_all(
+			"Product Bundle",
+			filters={"new_item_code": ["in", items_to_check]},
+			fields=["new_item_code"],
+			pluck="new_item_code"
+		)
+		bundle_set = set(bundle_items) if bundle_items else set()
+		regular_items = [item for item in items_to_check if item not in bundle_set]
 
 		# Build warehouse map for quick lookup
 		warehouse_map = {w.name: w for w in warehouses}
-
-		# Enrich stock data with warehouse details
 		result = []
-		for stock in stock_data:
-			warehouse = warehouse_map.get(stock.warehouse)
-			if warehouse:
-				stock_entry = {
-					"warehouse": stock.warehouse,
-					"warehouse_name": warehouse.warehouse_name,
-					"actual_qty": flt(stock.actual_qty),
-					"reserved_qty": flt(stock.reserved_qty),
-					"available_qty": flt(stock.actual_qty) - flt(stock.reserved_qty),
-					"company": warehouse.company
-				}
-				# Add item_code if multiple items requested
-				if include_item_code_in_result:
-					stock_entry["item_code"] = stock.item_code
-				result.append(stock_entry)
+
+		# ===================================================================
+		# HANDLE REGULAR ITEMS: Query tabBin for stock items
+		# ===================================================================
+		if regular_items:
+			bin = DocType("Bin")
+			warehouse_names = [w.name for w in warehouses]
+			
+			if include_item_code_in_result:
+				# When multiple items, group by both item_code and warehouse
+				stock_data = (
+					frappe.qb.from_(bin)
+					.select(
+						bin.item_code,
+						bin.warehouse,
+						fn.Sum(bin.actual_qty).as_("actual_qty"),
+						fn.Sum(bin.reserved_qty).as_("reserved_qty")
+					)
+					.where(bin.item_code.isin(regular_items))
+					.where(bin.warehouse.isin(warehouse_names))
+					.groupby(bin.item_code, bin.warehouse)
+					.having(fn.Sum(bin.actual_qty) > 0)
+					.run(as_dict=True)
+				)
+
+			else:
+				# Single item - group only by warehouse (backward compatible)
+				stock_data = (
+					frappe.qb.from_(bin)
+					.select(
+						bin.warehouse,
+						fn.Sum(bin.actual_qty).as_("actual_qty"),
+						fn.Sum(bin.reserved_qty).as_("reserved_qty")
+					)
+					.where(bin.item_code.isin(regular_items))
+					.where(bin.warehouse.isin(warehouse_names))
+					.groupby(bin.warehouse)
+					.having(fn.Sum(bin.actual_qty) > 0)
+					.run(as_dict=True)
+				)
+
+
+			# Enrich stock data with warehouse details
+			for stock in stock_data:
+				warehouse = warehouse_map.get(stock.warehouse)
+				if warehouse:
+					stock_entry = {
+						"warehouse": stock.warehouse,
+						"warehouse_name": warehouse.warehouse_name,
+						"actual_qty": flt(stock.actual_qty),
+						"reserved_qty": flt(stock.reserved_qty),
+						"available_qty": flt(stock.actual_qty) - flt(stock.reserved_qty),
+						"company": warehouse.company
+					}
+					# Add item_code if multiple items requested
+					if include_item_code_in_result:
+						stock_entry["item_code"] = stock.item_code
+					result.append(stock_entry)
+
+		# ===================================================================
+		# HANDLE PRODUCT BUNDLES: Calculate availability per warehouse (optimized)
+		# ===================================================================
+		# Use bulk calculation for all bundles across all warehouses efficiently
+		# This processes all bundles and warehouses in a single optimized pass
+		if bundle_set:
+			bundle_list = list(bundle_set)
+			warehouse_list = [{"name": w.name} for w in warehouses]
+			
+			# Bulk calculate bundle availability across all warehouses
+			bundle_warehouse_map = _get_bundle_warehouse_availability_bulk(
+				bundle_list,
+				warehouse_list
+			)
+			
+			# Build result entries from the bulk calculation
+			for bundle_code in bundle_list:
+				bundle_warehouses = bundle_warehouse_map.get(bundle_code, {})
+				for wh_name, available_qty in bundle_warehouses.items():
+					warehouse = warehouse_map.get(wh_name)
+					if warehouse:
+						bundle_entry = {
+							"warehouse": warehouse.name,
+							"warehouse_name": warehouse.warehouse_name,
+							"actual_qty": flt(available_qty),
+							"reserved_qty": 0.0,  # Bundles don't have reserved qty
+							"available_qty": flt(available_qty),
+							"company": warehouse.company
+						}
+						# Add item_code if multiple items requested
+						if include_item_code_in_result:
+							bundle_entry["item_code"] = bundle_code
+						result.append(bundle_entry)
 
 		return result
 

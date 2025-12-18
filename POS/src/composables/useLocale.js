@@ -12,17 +12,9 @@ const DEFAULT_LOCALE = "pt-MZ"
 // Reactive locale state (shared across all components)
 const currentLocale = ref(DEFAULT_LOCALE)
 const currentDir = ref("ltr")
+const allowedLocales = ref(null) // null = not fetched yet, array = fetched from server
 const PREFARED_LANGUAGE_KEY = "pos_next_language"
-const LOCALE_ALIASES = {
-	pt: "pt-MZ",
-	"pt-mz": "pt-MZ",
-	"pt_mz": "pt-MZ",
-	"pt-br": "pt-MZ",
-	"pt_br": "pt-MZ",
-	"pt-pt": "pt-MZ",
-	"pt_pt": "pt-MZ",
-	en: "pt-MZ",
-}
+const ALLOWED_LOCALES_KEY = "pos_next_allowed_locales"
 
 /** Track if initial language fetch from server has been attempted */
 let serverLanguageFetched = false
@@ -72,6 +64,41 @@ function resolveLocaleCode(locale) {
 	}
 
 	return DEFAULT_LOCALE
+}
+
+/**
+ * Fetch allowed locales from POS Settings
+ * Caches result in localStorage for offline use
+ * @returns {Promise<string[]|null>} Array of allowed locale codes or null if fetch fails
+ */
+async function fetchAllowedLocalesFromServer() {
+	try {
+		const response = await call("pos_next.api.localization.get_allowed_locales", {})
+		if (response?.locales && Array.isArray(response.locales)) {
+			// Cache for offline use
+			localStorage.setItem(ALLOWED_LOCALES_KEY, JSON.stringify(response.locales))
+			return response.locales
+		}
+	} catch (error) {
+		log.warn("Failed to fetch allowed locales from server", error)
+	}
+	return null
+}
+
+/**
+ * Get cached allowed locales from localStorage
+ * @returns {string[]|null} Array of allowed locale codes or null
+ */
+function getCachedAllowedLocales() {
+	try {
+		const cached = localStorage.getItem(ALLOWED_LOCALES_KEY)
+		if (cached) {
+			return JSON.parse(cached)
+		}
+	} catch (error) {
+		log.warn("Failed to parse cached allowed locales", error)
+	}
+	return null
 }
 
 /**
@@ -241,9 +268,22 @@ export function useLocale() {
 		const cachedLocale = detectCachedLanguage()
 		applyLocale(cachedLocale)
 
+		// Load cached allowed locales first for immediate display
+		const cachedAllowed = getCachedAllowedLocales()
+		if (cachedAllowed) {
+			allowedLocales.value = cachedAllowed
+		}
+
 		// If online and haven't fetched from server yet, get server language
 		if (!offlineState.isOffline && !serverLanguageFetched) {
 			serverLanguageFetched = true
+
+			// Fetch allowed locales from server
+			const serverAllowed = await fetchAllowedLocalesFromServer()
+			if (serverAllowed) {
+				allowedLocales.value = serverAllowed
+			}
+
 			const serverLocale = await fetchLanguageFromServer()
 
 			// If server returned a different language, switch to it
@@ -259,14 +299,19 @@ export function useLocale() {
 		initLocale()
 	})
 
-	// Build supported locales with flag URLs
+	// Build supported locales with flag URLs, filtered by allowed locales from POS Settings
 	const supportedLocales = computed(() => {
 		const result = {}
+		const allowed = allowedLocales.value
+
 		for (const [code, config] of Object.entries(SUPPORTED_LOCALES)) {
-			result[code] = {
-				...config,
-				flagUrl: getFlagUrl(config.countryCode),
-				flagUrlSvg: getFlagUrlSvg(config.countryCode),
+			// If allowed locales are set, filter by them; otherwise show all
+			if (allowed === null || allowed.length === 0 || allowed.includes(code)) {
+				result[code] = {
+					...config,
+					flagUrl: getFlagUrl(config.countryCode),
+					flagUrlSvg: getFlagUrlSvg(config.countryCode),
+				}
 			}
 		}
 		return result

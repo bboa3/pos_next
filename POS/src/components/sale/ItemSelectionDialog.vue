@@ -15,7 +15,7 @@
 							<p class="text-xs text-gray-500">{{ item.item_code }}</p>
 						</div>
 					</div>
-					<p class="text-xs text-gray-600 mb-3">{{ dialogDescription }}</p>
+					<p class="text-xs text-gray-600 mb-3 text-start">{{ dialogDescription }}</p>
 				</div>
 
 				<!-- Loading State -->
@@ -79,54 +79,101 @@
 					</div>
 				</div>
 
-				<!-- UOM Options (List format) -->
-				<div v-else-if="mode === 'uom' && options.length > 0">
-					<!-- Quantity Input (UOM Mode) -->
-					<div class="mb-4">
-						<label class="block text-sm font-medium text-gray-700 mb-1">{{ __('Quantity') }}</label>
-						<input
-							type="number"
-							v-model.number="quantity"
-							min="1"
-							class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 transition-colors"
-							@keydown.enter="confirm"
-							@blur="validateQuantity"
-						/>
-						<!-- Stock Warning -->
-						<p v-if="stockWarning" class="mt-1 text-xs text-orange-600 flex items-center gap-1">
-							<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-							</svg>
-							{{ stockWarning }}
+				<!-- UOM Options (Fast Cashier UI) -->
+				<div v-else-if="mode === 'uom' && options.length > 0" class="flex flex-col gap-4">
+					<!-- UOM Selection Buttons -->
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2 text-start">{{ __('Unit of Measure') }}</label>
+						<div class="grid gap-2" :class="options.length <= 2 ? 'grid-cols-2' : 'grid-cols-3'">
+							<button
+								v-for="(option, index) in options"
+								:key="index"
+								@click="selectOption(option)"
+								:class="[
+									'px-4 py-3 rounded-xl font-bold text-base transition-all touch-manipulation flex flex-col items-center justify-center min-h-[60px]',
+									selectedOption === option
+										? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
+										: 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
+								]"
+							>
+								<span>{{ option.label }}</span>
+								<span :class="['text-xs mt-0.5', selectedOption === option ? 'text-blue-100' : 'text-gray-500']">
+									{{ formatCurrency(option.rate || 0) }}
+								</span>
+							</button>
+						</div>
+					</div>
+
+					<!-- Quantity Control -->
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2 text-start">{{ __('Quantity') }}</label>
+						<div class="w-full h-10 border border-gray-300 rounded-lg bg-white flex items-center overflow-hidden">
+							<button
+								type="button"
+								@click="decrementQuantity"
+								class="w-[40px] h-[40px] min-w-[40px] bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-bold text-lg transition-colors flex items-center justify-center border-e border-gray-300 touch-manipulation"
+								style="flex: 0 0 40px;"
+							>
+								−
+							</button>
+							<div class="flex-1 h-full flex items-center justify-center px-3">
+								<input
+									v-model.number="quantity"
+									type="number"
+									min="1"
+									step="1"
+									inputmode="numeric"
+									class="w-full text-center border-0 text-sm font-semibold focus:outline-none focus:ring-0 bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+									@blur="validateQuantity"
+									@keydown.enter="confirm"
+								/>
+							</div>
+							<button
+								type="button"
+								@click="incrementQuantity"
+								class="w-[40px] h-[40px] min-w-[40px] bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-bold text-lg transition-colors flex items-center justify-center border-s border-gray-300 touch-manipulation"
+								style="flex: 0 0 40px;"
+							>
+								+
+							</button>
+						</div>
+
+						<!-- Quick Quantity Buttons -->
+						<div class="flex gap-2 mt-3">
+							<button
+								v-for="qty in [1, 5, 10, 20]"
+								:key="qty"
+								@click="quantity = qty"
+								:class="[
+									'flex-1 py-3 rounded-xl text-sm font-bold transition-all touch-manipulation',
+									quantity === qty
+										? 'bg-blue-600 text-white shadow-md'
+										: 'bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300'
+								]"
+							>
+								{{ qty }}
+							</button>
+						</div>
+					</div>
+
+					<!-- Price Summary -->
+					<div class="bg-blue-50 rounded-xl p-4 flex items-center justify-between">
+						<div>
+							<p class="text-sm text-gray-600">{{ __('Total') }}</p>
+							<p class="text-xs text-gray-500">{{ quantity }} × {{ formatCurrency(selectedOption?.rate || options[0]?.rate || 0) }}</p>
+						</div>
+						<p class="text-2xl font-bold text-blue-600">
+							{{ formatCurrency((selectedOption?.rate || options[0]?.rate || 0) * quantity) }}
 						</p>
 					</div>
 
-					<div class="flex flex-col gap-2 max-h-96 overflow-y-auto">
-						<button
-							v-for="(option, index) in options"
-							:key="index"
-							@click="selectOption(option)"
-							:class="[
-								'w-full text-start p-3 rounded-lg border-2 transition-all',
-								selectedOption === option
-									? 'border-blue-500 bg-blue-50'
-									: 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
-							]"
-						>
-							<div class="flex items-center justify-between">
-								<div class="flex-1">
-									<p class="text-sm font-semibold text-gray-900">{{ option.label }}</p>
-									<p class="text-xs text-gray-500">{{ option.description }}</p>
-								</div>
-								<div class="text-end ms-3">
-									<p class="text-sm font-bold text-blue-600">
-										{{ formatCurrency(option.rate || 0) }}
-									</p>
-									<p class="text-xs text-gray-500">{{ option.priceLabel }}</p>
-								</div>
-							</div>
-						</button>
-					</div>
+					<!-- Stock Warning -->
+					<p v-if="stockWarning" class="text-xs text-orange-600 flex items-center justify-center gap-1 bg-orange-50 rounded-lg p-2">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+						</svg>
+						{{ stockWarning }}
+					</p>
 				</div>
 
 				<!-- No Options -->
@@ -262,6 +309,17 @@ function validateQuantity() {
 	}
 }
 
+// Quantity counter functions
+function incrementQuantity() {
+	quantity.value = Math.max(1, quantity.value + 1)
+}
+
+function decrementQuantity() {
+	if (quantity.value > 1) {
+		quantity.value = quantity.value - 1
+	}
+}
+
 // Computed: Build a map of all available attribute values
 const variantAttributesMap = computed(() => {
 	if (props.mode !== "variant" || options.value.length === 0) return {}
@@ -363,8 +421,11 @@ function loadOptions() {
 		loading.value = true
 		variantsResource.reload()
 	} else {
-		// Load UOM options
+		// Load UOM options and auto-select first one
 		options.value = buildUomOptions()
+		if (options.value.length > 0) {
+			selectedOption.value = options.value[0]
+		}
 		loading.value = false
 	}
 }
@@ -402,7 +463,7 @@ function buildUomOptions() {
 				uom: uomData.uom,
 				conversion_factor: uomData.conversion_factor,
 				label: uomData.uom,
-				description: `1 ${uomData.uom} = ${uomData.conversion_factor} ${props.item.stock_uom}`,
+				description: __('1 {0} = {1} {2}', [uomData.uom, uomData.conversion_factor, props.item.stock_uom]),
 				rate: getUomPrice(uomData.uom, uomData.conversion_factor),
 				priceLabel: __('per {0}', [uomData.uom]),
 			})

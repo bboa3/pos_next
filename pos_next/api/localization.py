@@ -63,6 +63,53 @@ def get_user_language():
 
 
 @frappe.whitelist()
+def get_allowed_locales():
+	"""
+	Get list of allowed locales from POS Settings for the language switcher.
+
+	Returns:
+		dict: List of allowed locale codes
+	"""
+	allowed = get_allowed_locales_from_settings()
+	return {
+		"success": True,
+		"locales": list(allowed)
+	}
+
+
+def get_allowed_locales_from_settings():
+	"""
+	Get allowed locales from POS Settings.
+	Falls back to default locales if not configured.
+
+	Returns:
+		set: Set of allowed locale codes
+	"""
+	default_locales = {'ar', 'en'}
+
+	try:
+		# Get the first POS Settings (or we could use a specific one based on user's profile)
+		pos_settings_list = frappe.get_all(
+			"POS Settings",
+			filters={"enabled": 1},
+			fields=["name"],
+			limit=1
+		)
+
+		if not pos_settings_list:
+			return default_locales
+
+		pos_settings = frappe.get_doc("POS Settings", pos_settings_list[0].name)
+
+		if pos_settings.allowed_locales and len(pos_settings.allowed_locales) > 0:
+			return {row.language.lower() for row in pos_settings.allowed_locales}
+
+		return default_locales
+	except Exception:
+		return default_locales
+
+
+@frappe.whitelist()
 def change_user_language(locale):
 	"""
 	Change the language preference for the current user.
@@ -92,7 +139,8 @@ def change_user_language(locale):
 	# Normalize locale to supported canonical value
 	canonical_locale = canonicalize_locale(locale)
 
-	if canonical_locale not in SUPPORTED_LOCALES:
+	allowed_locales = get_allowed_locales_from_settings()
+	if locale not in allowed_locales:
 		frappe.throw(f"Locale '{locale}' is not supported", frappe.ValidationError)
 
 	# Update user's language preference
