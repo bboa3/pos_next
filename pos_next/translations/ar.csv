@@ -1167,6 +1167,8 @@
 "Points Value","قيمة النقاط",""
 "Points Earned","النقاط المكتسبة",""
 "Points Redeemed","النقاط المستبدلة",""
+"No redeemable points available","لا توجد نقاط متاحة للاستبدال",""
+"Points applied: {0}. Please pay remaining {1} with {2}","تم تطبيق النقاط: {0}. يرجى دفع المبلغ المتبقي {1} باستخدام {2}",""
 "Split Payment","تقسيم الدفع",""
 "Add Split","إضافة تقسيم",""
 "Remove Split","إزالة التقسيم",""

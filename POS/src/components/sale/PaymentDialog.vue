@@ -316,25 +316,39 @@
 							<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
 							<span class="text-sm text-gray-500">{{ __('Loading...') }}</span>
 						</div>
-						<div v-else-if="paymentMethods.length > 0" class="flex flex-wrap gap-1.5 lg:gap-2">
+						<div v-else-if="filteredPaymentMethods.length > 0" class="flex flex-wrap gap-1.5 lg:gap-2">
 							<button
-								v-for="method in paymentMethods"
+								v-for="method in filteredPaymentMethods"
 								:key="method.mode_of_payment"
 								@pointerdown="onPaymentMethodDown(method, $event)"
 								@pointerup="onPaymentMethodUp(method)"
 								@pointerleave="onPaymentMethodCancel"
 								@pointercancel="onPaymentMethodCancel"
+								:disabled="isWalletPaymentMethod(method.mode_of_payment) && availableWalletBalance <= 0 && getMethodTotal(method.mode_of_payment) === 0"
 								:class="[
 									'inline-flex items-center gap-1 lg:gap-2 px-2.5 lg:px-4 rounded-lg border-2 transition-all font-medium select-none touch-none',
 									'h-8 text-xs lg:h-11 lg:text-sm',
 									lastSelectedMethod?.mode_of_payment === method.mode_of_payment
-										? 'border-blue-500 bg-blue-50 text-blue-700'
-										: 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 text-gray-700'
+										? isWalletPaymentMethod(method.mode_of_payment)
+											? 'border-amber-500 bg-amber-50 text-amber-700'
+											: 'border-blue-500 bg-blue-50 text-blue-700'
+										: isWalletPaymentMethod(method.mode_of_payment)
+											? availableWalletBalance > 0
+												? 'border-amber-300 bg-amber-50 hover:border-amber-500 hover:bg-amber-100 text-amber-700'
+												: 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
+											: 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50 text-gray-700'
 								]"
 							>
-								<span class="text-sm lg:text-lg">{{ getPaymentIcon(method.type) }}</span>
+								<span class="text-sm lg:text-lg">{{ isWalletPaymentMethod(method.mode_of_payment) ? '🎁' : getPaymentIcon(method.type) }}</span>
 								<span>{{ __(method.mode_of_payment) }}</span>
-								<span v-if="getMethodTotal(method.mode_of_payment) > 0" class="text-xs font-bold text-blue-600 bg-blue-100 px-1 py-0.5 rounded">
+								<!-- Wallet Balance Badge -->
+								<span v-if="isWalletPaymentMethod(method.mode_of_payment) && walletInfo.wallet_enabled" class="text-[10px] font-bold px-1.5 py-0.5 rounded"
+									:class="availableWalletBalance > 0 ? 'text-amber-700 bg-amber-100' : 'text-gray-500 bg-gray-200'">
+									{{ formatCurrency(availableWalletBalance) }}
+								</span>
+								<!-- Payment Amount Badge -->
+								<span v-if="getMethodTotal(method.mode_of_payment) > 0" class="text-xs font-bold px-1 py-0.5 rounded"
+									:class="isWalletPaymentMethod(method.mode_of_payment) ? 'text-amber-600 bg-amber-200' : 'text-blue-600 bg-blue-100'">
 									{{ formatCurrency(getMethodTotal(method.mode_of_payment)) }}
 								</span>
 							</button>
@@ -637,7 +651,7 @@ import { formatCurrency as formatCurrencyUtil, getCurrencySymbol } from "@/utils
 import { getPaymentIcon } from "@/utils/payment"
 import { offlineWorker } from "@/utils/offline/workerClient"
 import { logger } from "@/utils/logger"
-import { Dialog, createResource } from "frappe-ui"
+import { Dialog, createResource, call } from "frappe-ui"
 import { computed, ref, watch, nextTick, onMounted, onUnmounted } from "vue"
 import { useToast } from "@/composables/useToast"
 import { useLongPress } from "@/composables/useLongPress"
@@ -718,6 +732,11 @@ const paymentEntries = ref([])
 const customerCredit = ref([])
 const customerBalance = ref({ total_outstanding: 0, total_credit: 0, net_balance: 0 })
 const loadingCredit = ref(false)
+
+// Wallet state
+const walletInfo = ref({ wallet_enabled: false, wallet_exists: false, wallet_balance: 0, wallet_name: null })
+const loadingWallet = ref(false)
+const walletPaymentMethods = ref(new Set()) // Set of mode_of_payment names that are wallet payments
 
 // Delivery date for Sales Orders
 const deliveryDate = ref("")
@@ -912,6 +931,8 @@ const paymentMethodsResource = createResource({
 			const defaultMethod = paymentMethods.value.find((m) => m.default)
 			lastSelectedMethod.value = defaultMethod || paymentMethods.value[0]
 		}
+		// Identify wallet payment methods
+		identifyWalletPaymentMethods()
 	},
 })
 
@@ -960,6 +981,77 @@ const customerBalanceResource = createResource({
 		log.error("[PaymentDialog] Error loading customer balance:", error)
 		customerBalance.value = { total_outstanding: 0, total_credit: 0, net_balance: 0 }
 	},
+})
+
+// Wallet resource
+const walletInfoResource = createResource({
+	url: "pos_next.api.wallet.get_wallet_info",
+	makeParams() {
+		const customerName = props.customer?.name || props.customer
+		log.debug('[PaymentDialog] Fetching wallet info for customer:', customerName)
+		return {
+			customer: customerName,
+			company: props.company,
+			pos_profile: props.posProfile,
+		}
+	},
+	auto: false,
+	onSuccess(data) {
+		log.debug('[PaymentDialog] Wallet info loaded:', data)
+		walletInfo.value = data || { wallet_enabled: false, wallet_exists: false, wallet_balance: 0, wallet_name: null }
+		loadingWallet.value = false
+	},
+	onError(error) {
+		log.error("[PaymentDialog] Error loading wallet info:", error)
+		walletInfo.value = { wallet_enabled: false, wallet_exists: false, wallet_balance: 0, wallet_name: null }
+		loadingWallet.value = false
+	},
+})
+
+// Identify which payment methods are wallet payments
+async function identifyWalletPaymentMethods() {
+	walletPaymentMethods.value = new Set()
+
+	for (const method of paymentMethods.value) {
+		try {
+			// Check if the mode of payment has is_wallet_payment flag
+			const result = await call('frappe.client.get_value', {
+				doctype: 'Mode of Payment',
+				filters: { name: method.mode_of_payment },
+				fieldname: 'is_wallet_payment'
+			})
+			if (result?.is_wallet_payment) {
+				walletPaymentMethods.value.add(method.mode_of_payment)
+				log.debug('[PaymentDialog] Wallet payment method identified:', method.mode_of_payment)
+			}
+		} catch (error) {
+			log.error('[PaymentDialog] Error checking wallet payment method:', error)
+		}
+	}
+}
+
+// Check if a payment method is a wallet payment
+function isWalletPaymentMethod(methodName) {
+	return walletPaymentMethods.value.has(methodName)
+}
+
+// Get available wallet balance for payment (considering already added wallet payments)
+const availableWalletBalance = computed(() => {
+	const totalWalletPayments = paymentEntries.value
+		.filter(p => isWalletPaymentMethod(p.mode_of_payment))
+		.reduce((sum, p) => sum + (p.amount || 0), 0)
+	return Math.max(0, walletInfo.value.wallet_balance - totalWalletPayments)
+})
+
+// Filter payment methods - hide wallet methods when loyalty is not enabled
+const filteredPaymentMethods = computed(() => {
+	return paymentMethods.value.filter(method => {
+		// If it's a wallet payment method, only show when loyalty/wallet is enabled
+		if (isWalletPaymentMethod(method.mode_of_payment)) {
+			return walletInfo.value.wallet_enabled
+		}
+		return true
+	})
 })
 
 // Sales Persons state
@@ -1278,6 +1370,16 @@ watch(show, (newVal) => {
 				hasCompany: !!props.company
 			})
 		}
+
+		// Load wallet info if customer is selected
+		if (props.customer && props.company) {
+			log.debug('[PaymentDialog] Loading wallet info...')
+			loadingWallet.value = true
+			walletInfoResource.fetch()
+		} else {
+			// Reset wallet info only if no customer
+			walletInfo.value = { wallet_enabled: false, wallet_exists: false, wallet_balance: 0, wallet_name: null }
+		}
 	}
 })
 
@@ -1292,17 +1394,83 @@ function selectPaymentMethod(method) {
 	log.debug('[PaymentDialog] Selected payment method:', method.mode_of_payment)
 }
 
+// Helper to get default non-wallet payment method
+function getDefaultNonWalletMethod() {
+	// First try to find the default method that's not a wallet payment
+	const defaultMethod = paymentMethods.value.find(m => m.default && !isWalletPaymentMethod(m.mode_of_payment))
+	if (defaultMethod) return defaultMethod
+
+	// Otherwise, find any non-wallet method (preferably Cash)
+	const cashMethod = paymentMethods.value.find(m =>
+		!isWalletPaymentMethod(m.mode_of_payment) &&
+		(m.mode_of_payment.toLowerCase().includes('cash') || m.type?.toLowerCase() === 'cash')
+	)
+	if (cashMethod) return cashMethod
+
+	// Fall back to first non-wallet method
+	return paymentMethods.value.find(m => !isWalletPaymentMethod(m.mode_of_payment))
+}
+
+// Helper to switch to next payment method after partial wallet payment
+function switchToNextPaymentMethod(partialAmount) {
+	const nextMethod = getDefaultNonWalletMethod()
+	if (nextMethod) {
+		lastSelectedMethod.value = nextMethod
+		// Pre-fill numpad with remaining amount for convenience
+		const newRemaining = round2(remainingAmount.value)
+		if (newRemaining > 0) {
+			numpadDisplay.value = newRemaining.toFixed(2)
+			// Also set mobile custom amount
+			mobileCustomAmount.value = newRemaining.toFixed(2)
+		}
+		frappe.show_alert({
+			message: __('Points applied: {0}. Please pay remaining {1} with {2}',
+				[formatCurrency(partialAmount), formatCurrency(newRemaining), __(nextMethod.mode_of_payment)]),
+			indicator: 'blue'
+		})
+	}
+}
+
 // Quick add payment (long press action)
 function quickAddPayment(method) {
 	if (remainingAmount.value <= 0) return
 
 	lastSelectedMethod.value = method
+
+	let amt = remainingAmount.value
+	let isPartialWalletPayment = false
+
+	// Wallet payment validation: limit to available balance
+	if (isWalletPaymentMethod(method.mode_of_payment)) {
+		const walletAvailable = availableWalletBalance.value
+		if (walletAvailable <= 0) {
+			frappe.show_alert({
+				message: __('No redeemable points available'),
+				indicator: 'orange'
+			})
+			return
+		}
+		if (amt > walletAvailable) {
+			// Limit payment to available redeemable points
+			amt = walletAvailable
+			isPartialWalletPayment = true
+		}
+	}
+
 	paymentEntries.value.push({
 		mode_of_payment: method.mode_of_payment,
-		amount: Number.parseFloat(remainingAmount.value.toFixed(2)),
+		amount: Number.parseFloat(amt.toFixed(2)),
 		type: method.type || __('Cash'),
+		is_wallet_payment: isWalletPaymentMethod(method.mode_of_payment),
 	})
 	log.debug('[PaymentDialog] Long press payment added:', method.mode_of_payment)
+
+	// If this was a partial wallet payment, switch to another payment method
+	if (isPartialWalletPayment) {
+		nextTick(() => {
+			switchToNextPaymentMethod(amt)
+		})
+	}
 }
 
 // Initialize long press composable with callbacks
@@ -1337,17 +1505,44 @@ function addCustomPayment(method, amount) {
 		currentEntries: paymentEntries.value.length
 	})
 
-	const amt = Number.parseFloat(amount)
+	let amt = Number.parseFloat(amount)
 	if (!amt || amt <= 0) return
+
+	let isPartialWalletPayment = false
+
+	// Wallet payment validation: limit to available balance
+	if (isWalletPaymentMethod(method.mode_of_payment)) {
+		const walletAvailable = availableWalletBalance.value
+		if (walletAvailable <= 0) {
+			frappe.show_alert({
+				message: __('No redeemable points available'),
+				indicator: 'orange'
+			})
+			return
+		}
+		if (amt > walletAvailable) {
+			// Limit payment to available redeemable points
+			amt = walletAvailable
+			isPartialWalletPayment = true
+		}
+	}
 
 	paymentEntries.value.push({
 		mode_of_payment: method.mode_of_payment,
 		amount: amt,
 		type: method.type || __('Cash'),
+		is_wallet_payment: isWalletPaymentMethod(method.mode_of_payment),
 	})
 
 	log.debug('[PaymentDialog] Payment added, new entries:', paymentEntries.value)
 	customAmount.value = ""
+
+	// If this was a partial wallet payment, switch to another payment method
+	if (isPartialWalletPayment) {
+		nextTick(() => {
+			switchToNextPaymentMethod(amt)
+		})
+	}
 }
 
 // Apply existing customer credit to payment
