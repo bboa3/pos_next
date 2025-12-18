@@ -316,9 +316,9 @@
 							<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
 							<span class="text-sm text-gray-500">{{ __('Loading...') }}</span>
 						</div>
-						<div v-else-if="paymentMethods.length > 0" class="flex flex-wrap gap-1.5 lg:gap-2">
+						<div v-else-if="filteredPaymentMethods.length > 0" class="flex flex-wrap gap-1.5 lg:gap-2">
 							<button
-								v-for="method in paymentMethods"
+								v-for="method in filteredPaymentMethods"
 								:key="method.mode_of_payment"
 								@pointerdown="onPaymentMethodDown(method, $event)"
 								@pointerup="onPaymentMethodUp(method)"
@@ -1041,6 +1041,17 @@ const availableWalletBalance = computed(() => {
 		.filter(p => isWalletPaymentMethod(p.mode_of_payment))
 		.reduce((sum, p) => sum + (p.amount || 0), 0)
 	return Math.max(0, walletInfo.value.wallet_balance - totalWalletPayments)
+})
+
+// Filter payment methods - hide wallet methods when loyalty is not enabled
+const filteredPaymentMethods = computed(() => {
+	return paymentMethods.value.filter(method => {
+		// If it's a wallet payment method, only show when loyalty/wallet is enabled
+		if (isWalletPaymentMethod(method.mode_of_payment)) {
+			return walletInfo.value.wallet_enabled
+		}
+		return true
+	})
 })
 
 // Sales Persons state

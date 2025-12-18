@@ -9,9 +9,9 @@
   "section_break_localization",
   "allowed_locales",
   "section_break_wallet",
-  "enable_wallet",
-  "wallet_account",
+  "enable_loyalty_program",
   "default_loyalty_program",
+  "wallet_account",
   "column_break_wallet",
   "auto_create_wallet",
   "loyalty_to_wallet",
@@ -105,25 +105,28 @@
   },
   {
    "default": "0",
-   "fieldname": "enable_wallet",
+   "fieldname": "enable_loyalty_program",
    "fieldtype": "Check",
-   "label": "Enable Wallet Payment",
-   "description": "Allow customers to pay using their wallet balance"
-  },
-  {
-   "fieldname": "wallet_account",
-   "fieldtype": "Link",
-   "label": "Default Wallet Account",
-   "options": "Account",
-   "depends_on": "enable_wallet",
-   "description": "Default receivable account for customer wallets"
+   "label": "Enable Loyalty Program",
+   "description": "Enable loyalty program features for this POS profile"
   },
   {
    "fieldname": "default_loyalty_program",
    "fieldtype": "Link",
-   "label": "Default Loyalty Program",
+   "label": "Loyalty Program",
    "options": "Loyalty Program",
-   "description": "Loyalty program to auto-assign to new customers. Leave empty to disable auto-assignment."
+   "depends_on": "enable_loyalty_program",
+   "mandatory_depends_on": "enable_loyalty_program",
+   "description": "Loyalty program for this POS profile"
+  },
+  {
+   "fieldname": "wallet_account",
+   "fieldtype": "Link",
+   "label": "Wallet Account",
+   "options": "Account",
+   "depends_on": "enable_loyalty_program",
+   "mandatory_depends_on": "enable_loyalty_program",
+   "description": "Receivable account for customer wallets"
   },
   {
    "fieldname": "column_break_wallet",
@@ -134,16 +137,18 @@
    "fieldname": "auto_create_wallet",
    "fieldtype": "Check",
    "label": "Auto Create Wallet",
-   "depends_on": "enable_wallet",
-   "description": "Automatically create wallet for new customers"
+   "depends_on": "enable_loyalty_program",
+   "read_only_depends_on": "enable_loyalty_program",
+   "description": "Automatically create wallet for new customers (always enabled when loyalty program is active)"
   },
   {
-   "default": "0",
+   "default": "1",
    "fieldname": "loyalty_to_wallet",
    "fieldtype": "Check",
    "label": "Convert Loyalty Points to Wallet",
-   "depends_on": "enable_wallet",
-   "description": "Automatically convert earned loyalty points to wallet balance. Uses Conversion Factor from Loyalty Program."
+   "depends_on": "enable_loyalty_program",
+   "read_only_depends_on": "enable_loyalty_program",
+   "description": "Automatically convert earned loyalty points to wallet balance. Uses Conversion Factor from Loyalty Program (always enabled when loyalty program is active)"
   },
   {
    "collapsible": 0,

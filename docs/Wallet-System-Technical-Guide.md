@@ -9,24 +9,29 @@
 5. [Doctypes](#doctypes)
 6. [API Reference](#api-reference)
 7. [Hooks & Triggers](#hooks--triggers)
-8. [Wallet WITH Loyalty](#wallet-with-loyalty)
-9. [Wallet WITHOUT Loyalty](#wallet-without-loyalty)
-10. [GL Entries](#gl-entries)
+8. [Setup Guide](#setup-guide)
+9. [GL Entries](#gl-entries)
 
 ---
 
 ## System Overview
 
-The Wallet System provides customers with a stored-value account that can be:
-- **Credited** via loyalty points, manual adjustments, or refunds
-- **Debited** when used as payment in POS
+The Wallet & Loyalty System provides customers with:
+- **Loyalty Points**: Earned on every purchase based on collection rules
+- **Wallet Balance**: Points automatically converted to spendable credit
+- **Wallet Payment**: Use wallet balance to pay at POS
 
-### Two Operating Modes
+### Key Principle
 
-| Mode | Description | Loyalty Required |
-|------|-------------|------------------|
-| **With Loyalty** | Points earned → Converted to wallet → Used for payment | Yes |
-| **Without Loyalty** | Manual credits → Used for payment | No |
+**Enable Loyalty Program** is the master switch. When enabled:
+- Loyalty Program selection is **mandatory**
+- Wallet Account selection is **mandatory**
+- Auto Create Wallet is **always enabled** (read-only)
+- Convert Loyalty Points to Wallet is **always enabled** (read-only)
+
+```
+Loyalty Program Enabled → All wallet features automatically activated
+```
 
 ---
 
@@ -82,7 +87,7 @@ pos_next/
 
 ## Data Flow
 
-### Flow 1: Loyalty Points → Wallet (With Loyalty)
+### Flow 1: Loyalty Points → Wallet
 
 ```
 1. Customer makes purchase
@@ -95,8 +100,8 @@ pos_next/
    │
    └──▶ process_loyalty_to_wallet() hook triggered
         │
-        ├── Check: enable_wallet = 1?
-        ├── Check: loyalty_to_wallet = 1?
+        ├── Check: enable_loyalty_program = 1?
+        ├── Check: loyalty_to_wallet = 1? (always true when loyalty enabled)
         ├── Check: Customer has loyalty_program?
         │
         ▼
@@ -140,7 +145,7 @@ pos_next/
    - Credit: Revenue Account
 ```
 
-### Flow 3: Manual Credit (Without Loyalty)
+### Flow 3: Manual Credit
 
 ```
 1. Admin creates Wallet Transaction manually
@@ -164,21 +169,34 @@ pos_next/
 
 ## Configuration Options
 
-### POS Settings
+### POS Settings - Wallet & Loyalty Section
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `enable_wallet` | Check | 0 | Master switch for wallet feature |
-| `wallet_account` | Link (Account) | - | Receivable account for wallet balances |
-| `auto_create_wallet` | Check | 1 | Auto-create wallet for new customers |
-| `default_loyalty_program` | Link (Loyalty Program) | - | Auto-assign to new customers |
-| `loyalty_to_wallet` | Check | 0 | Convert earned points to wallet |
+| Field | Type | Mandatory | Description |
+|-------|------|-----------|-------------|
+| `enable_loyalty_program` | Check | No | **Master switch** - enables all loyalty/wallet features |
+| `default_loyalty_program` | Link (Loyalty Program) | **Yes*** | Loyalty program for this POS profile |
+| `wallet_account` | Link (Account) | **Yes*** | Receivable account for wallet balances |
+| `auto_create_wallet` | Check | Read-only | Always enabled when loyalty is on |
+| `loyalty_to_wallet` | Check | Read-only | Always enabled when loyalty is on |
+
+> *Mandatory when `enable_loyalty_program` is checked
+
+### Field Behavior When Loyalty Enabled
+
+| Field | Visibility | Editable | Default |
+|-------|------------|----------|---------|
+| Loyalty Program | Visible | Yes | Required |
+| Wallet Account | Visible | Yes | Required |
+| Auto Create Wallet | Visible | **No** (read-only) | Always ✓ |
+| Convert to Wallet | Visible | **No** (read-only) | Always ✓ |
 
 ### Mode of Payment
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `is_wallet_payment` | Check | Marks payment method as wallet-based |
+
+> **Important**: Payment methods with `is_wallet_payment = 1` are only shown in POS when loyalty is enabled.
 
 ### Loyalty Program (ERPNext Standard)
 
@@ -264,7 +282,9 @@ info = get_wallet_info(
 #     "wallet_exists": True,
 #     "wallet_balance": 500.0,
 #     "wallet_name": "CUST-001-WALLET",
-#     "auto_create": True
+#     "auto_create": True,
+#     "loyalty_program": "POS Rewards",
+#     "loyalty_to_wallet": True
 # }
 ```
 
@@ -339,78 +359,85 @@ doc_events = {
 
 | Hook | Trigger | Function | Purpose |
 |------|---------|----------|---------|
-| Customer.after_insert | New customer created | `auto_assign_loyalty_program` | Assign default loyalty program |
+| Customer.after_insert | New customer created | `auto_assign_loyalty_program` | Assign loyalty program from POS Settings |
 | Sales Invoice.validate | Invoice saved | `validate_wallet_payment` | Check wallet balance |
 | Sales Invoice.on_submit | Invoice submitted | `process_loyalty_to_wallet` | Convert points to wallet |
 
 ---
 
-## Wallet WITH Loyalty
+## Setup Guide
 
-### Setup Checklist
+### Prerequisites
 
-- [x] Create Loyalty Program with collection rules
-- [x] Set `conversion_factor` in Loyalty Program
-- [x] Create Wallet Account (Receivable type)
-- [x] Create "Redeem Points" Mode of Payment with `is_wallet_payment` = 1
-- [x] Add Mode of Payment to POS Profile
-- [x] Configure POS Settings:
-  - [x] `enable_wallet` = 1
-  - [x] `wallet_account` = Customer Wallet
-  - [x] `auto_create_wallet` = 1
-  - [x] `default_loyalty_program` = Your Loyalty Program
-  - [x] `loyalty_to_wallet` = 1
+1. ERPNext with Loyalty Program module
+2. POS Next installed
+3. Chart of Accounts configured
 
-### Flow
+### Step-by-Step Setup
+
+#### 1. Create Loyalty Program
 
 ```
-Purchase → Earn Points → Auto-Convert to Wallet → Use for Payment
+Selling > Loyalty Program > New
+├── Program Name: "POS Rewards"
+├── Company: [Your Company]
+├── Auto Opt In: ✓
+├── Conversion Factor: 1.0
+├── Expense Account: [Loyalty Expense Account]
+└── Collection Rules:
+    └── Tier: Base, Min Spent: 0, Factor: 1
 ```
 
----
-
-## Wallet WITHOUT Loyalty
-
-### Setup Checklist
-
-- [x] Create Wallet Account (Receivable type)
-- [x] Create "Wallet" Mode of Payment with `is_wallet_payment` = 1
-- [x] Add Mode of Payment to POS Profile
-- [x] Configure POS Settings:
-  - [x] `enable_wallet` = 1
-  - [x] `wallet_account` = Customer Wallet
-  - [x] `auto_create_wallet` = 1
-  - [ ] `default_loyalty_program` = **Leave Empty**
-  - [ ] `loyalty_to_wallet` = **Leave Unchecked**
-
-### Credit Methods
-
-1. **Manual Adjustment** (Desk)
-   - Go to Wallet Transaction → New
-   - Select wallet, amount, source_type = "Manual Adjustment"
-   - Submit
-
-2. **API Credit**
-   ```python
-   from pos_next.api.wallet import create_manual_wallet_credit
-   create_manual_wallet_credit("CUST-001", "Company", 100, "Top-up")
-   ```
-
-3. **Refund to Wallet**
-   - Create Wallet Transaction
-   - source_type = "Refund"
-
-### Flow
+#### 2. Create Wallet Account
 
 ```
-Manual Credit → Wallet Balance → Use for Payment
+Accounting > Chart of Accounts
+├── Assets
+│   └── Receivables
+│       └── Add Child: "Customer Wallet"
+│           ├── Account Type: Receivable
+│           └── Is Group: No
+```
+
+#### 3. Create Wallet Payment Method
+
+```
+Accounting > Mode of Payment > New
+├── Mode of Payment: "Redeem Points"
+├── Type: General
+├── Is Wallet Payment: ✓ (REQUIRED!)
+└── Accounts:
+    └── Company: [Your Company]
+        └── Default Account: Customer Wallet
+```
+
+#### 4. Add to POS Profile
+
+```
+Retail > POS Profile > [Your Profile]
+└── Payment Methods:
+    └── Add Row: "Redeem Points"
+```
+
+#### 5. Configure POS Settings
+
+```
+Search: "POS Settings" > New
+├── POS Profile: [Your Profile]
+├── Enabled: ✓
+└── Wallet & Loyalty:
+    ├── Enable Loyalty Program: ✓
+    ├── Loyalty Program: "POS Rewards" (REQUIRED)
+    ├── Wallet Account: "Customer Wallet" (REQUIRED)
+    ├── Auto Create Wallet: ✓ (read-only)
+    └── Convert to Wallet: ✓ (read-only)
 ```
 
 ---
 
 ## GL Entries
 
-### Wallet Credit (Loyalty)
+### Wallet Credit (Loyalty Conversion)
 
 | Account | Debit | Credit | Party |
 |---------|-------|--------|-------|
@@ -445,38 +472,40 @@ Wallet Balance = -1 × GL Balance
 
 ## Summary: Configuration Matrix
 
-| Feature | Required Settings | Loyalty Required |
-|---------|-------------------|------------------|
-| Wallet exists | `enable_wallet` | No |
-| Auto-create wallet | `auto_create_wallet` | No |
-| Wallet payment | `enable_wallet` + Mode of Payment | No |
-| Manual credit | `enable_wallet` | No |
-| Earn points | Loyalty Program on Customer | **Yes** |
-| Points → Wallet | `loyalty_to_wallet` + Loyalty Program | **Yes** |
-| Auto-assign loyalty | `default_loyalty_program` | **Yes** |
+| Feature | Required Settings |
+|---------|-------------------|
+| Wallet Payment | `enable_loyalty_program` + Mode of Payment with `is_wallet_payment` |
+| Auto-create wallet | `enable_loyalty_program` (always on) |
+| Earn points | `enable_loyalty_program` + Loyalty Program |
+| Points → Wallet | `enable_loyalty_program` (always on) |
+| Auto-assign loyalty | `enable_loyalty_program` + Loyalty Program set |
 
 ---
 
 ## Quick Reference
 
-### Enable Wallet Only (No Loyalty)
+### Enable Loyalty & Wallet
 
 ```
 POS Settings:
-├── enable_wallet: ✓
-├── wallet_account: [Set]
-├── auto_create_wallet: ✓
-├── default_loyalty_program: [Empty]
-└── loyalty_to_wallet: ✗
+├── enable_loyalty_program: ✓
+├── Loyalty Program: [Required - Select Program]
+├── Wallet Account: [Required - Select Account]
+├── auto_create_wallet: ✓ (automatic, read-only)
+└── loyalty_to_wallet: ✓ (automatic, read-only)
 ```
 
-### Enable Wallet + Loyalty
+### Disable Loyalty & Wallet
 
 ```
 POS Settings:
-├── enable_wallet: ✓
-├── wallet_account: [Set]
-├── auto_create_wallet: ✓
-├── default_loyalty_program: [Set]
-└── loyalty_to_wallet: ✓
+├── enable_loyalty_program: ✗
+└── (All other loyalty/wallet fields hidden)
 ```
+
+### Frontend Behavior
+
+| Loyalty Program | Redeem Points Button |
+|-----------------|---------------------|
+| Enabled | Visible in Payment Dialog |
+| Disabled | **Hidden** from Payment Dialog |

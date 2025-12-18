@@ -51,7 +51,7 @@ def process_loyalty_to_wallet(doc, method=None):
 	if not pos_settings:
 		return
 
-	if not cint(pos_settings.get("enable_wallet")) or not cint(pos_settings.get("loyalty_to_wallet")):
+	if not cint(pos_settings.get("enable_loyalty_program")) or not cint(pos_settings.get("loyalty_to_wallet")):
 		return
 
 	# Check if customer has loyalty program
@@ -343,11 +343,11 @@ def get_pos_settings(pos_profile):
 		"POS Settings",
 		{"pos_profile": pos_profile},
 		[
-			"enable_wallet",
+			"enable_loyalty_program",
+			"default_loyalty_program",
 			"wallet_account",
 			"auto_create_wallet",
-			"loyalty_to_wallet",
-			"loyalty_conversion_rate"
+			"loyalty_to_wallet"
 		],
 		as_dict=True
 	)
@@ -391,16 +391,20 @@ def get_wallet_info(customer, company, pos_profile=None):
 		"wallet_balance": 0.0,
 		"wallet_account": None,
 		"wallet_name": None,
-		"auto_create": False
+		"auto_create": False,
+		"loyalty_program": None,
+		"loyalty_to_wallet": False
 	}
 
-	# Check if wallet is enabled in POS Settings
+	# Check if loyalty program is enabled in POS Settings
 	if pos_profile:
 		pos_settings = get_pos_settings(pos_profile)
 		if pos_settings:
-			result["wallet_enabled"] = cint(pos_settings.get("enable_wallet"))
+			result["wallet_enabled"] = cint(pos_settings.get("enable_loyalty_program"))
 			result["wallet_account"] = pos_settings.get("wallet_account")
 			result["auto_create"] = cint(pos_settings.get("auto_create_wallet"))
+			result["loyalty_program"] = pos_settings.get("default_loyalty_program")
+			result["loyalty_to_wallet"] = cint(pos_settings.get("loyalty_to_wallet"))
 
 	if not result["wallet_enabled"]:
 		return result

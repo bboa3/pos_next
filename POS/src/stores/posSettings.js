@@ -8,6 +8,12 @@ export const usePOSSettingsStore = defineStore("posSettings", () => {
 	const settings = ref({
 		pos_profile: "",
 		enabled: 0,
+		// Wallet & Loyalty Settings
+		enable_loyalty_program: 0,
+		default_loyalty_program: "",
+		wallet_account: "",
+		auto_create_wallet: 1,
+		loyalty_to_wallet: 1,
 		// General Settings
 		max_discount_allowed: 0,
 		use_percentage_discount: 0,
@@ -59,6 +65,23 @@ export const usePOSSettingsStore = defineStore("posSettings", () => {
 
 	const isLoading = ref(false)
 	const isLoaded = ref(false)
+
+	// Computed - Wallet & Loyalty Settings
+	const enableLoyaltyProgram = computed(() =>
+		Boolean(settings.value.enable_loyalty_program),
+	)
+	const defaultLoyaltyProgram = computed(() =>
+		settings.value.default_loyalty_program || "",
+	)
+	const walletAccount = computed(() =>
+		settings.value.wallet_account || "",
+	)
+	const autoCreateWallet = computed(() =>
+		Boolean(settings.value.auto_create_wallet),
+	)
+	const loyaltyToWallet = computed(() =>
+		Boolean(settings.value.loyalty_to_wallet),
+	)
 
 	// Computed - General Settings
 	const isEnabled = computed(() => Boolean(settings.value.enabled))
@@ -252,6 +275,13 @@ export const usePOSSettingsStore = defineStore("posSettings", () => {
 		settings.value = {
 			pos_profile: "",
 			enabled: 0,
+			// Wallet & Loyalty Settings
+			enable_loyalty_program: 0,
+			default_loyalty_program: "",
+			wallet_account: "",
+			auto_create_wallet: 1,
+			loyalty_to_wallet: 1,
+			// General Settings
 			max_discount_allowed: 0,
 			use_percentage_discount: 0,
 			allow_user_to_edit_additional_discount: 0,
@@ -349,6 +379,13 @@ export const usePOSSettingsStore = defineStore("posSettings", () => {
 		settings,
 		isLoading,
 		isLoaded,
+
+		// Computed - Wallet & Loyalty Settings
+		enableLoyaltyProgram,
+		defaultLoyaltyProgram,
+		walletAccount,
+		autoCreateWallet,
+		loyaltyToWallet,
 
 		// Computed - General Settings
 		isEnabled,

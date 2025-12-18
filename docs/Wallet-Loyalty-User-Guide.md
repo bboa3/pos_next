@@ -16,6 +16,16 @@ Customer Purchase → Earn Points → Auto-Convert to Wallet → Use for Future 
 
 ---
 
+## Quick Start
+
+**Enable Loyalty Program** is the master switch. When you enable it:
+- You must select a **Loyalty Program** (required)
+- You must select a **Wallet Account** (required)
+- **Auto Create Wallet** is automatically enabled
+- **Convert Points to Wallet** is automatically enabled
+
+---
+
 ## Step-by-Step Setup
 
 ---
@@ -32,7 +42,7 @@ Customer Purchase → Earn Points → Auto-Convert to Wallet → Use for Future 
    |-------|-------|
    | Loyalty Program Name | POS Rewards Program |
    | Company | Select your company |
-   | Auto Opt In | ✓ Enabled |
+   | Auto Opt In | Enabled |
    | From Date | Today's date |
 
 4. In **Collection Rules** section, add:
@@ -79,7 +89,7 @@ Customer Purchase → Earn Points → Auto-Convert to Wallet → Use for Future 
    |-------|-------|
    | Mode of Payment | Redeem Points |
    | Type | General |
-   | **Is Wallet Payment** | ✓ **Enabled** |
+   | **Is Wallet Payment** | **Enabled** |
 
    > **Critical**: You MUST enable "Is Wallet Payment" checkbox
 
@@ -122,15 +132,15 @@ Customer Purchase → Earn Points → Auto-Convert to Wallet → Use for Future 
    | Field | Value |
    |-------|-------|
    | POS Profile | Select your profile |
-   | Enable Wallet | ✓ Enabled |
-   | Wallet Account | Customer Wallet |
-   | **Default Loyalty Program** | Select your loyalty program |
-   | Auto Create Wallet | ✓ Enabled |
-   | Loyalty to Wallet | ✓ Enabled |
+   | **Enable Loyalty Program** | **Enabled** (master switch) |
+   | **Loyalty Program** | Select your loyalty program (required) |
+   | **Wallet Account** | Customer Wallet (required) |
+   | Auto Create Wallet | Automatically enabled |
+   | Convert to Wallet | Automatically enabled |
 
-   > **Default Loyalty Program**: New customers will automatically be enrolled in this program. Leave empty to disable auto-enrollment.
-   >
-   > **Conversion Rate**: Set in Loyalty Program → Redemption → Conversion Factor
+   > **Note**: When "Enable Loyalty Program" is checked:
+   > - Loyalty Program and Wallet Account become **mandatory**
+   > - Auto Create Wallet and Convert to Wallet are **automatically enabled** (read-only)
 
 4. Click **Save**
 
@@ -141,8 +151,8 @@ Customer Purchase → Earn Points → Auto-Convert to Wallet → Use for Future 
 ### Customer Enrollment
 
 When a new customer is created:
-1. Automatically enrolled in Loyalty Program (if Auto Opt In enabled)
-2. Wallet automatically created (if Auto Create Wallet enabled)
+1. Automatically enrolled in Loyalty Program (if set in POS Settings)
+2. Wallet automatically created
 
 ### Earning Points
 
@@ -166,7 +176,7 @@ Wallet Credit: 500 SAR
 3. Open Payment Dialog
 4. You'll see balance on "Redeem Points" button:
    ```
-   🎁 Redeem Points ê 500.00
+   Redeem Points  500.00
    ```
 
 ### Paying with Wallet
@@ -184,7 +194,7 @@ Wallet Balance: 500 SAR
 
 Payment 1: Redeem Points - 500 SAR
 Payment 2: Cash - 300 SAR
-Total: 800 SAR ✓
+Total: 800 SAR
 ```
 
 ---
@@ -219,26 +229,36 @@ Total: 800 SAR ✓
 
 ## Troubleshooting
 
+### "Redeem Points" button not visible
+
+**Cause:** Loyalty Program is not enabled
+
+**Solution:**
+1. Go to POS Settings
+2. Enable "Enable Loyalty Program"
+3. Select a Loyalty Program (required)
+4. Select a Wallet Account (required)
+5. Save
+
 ### Customer not earning points
 
 **Check:**
+- Loyalty Program is enabled in POS Settings
+- Loyalty Program is selected in POS Settings
 - Customer has loyalty program assigned
-- "Auto Opt In" is enabled on Loyalty Program
-- "Default Loyalty Program" is set in POS Settings
 
 **Solution:**
 - Open Customer record and check "Loyalty Program" field
-- If empty, select the loyalty program and save
-- For new customers: Set "Default Loyalty Program" in POS Settings for auto-enrollment
+- If empty, new customers will be auto-assigned when Loyalty Program is set in POS Settings
 
 ### Points not converting to wallet
 
 **Check:**
-- "Loyalty to Wallet" is enabled in POS Settings
-- Customer has an active wallet
+- "Enable Loyalty Program" is checked in POS Settings
+- Loyalty Program and Wallet Account are configured
 
 **Solution:**
-- Verify POS Settings configuration
+- When Loyalty Program is enabled, conversion is automatic
 - Check Error Log for any conversion errors
 
 ### Wallet balance shows 0
@@ -256,11 +276,33 @@ Total: 800 SAR ✓
 **Causes:**
 - Wallet balance is 0
 - No wallet exists for customer
-- Wallet feature is disabled in POS Settings
 
 **Solution:**
 - Customer needs to earn points first or receive manual credit
-- Verify POS Settings has wallet enabled
+
+---
+
+## Settings Summary
+
+### When Loyalty Program is ENABLED
+
+| Setting | State |
+|---------|-------|
+| Loyalty Program | **Required** - must select |
+| Wallet Account | **Required** - must select |
+| Auto Create Wallet | **Enabled** (read-only) |
+| Convert to Wallet | **Enabled** (read-only) |
+| Redeem Points button | **Visible** in POS |
+
+### When Loyalty Program is DISABLED
+
+| Setting | State |
+|---------|-------|
+| Loyalty Program | Hidden |
+| Wallet Account | Hidden |
+| Auto Create Wallet | Hidden |
+| Convert to Wallet | Hidden |
+| Redeem Points button | **Hidden** in POS |
 
 ---
 
@@ -271,9 +313,9 @@ Total: 800 SAR ✓
 - [ ] Create "Redeem Points" payment method with Is Wallet Payment enabled
 - [ ] Add payment method to POS Profile
 - [ ] Configure POS Settings:
-  - [ ] Set Default Loyalty Program (for auto-enrollment)
-  - [ ] Enable Wallet and set Wallet Account
-  - [ ] Enable Loyalty to Wallet conversion
+  - [ ] Enable Loyalty Program (master switch)
+  - [ ] Select Loyalty Program (required)
+  - [ ] Select Wallet Account (required)
 
 ---
 
