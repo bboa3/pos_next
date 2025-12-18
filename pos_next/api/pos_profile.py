@@ -315,7 +315,7 @@ def get_sales_persons(pos_profile=None):
 		frappe.log_error(frappe.get_traceback(), "Get Sales Persons Error")
 		return []
 
-
+@frappe.whitelist()
 def get_create_pos_profile(*args, **kwargs):
 	"""
 	Get selection data for creating POS Profile
@@ -417,7 +417,7 @@ def get_create_pos_profile(*args, **kwargs):
 	except Exception as e:
 		frappe.throw(_("Error getting create POS profile: {0}").format(str(e)))
 
-
+@frappe.whitelist()
 def create_pos_profile(*arg ,**parameters):
 	"""
 	Create a new POS Profile
@@ -501,7 +501,8 @@ def create_pos_profile(*arg ,**parameters):
 
 	pos_profile.insert()
 	return pos_profile
-		
+
+@frappe.whitelist()		
 def update_pos_profile(*args, **parameters):
 	"""
 		Update an existing POS Profile
@@ -574,7 +575,7 @@ def update_pos_profile(*args, **parameters):
 	pos_profile.save()
 	return pos_profile
 	
-
+@frappe.whitelist()
 def delete_pos_profile(pos_profile):
 	"""
 		Delete a POS Profile
