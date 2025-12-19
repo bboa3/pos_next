@@ -45,7 +45,7 @@
 					</button>
 				</div>
 				<p v-if="!loading && allCustomers.length > 0" class="text-start text-xs text-gray-500 mt-0">
-					<span v-if="showingRecent" class="text-blue-600 font-medium">{{ __('⭐ Recent & Frequent') }}</span>
+					<span v-if="showingRecent" class="text-blue-600 font-medium">⭐ {{ __('Recent & Frequent') }}</span>
 					<span v-else>{{ __('{0} of {1} customers', [customers.length, allCustomers.length]) }}</span>
 					<span v-if="customers.length > 0" class="text-gray-400 ms-1">{{ __('• Use ↑↓ to navigate, Enter to select') }}</span>
 				</p>
