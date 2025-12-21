@@ -1088,6 +1088,30 @@
 					</svg>
 					<span>{{ __("Checkout") }}</span>
 				</button>
+
+				<!-- Hold Order Button (Secondary - 50% width) -->
+				<button
+					type="button"
+					v-if="items.length > 0"
+					@click="$emit('save-draft')"
+					class="flex-1 py-2.5 px-2 rounded-lg font-semibold text-xs text-orange-700 bg-orange-50 hover:bg-orange-100 active:bg-orange-200 transition-all touch-manipulation active:scale-[0.98] flex items-center justify-center"
+					:aria-label="__('Hold order as draft')"
+				>
+					<svg
+						class="w-4 h-4 me-1.5"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+						/>
+					</svg>
+					<span>{{ __("Hold", null, "order") }}</span>
+				</button>
 			</div>
 		</div>
 

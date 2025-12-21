@@ -186,7 +186,7 @@ function applyMessages(messages: Messages) {
  * @returns Translation dictionary or null on failure
  */
 async function requestTranslations() {
-  const messages = await call("frappe.translate.get_app_translations", {})
+  const messages = await call("pos_next.api.localization.get_app_translations", {})
   return (messages as Messages) || null
 }
 
@@ -238,7 +238,7 @@ async function loadLocale(locale: string, options: LoadOptions = {}) {
  */
 function fallbackFetch(locale?: string) {
   createResource({
-    url: "frappe.translate.get_app_translations",
+    url: "pos_next.api.localization.get_app_translations",
     method: "GET",
     cache: "translations",
     auto: true,

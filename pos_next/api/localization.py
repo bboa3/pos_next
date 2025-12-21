@@ -3,6 +3,21 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import translate
+
+
+@frappe.whitelist()
+def get_app_translations():
+	"""
+	Get all translations for the current user's language.
+	This is a wrapper around frappe.translate.get_all_translations
+	since the original function is not whitelisted.
+
+	Returns:
+		dict: Translation dictionary {source: translated}
+	"""
+	lang = frappe.local.lang or "en"
+	return translate.get_all_translations(lang)
 
 SUPPORTED_LOCALES = {"pt-MZ"}
 CANONICAL_LOCALE_MAP = {code.lower(): code for code in SUPPORTED_LOCALES}
